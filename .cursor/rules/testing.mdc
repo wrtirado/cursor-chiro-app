@@ -1,0 +1,338 @@
+---
+description: Testing strategy and standards for React Native and GraphQL applications
+globs: **/src/**/*.test.ts, **/src/**/*.test.tsx, **/src/**/*.spec.ts, **/src/**/*.spec.tsx, **/src/**/__tests__/**/*,  **/server/**/*.test.ts, **/server/**/*.spec.ts, **/server/**/__tests__/**/*
+alwaysApply: false
+---
+
+- **Testing Philosophy**
+  - Write tests for business logic and critical paths
+  - Use a combination of unit, integration, and E2E tests
+  - Follow the testing pyramid: many unit tests, fewer integration tests, few E2E tests
+  - Test behavior, not implementation details
+  - Use test-driven development (TDD) for complex features
+
+- **Component Testing**
+  - Use React Native Testing Library for component tests
+  - Test component behavior rather than implementation details
+  - Write tests from the user's perspective
+  ```typescript
+  // ✅ DO: Test component behavior
+  import React from 'react';
+  import { render, fireEvent } from '@testing-library/react-native';
+  import { GroceryListItem } from './GroceryListItem';
+
+  describe('GroceryListItem', () => {
+    const mockItem = { 
+      id: '1', 
+      name: 'Milk', 
+      quantity: 1, 
+      checked: false 
+    };
+    const mockToggle = jest.fn();
+    
+    it('renders item name and quantity', () => {
+      const { getByText } = render(
+        <GroceryListItem item={mockItem} onToggle={mockToggle} />
+      );
+      
+      expect(getByText('Milk')).toBeTruthy();
+      expect(getByText('1')).toBeTruthy();
+    });
+    
+    it('calls onToggle when pressed', () => {
+      const { getByTestId } = render(
+        <GroceryListItem item={mockItem} onToggle={mockToggle} />
+      );
+      
+      fireEvent.press(getByTestId('grocery-item'));
+      
+      expect(mockToggle).toHaveBeenCalledWith('1');
+    });
+    
+    it('shows checked styling when item is checked', () => {
+      const checkedItem = { ...mockItem, checked: true };
+      const { getByTestId } = render(
+        <GroceryListItem item={checkedItem} onToggle={mockToggle} />
+      );
+      
+      const itemContainer = getByTestId('grocery-item');
+      
+      // Check for styling changes (assuming a style test ID or class)
+      expect(itemContainer.props.style).toMatchObject(
+        expect.objectContaining({
+          textDecorationLine: 'line-through',
+        })
+      );
+    });
+  });
+  ```
+
+- **Hook Testing**
+  - Use `@testing-library/react-hooks` for testing custom hooks
+  - Test the hook API, not implementation details
+  ```typescript
+  // ✅ DO: Test hook behavior
+  import { renderHook, act } from '@testing-library/react-hooks';
+  import { useGroceryForm } from './useGroceryForm';
+
+  describe('useGroceryForm', () => {
+    it('should initialize with empty items by default', () => {
+      const { result } = renderHook(() => useGroceryForm());
+      
+      expect(result.current.items).toEqual([]);
+    });
+    
+    it('should add an item correctly', () => {
+      const { result } = renderHook(() => useGroceryForm());
+      
+      act(() => {
+        result.current.addItem('Eggs', 2);
+      });
+      
+      expect(result.current.items).toHaveLength(1);
+      expect(result.current.items[0]).toMatchObject({
+        name: 'Eggs',
+        quantity: 2,
+        checked: false,
+      });
+    });
+    
+    it('should remove an item correctly', () => {
+      // Setup initial items
+      const initialItems = [
+        { id: '1', name: 'Milk', quantity: 1, checked: false },
+        { id: '2', name: 'Eggs', quantity: 2, checked: false },
+      ];
+      
+      const { result } = renderHook(() => useGroceryForm(initialItems));
+      
+      act(() => {
+        result.current.removeItem('1');
+      });
+      
+      expect(result.current.items).toHaveLength(1);
+      expect(result.current.items[0].id).toBe('2');
+    });
+  });
+  ```
+
+- **GraphQL Resolver Testing**
+  - Mock database interactions
+  - Test success and error paths
+  - Test authorization logic
+  ```typescript
+  // ✅ DO: Test resolvers with mocks
+  import { groceryListResolvers } from './groceryListResolvers';
+  
+  // Mock the Prisma client
+  jest.mock('@/lib/prisma', () => ({
+    prisma: {
+      groceryList: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+    },
+  }));
+  
+  import { prisma } from '@/lib/prisma';
+  
+  describe('Grocery List Resolvers', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
+    
+    describe('Query.groceryLists', () => {
+      it('returns lists for authenticated user', async () => {
+        // Mock the database response
+        (prisma.groceryList.findMany as jest.Mock).mockResolvedValue([
+          { id: '1', name: 'Groceries', userId: 'user1' },
+          { id: '2', name: 'Hardware Store', userId: 'user1' },
+        ]);
+        
+        const context = { user: { id: 'user1' }, prisma };
+        
+        const result = await groceryListResolvers.Query.groceryLists(null, {}, context);
+        
+        expect(prisma.groceryList.findMany).toHaveBeenCalledWith({
+          where: { userId: 'user1' },
+          orderBy: { updatedAt: 'desc' },
+        });
+        
+        expect(result).toHaveLength(2);
+      });
+      
+      it('throws authentication error when not logged in', async () => {
+        const context = { user: null, prisma };
+        
+        await expect(
+          groceryListResolvers.Query.groceryLists(null, {}, context)
+        ).rejects.toThrow('User not authenticated');
+        
+        expect(prisma.groceryList.findMany).not.toHaveBeenCalled();
+      });
+    });
+  });
+  ```
+
+- **Testing Authentication and Authorization**
+  - Provide mocked authentication context to tests
+  - Test both authenticated and unauthenticated states
+  - Test different user roles
+  ```typescript
+  // ✅ DO: Test protected components
+  describe('CommunityManagerDashboard', () => {
+    it('renders dashboard for community managers', () => {
+      // Mock authenticated user with community manager role
+      const mockUser = {
+        id: 'user1',
+        role: 'COMMUNITY_MANAGER',
+        assignedZipCodes: ['12345', '67890'],
+      };
+      
+      // Mock auth context
+      const authContextValue = {
+        user: mockUser,
+        loading: false,
+        error: null,
+      };
+      
+      const { getByText, queryByText } = render(
+        <AuthContext.Provider value={authContextValue}>
+          <CommunityManagerDashboard />
+        </AuthContext.Provider>
+      );
+      
+      expect(getByText('Pending Store Requests')).toBeTruthy();
+      expect(getByText('Your Assigned Areas')).toBeTruthy();
+    });
+    
+    it('redirects non-community managers to access denied page', () => {
+      // Mock authenticated user with regular user role
+      const mockUser = {
+        id: 'user1',
+        role: 'USER',
+      };
+      
+      // Mock auth context
+      const authContextValue = {
+        user: mockUser,
+        loading: false,
+        error: null,
+      };
+      
+      const { getByText, queryByText } = render(
+        <AuthContext.Provider value={authContextValue}>
+          <CommunityManagerDashboard />
+        </AuthContext.Provider>
+      );
+      
+      expect(getByText('Access Denied')).toBeTruthy();
+      expect(queryByText('Pending Store Requests')).toBeNull();
+    });
+  });
+  ```
+
+- **Mocking External Services**
+  - Mock API calls and third-party services
+  - Mock location, camera, and platform-specific features
+  ```typescript
+  // ✅ DO: Mock external dependencies
+  // Mock geolocation
+  jest.mock('@/utils/geolocation', () => ({
+    getCurrentPosition: jest.fn().mockResolvedValue({
+      coords: {
+        latitude: 37.7749,
+        longitude: -122.4194,
+      },
+    }),
+  }));
+  
+  // Mock AdMob
+  jest.mock('react-native-admob', () => ({
+    BannerAd: jest.fn().mockImplementation(({ children }) => children),
+    InterstitialAd: {
+      showAd: jest.fn(),
+      requestAd: jest.fn(),
+    },
+  }));
+  
+  // Mock in-app purchases
+  jest.mock('react-native-iap', () => ({
+    initConnection: jest.fn().mockResolvedValue(true),
+    getProducts: jest.fn().mockResolvedValue([
+      { productId: 'wtf_ad_removal', price: '2.99', title: 'Remove Ads', description: 'Remove all ads' },
+    ]),
+    requestPurchase: jest.fn().mockResolvedValue({ purchaseToken: 'mock-token' }),
+    finishTransaction: jest.fn().mockResolvedValue(true),
+  }));
+  ```
+
+- **Test Organization**
+  - Keep test files close to the files they test
+  - Use descriptive test file names
+  - Group tests logically with describe blocks
+  - Use before/after hooks for common setup/teardown
+  ```
+  src/
+  ├── components/
+  │   ├── Button/
+  │   │   ├── index.tsx
+  │   │   ├── Button.test.tsx  # Component test
+  │   │   └── styles.ts
+  ├── hooks/
+  │   ├── useGroceryForm.ts
+  │   └── useGroceryForm.test.ts  # Hook test
+  ├── graphql/
+  │   ├── resolvers/
+  │   │   ├── groceryListResolvers.ts
+  │   │   └── groceryListResolvers.test.ts  # Resolver test
+  ```
+
+- **End-to-End Testing**
+  - Use Detox for essential flows
+  - Focus on critical user journeys
+  - Run E2E tests on CI/CD pipelines
+  ```typescript
+  // ✅ DO: Write E2E tests for critical flows
+  describe('Creating and using grocery lists', () => {
+    beforeAll(async () => {
+      await device.launchApp();
+      // Log in
+      await element(by.id('email-input')).typeText('test@example.com');
+      await element(by.id('password-input')).typeText('password');
+      await element(by.id('login-button')).tap();
+      await waitFor(element(by.text('My Lists'))).toBeVisible().withTimeout(2000);
+    });
+    
+    it('should allow creating a new grocery list', async () => {
+      // Navigate to lists tab
+      await element(by.text('Lists')).tap();
+      
+      // Add new list
+      await element(by.id('add-list-button')).tap();
+      await element(by.id('list-name-input')).typeText('Weekend Shopping');
+      await element(by.id('save-list-button')).tap();
+      
+      // Verify list was created
+      await expect(element(by.text('Weekend Shopping'))).toBeVisible();
+    });
+    
+    it('should allow adding items to a list', async () => {
+      // Open the list
+      await element(by.text('Weekend Shopping')).tap();
+      
+      // Add items
+      await element(by.id('add-item-button')).tap();
+      await element(by.id('item-name-input')).typeText('Milk');
+      await element(by.id('item-quantity-input')).typeText('2');
+      await element(by.id('save-item-button')).tap();
+      
+      // Verify item was added
+      await expect(element(by.text('Milk'))).toBeVisible();
+      await expect(element(by.text('2'))).toBeVisible();
+    });
+  });
+  ``` 

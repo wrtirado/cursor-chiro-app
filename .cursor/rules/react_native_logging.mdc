@@ -1,0 +1,80 @@
+---
+description: 
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: false
+---
+
+- **Use React Native DevTools Instead of Console Logging**
+  - Use the logger utility from @utils/logger instead of direct console methods
+  - This ensures compatibility with React Native 0.77+ where console logs will be removed from Metro
+  - DevTools provides better debugging capabilities including component inspection
+
+- **Logger Import and Usage**
+  ```typescript
+  // ✅ DO: Import and use the logger utility
+  import { logger } from "@utils/logger";
+  
+  // Information logging
+  logger.log("This is a log message");
+  logger.info("This is an info message");
+  
+  // Warning and error logging
+  logger.warn("This is a warning");
+  logger.error("This is an error", errorObject);
+  
+  // Debug logging (only shown in development)
+  logger.debug("This is a debug message");
+  
+  // ❌ DON'T: Use console methods directly
+  console.log("This will stop working in RN 0.77");
+  console.error("Don't use this directly");
+  console.warn("Use the logger utility instead");
+  ```
+
+- **Conditional Logging**
+  - The logger utility automatically handles conditional logging
+  - Debug logs are only shown in development
+  - Error logs are preserved in production for crash reporting
+  
+  ```typescript
+  // ✅ DO: Use the logger which handles conditional logging
+  logger.debug("Only shown in development");
+  logger.error("Always logged for error tracking");
+  
+  // ❌ DON'T: Implement your own conditional logging
+  if (__DEV__) {
+    console.log("Debug info");
+  }
+  ```
+
+- **Structured Logging**
+  - Use structured data for complex logs
+  - This makes debugging easier in DevTools
+  
+  ```typescript
+  // ✅ DO: Log structured data
+  logger.log("User state:", { id: 123, name: "John", isLoggedIn: true });
+  
+  // ❌ DON'T: Concatenate complex data as strings
+  console.log("User state: id=" + id + ", name=" + name);
+  ```
+
+- **Error Handling**
+  - Always use logger.error for error conditions
+  - Include the full error object for stack traces
+  
+  ```typescript
+  // ✅ DO: Log the full error object 
+  try {
+    // Some operation
+  } catch (error) {
+    logger.error("Operation failed:", error);
+  }
+  
+  // ❌ DON'T: Log only error message or use console.error
+  try {
+    // Some operation
+  } catch (error) {
+    console.error("Operation failed: " + error.message);
+  }
+  ``` 

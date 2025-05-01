@@ -1,0 +1,328 @@
+---
+description: Standards for TypeScript and React component development in Client Portal
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# TypeScript and React Code Standards
+
+Rules for consistent, error-free TypeScript and React development in the Open Security Client Portal.
+
+<rule>
+name: typescript_react_standards
+description: Guidelines for TypeScript and React code quality, avoiding common linting errors
+
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|tsx)$"
+  - type: content
+    pattern: "(?:useState|useEffect|\\|\\||\\?\\?|React|\\.map\\(|any|unknown)"
+
+actions:
+  - type: suggest
+    message: |
+      ## TypeScript & React Code Standards
+      
+      ### Null Coalescing (??) vs Logical OR (||)
+      
+      Use `??` when you want to fall back only when the value is `null` or `undefined`:
+      
+      ```typescript
+      // ❌ Incorrect: || will fallback on any falsy value (0, '', false, etc.)
+      const count = someValue || 10;
+      
+      // ✅ Correct: ?? only falls back when someValue is null or undefined
+      const count = someValue ?? 10;
+      
+      // ✅ Example:
+      const value = 0;
+      console.log(value || 10);  // Outputs: 10 (falsy value triggered fallback)
+      console.log(value ?? 10);  // Outputs: 0 (value is not null/undefined)
+      ```
+      
+      ### Type Safety
+      
+      Avoid using `any` whenever possible:
+      
+      ```typescript
+      // ❌ Incorrect: Using any loses type safety
+      const processData = (data: any) => {
+        return data.value;  // No type checking or autocompletion
+      };
+      
+      // ✅ Correct: Use specific types or generic constraints
+      const processData = <T extends { value: string }>(data: T) => {
+        return data.value;  // Safely typed
+      };
+      
+      // ✅ If type is truly unknown, use unknown + type guards
+      const processData = (data: unknown) => {
+        if (typeof data === 'object' && data !== null && 'value' in data) {
+          return (data as { value: string }).value;
+        }
+        return null;
+      };
+      ```
+      
+      ### React Hooks
+      
+      1. **Always include all dependencies in useEffect**:
+      
+      ```typescript
+      // ❌ Incorrect: Missing dependencies
+      useEffect(() => {
+        fetchData(userId);
+      }, []); // userId is missing from deps array
+      
+      // ✅ Correct: All dependencies included
+      useEffect(() => {
+        fetchData(userId);
+      }, [userId]); // userId is properly listed
+      ```
+      
+      2. **Order hooks consistently**:
+      
+      ```typescript
+      // ✅ Correct ordering
+      const MyComponent = () => {
+        // State hooks first
+        const [data, setData] = useState(null);
+        
+        // Ref hooks next
+        const ref = useRef(null);
+        
+        // Effect hooks last
+        useEffect(() => {
+          // ...
+        }, []);
+        
+        // Rest of the component...
+      };
+      ```
+      
+      ### Array Operations
+      
+      When using `.map()`, always provide a unique `key` for list items:
+      
+      ```tsx
+      // ❌ Incorrect: Missing or index-based keys
+      {items.map((item, index) => (
+        <ListItem item={item} key={index} />
+      ))}
+      
+      // ✅ Correct: Stable, unique identifier as key
+      {items.map((item) => (
+        <ListItem item={item} key={item.id} />
+      ))}
+      ```
+      
+      ### Optional Chaining
+      
+      Use optional chaining for nullable/undefined objects:
+      
+      ```typescript
+      // ❌ Incorrect: Verbose null checks
+      const userName = user && user.profile && user.profile.name;
+      
+      // ✅ Correct: Clean optional chaining
+      const userName = user?.profile?.name;
+      ```
+      
+      ### Async/Await Error Handling
+      
+      Properly handle errors in async functions:
+      
+      ```typescript
+      // ❌ Incorrect: Unhandled promise rejection
+      const fetchData = async () => {
+        const data = await api.get('/endpoint');
+        return data;
+      };
+      
+      // ✅ Correct: Using try/catch
+      const fetchData = async () => {
+        try {
+          const data = await api.get('/endpoint');
+          return data;
+        } catch (error) {
+          console.error('Failed to fetch data:', error);
+          return null;
+        }
+      };
+      ```
+      
+      ### Default Props & Destructuring
+      
+      Use default parameters with destructuring:
+      
+      ```typescript
+      // ❌ Incorrect: Not using default params
+      const Button = (props) => {
+        const type = props.type || 'primary';
+        return <button className={type}>{props.label}</button>;
+      };
+      
+      // ✅ Correct: Destructuring with default params
+      const Button = ({ 
+        type = 'primary', 
+        label, 
+        onClick 
+      }: ButtonProps) => {
+        return <button className={type} onClick={onClick}>{label}</button>;
+      };
+      ```
+      
+      ### React Component Props
+      
+      Always define the props interface for components:
+      
+      ```tsx
+      // ❌ Incorrect: Implicit props type
+      const UserCard = ({ name, email }) => {
+        return (
+          <div>
+            <h2>{name}</h2>
+            <p>{email}</p>
+          </div>
+        );
+      };
+      
+      // ✅ Correct: Explicit interface definition
+      interface UserCardProps {
+        name: string;
+        email: string;
+        isActive?: boolean;
+      }
+      
+      const UserCard = ({ name, email, isActive = false }: UserCardProps) => {
+        return (
+          <div className={isActive ? 'active' : ''}>
+            <h2>{name}</h2>
+            <p>{email}</p>
+          </div>
+        );
+      };
+      ```
+      
+      ### State Updates in React
+      
+      Always use the functional form for state updates that depend on previous state:
+      
+      ```typescript
+      // ❌ Incorrect: Using previous state directly
+      const incrementCount = () => {
+        setCount(count + 1);
+      };
+      
+      // ✅ Correct: Using functional update
+      const incrementCount = () => {
+        setCount(prevCount => prevCount + 1);
+      };
+      ```
+      
+      ### Conditional Rendering
+      
+      Use logical AND (&&) with proper type checking:
+      
+      ```tsx
+      // ❌ Incorrect: Can render '0' if items.length is 0
+      return (
+        <div>
+          {items.length && <ItemsList items={items} />}
+        </div>
+      );
+      
+      // ✅ Correct: Boolean condition prevents rendering '0'
+      return (
+        <div>
+          {items.length > 0 && <ItemsList items={items} />}
+        </div>
+      );
+      ```
+      
+      ### Imports and Exports
+      
+      Use named exports for better tooling and refactoring support:
+      
+      ```typescript
+      // ❌ Avoid default exports when possible
+      export default function Button() { /* ... */ }
+      
+      // ✅ Prefer named exports
+      export function Button() { /* ... */ }
+      export const Card = () => { /* ... */ };
+      ```
+
+### UI Code Organization
+
+Place all UI code in the appropriate directory under `src/app/(main)`:
+
+```typescript
+// ❌ Incorrect: UI code directly in src/app
+src/app/admin/users/page.tsx
+
+// ✅ Correct: UI code in (main) directory
+src/app/(main)/admin/users/page.tsx
+```
+
+The `(main)` directory structure ensures:
+- Consistent layout application across pages
+- Proper middleware handling
+- Standardized navigation and routing
+- Shared authentication context
+
+Follow these guidelines for UI organization:
+1. Place all new UI code under `src/app/(main)`
+2. Group related features in subdirectories (e.g., admin, dashboard)
+3. Use proper Next.js file conventions (page.tsx, layout.tsx, etc.)
+4. Keep component-specific types and utilities in the same directory
+
+examples:
+  - input: |
+      // Type safety issues
+      function processUser(user: any) {
+        return user.name || 'Anonymous';
+      }
+      
+      // State update issue
+      function Counter() {
+        const [count, setCount] = useState(0);
+        
+        const increment = () => {
+          setCount(count + 1);
+          setCount(count + 1); // Bug: this will only increment once
+        };
+        
+        return (
+          <div>
+            {count && <span>Count: {count}</span>}
+            <button onClick={increment}>Increment</button>
+          </div>
+        );
+      }
+    output: |
+      // Type safety fixed
+      function processUser(user: { name?: string }) {
+        return user.name ?? 'Anonymous';
+      }
+      
+      // State update fixed
+      function Counter() {
+        const [count, setCount] = useState(0);
+        
+        const increment = () => {
+          setCount(prevCount => prevCount + 1);
+          setCount(prevCount => prevCount + 1); // Now correctly increments twice
+        };
+        
+        return (
+          <div>
+            {count > 0 && <span>Count: {count}</span>}
+            <button onClick={increment}>Increment</button>
+          </div>
+        );
+      }
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

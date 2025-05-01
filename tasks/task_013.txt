@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: Web App User Management Interface
+# Status: pending
+# Dependencies: 12, 4
+# Priority: high
+# Description: Implement user management interfaces for the web application.
+# Details:
+Create interfaces for user listing, creation, editing, and deletion. Implement role assignment functionality. Develop patient management screens for chiropractors. Create join code generation and management UI. Implement search and filtering for user lists.
+
+# Test Strategy:
+Test user CRUD operations through the UI. Verify proper display of role-specific information. Test join code generation and display. Ensure proper error handling and user feedback.

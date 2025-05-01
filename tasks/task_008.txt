@@ -1,0 +1,43 @@
+# Task ID: 8
+# Title: Patient Progress Tracking API
+# Status: done
+# Dependencies: 6
+# Priority: medium
+# Description: Implement API endpoints for tracking and reporting patient progress with therapy plans.
+# Details:
+Create endpoints for recording exercise completion, specifically:
+- POST /progress: For batch updating exercise completion status from mobile app
+- GET /progress/{patient_id}: For chiropractors to view patient progress
+
+Implement progress synchronization from mobile app. Develop reporting endpoints for chiropractors to view patient adherence. Implement analytics for therapy plan effectiveness. Create notification triggers based on patient progress.
+
+All request and response formats must follow SDP (Standard Data Protocol) specifications.
+
+# Test Strategy:
+Test progress recording with various scenarios (online/offline sync). Verify accurate reporting of completion percentages. Test data aggregation for analytics. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors.
+
+# Subtasks:
+## 8.1. Define API endpoint specifications [done]
+### Dependencies: None
+### Description: Document the detailed specifications for POST /progress and GET /progress/{patient_id} endpoints including request/response formats according to SDP
+### Details:
+
+
+## 8.2. Implement batch progress update endpoint [done]
+### Dependencies: None
+### Description: Create the POST /progress endpoint for updating exercise completion status in batches from the mobile app
+### Details:
+
+
+## 8.3. Implement patient progress retrieval endpoint [done]
+### Dependencies: None
+### Description: Create the GET /progress/{patient_id} endpoint for chiropractors to view patient progress with proper authorization checks
+### Details:
+
+
+## 8.4. Implement SDP validation [done]
+### Dependencies: None
+### Description: Add validation to ensure all requests and responses conform to SDP specifications
+### Details:
+
+

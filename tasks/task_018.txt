@@ -1,0 +1,11 @@
+# Task ID: 18
+# Title: Mobile App Authentication and Onboarding
+# Status: pending
+# Dependencies: 17, 4
+# Priority: high
+# Description: Implement patient authentication, registration, and chiropractor association.
+# Details:
+Create login and registration screens. Implement join code entry and validation. Develop onboarding flow for new patients. Create account management screens. Implement secure token storage and refresh mechanisms. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint.
+
+# Test Strategy:
+Test registration and login flows. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management. Ensure proper error handling and user feedback during the association process.

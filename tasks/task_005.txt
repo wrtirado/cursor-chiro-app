@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Company and Office Management API
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Implement API endpoints for managing the hierarchical structure of companies and their offices.
+# Details:
+Create endpoints for company creation and management. Implement office management within companies. Develop API for assigning managers to offices. Set up relationships between offices, chiropractors, and patients. Implement configuration options for company-wide vs. office-specific settings.
+
+# Test Strategy:
+Test the creation of multi-level hierarchies. Verify proper assignment of users to offices. Test permission inheritance through the hierarchy. Ensure office-specific settings override company defaults when configured.

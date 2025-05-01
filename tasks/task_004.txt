@@ -1,0 +1,31 @@
+# Task ID: 4
+# Title: User Management API Endpoints
+# Status: done
+# Dependencies: 3
+# Priority: high
+# Description: Implement API endpoints for managing users (patients, chiropractors, office managers) within the system.
+# Details:
+Create CRUD endpoints for user management. Implement endpoints for adding/removing patients associated with chiropractors. Develop endpoints for managing chiropractor accounts within an office. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table.
+
+# Test Strategy:
+Test each endpoint with various role permissions. Verify proper error handling for unauthorized access. Test join code generation and validation. Ensure proper data validation for user creation and updates. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities. Validate RBAC implementation by testing access restrictions for each user role type.
+
+# Subtasks:
+## 4.1. Implement GET /users/me endpoint [done]
+### Dependencies: None
+### Description: Create an endpoint that returns the authenticated user's details
+### Details:
+
+
+## 4.2. Implement PUT /users/me endpoint [done]
+### Dependencies: None
+### Description: Create an endpoint that allows users to update their name, email, and password
+### Details:
+
+
+## 4.3. Implement RBAC for user roles [done]
+### Dependencies: None
+### Description: Set up role-based access control for different user types (chiropractor, office_manager, billing, patient) using the Roles table
+### Details:
+
+

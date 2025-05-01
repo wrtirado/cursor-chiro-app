@@ -1,0 +1,32 @@
+# Environment variables
+.env
+webapp/.env # Ignore webapp env file
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+scripts/__pycache__/
+
+# OS generated files
+.DS_Store
+
+# Virtual environment
+.venv/
+virtualenv/
+env/
+venv/
+ENV/
+
+# Node / Bun Modules
+node_modules/
+webapp/node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+webapp/dist/ # Ignore webapp build output
+
+# Docker
+.dockerignore 

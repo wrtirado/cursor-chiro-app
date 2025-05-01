@@ -1,0 +1,14 @@
+---
+description: Guidelines for code execution to prevent automatically running code after making changes
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: true
+---
+
+- **Avoid Running Code After Changes**
+  - Do not automatically run code after making changes
+  - User is running the code in a separate terminal
+  - Only run code when explicitly requested by the user
+  - Focus on making necessary code changes without executing
+  - Prefer analyzing code statically instead of running it
+  - Explain changes and reasoning without verification through execution
+  - When showing examples that would typically involve running code, describe the expected behavior instead 

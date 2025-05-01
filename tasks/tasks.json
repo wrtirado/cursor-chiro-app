@@ -1,0 +1,537 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Repository and Docker Environment",
+      "description": "Initialize the project repository with necessary Docker configuration for containerization of the backend API and PostgreSQL database.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Create a new Git repository. Set up a Docker Compose file that defines services for the FastAPI backend and PostgreSQL database. Create a Dockerfile for the API container based on Python with proper installation of dependencies from requirements.txt. Use the official PostgreSQL image configured through environment variables. Configure environment variables for database credentials and other sensitive information. Set up Docker volumes for PostgreSQL data persistence. Define appropriate networks in docker-compose.yml to facilitate communication between services.",
+      "testStrategy": "Verify Docker Compose successfully builds and runs both containers. Ensure the API container can connect to the database container. Confirm data persistence by restarting containers and checking if data remains. Test that the FastAPI service can properly access the PostgreSQL database through the defined Docker network.",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Create Dockerfile for FastAPI API",
+          "description": "Create a Dockerfile using Python as the base image and properly installing dependencies from requirements.txt",
+          "status": "done"
+        },
+        {
+          "id": "1.2",
+          "title": "Configure PostgreSQL container",
+          "description": "Use the official PostgreSQL image and configure it with appropriate environment variables",
+          "status": "done"
+        },
+        {
+          "id": "1.3",
+          "title": "Create docker-compose.yml",
+          "description": "Set up docker-compose.yml with services for API and DB, networks for inter-service communication, and volumes for data persistence",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Database Schema Design and Implementation",
+      "description": "Design and implement the PostgreSQL database schema to support the application's data requirements.",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "Create database schemas for the SDP system with the following key tables:\n\n1. Companies - Base organizational entity\n2. Offices - Locations belonging to companies\n3. Users - All system users (patients, chiropractors, office managers, billing admins)\n4. Roles - User role definitions\n5. TherapyPlans - Treatment plans created by chiropractors\n6. PlanExercises - Exercises included in therapy plans\n7. PlanAssignments - Assignment of plans to patients\n8. Progress - Patient progress tracking\n9. Branding - Company/office branding information\n\nImplement the following relationships:\n- Company -> Offices (one-to-many)\n- Office -> Users (one-to-many)\n- User (chiropractor) -> TherapyPlans (one-to-many)\n- TherapyPlan -> PlanExercises/PlanAssignments (one-to-many)\n- PlanAssignment -> Progress (one-to-many)\n\nSet up migrations for schema changes. Configure PostgreSQL with appropriate indexes and constraints. Initial schema may be implemented via manual migration.",
+      "testStrategy": "Write and execute database migration tests. Verify all required tables (Companies, Offices, Users, Roles, TherapyPlans, PlanExercises, PlanAssignments, Progress, Branding) are created with correct relationships. Test CRUD operations on each table to ensure proper functionality. Validate relationship constraints between entities (e.g., cascading deletes where appropriate)."
+    },
+    {
+      "id": 3,
+      "title": "FastAPI Backend Setup and Authentication",
+      "description": "Set up the FastAPI backend with authentication endpoints for both web and mobile applications.",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Initialize FastAPI application with proper project structure. Implement JWT-based authentication system for secure sessions. Create the following authentication endpoints:\n1. POST /auth/login - Accept email and password, return access_token\n2. POST /auth/register - Accept name, email, password, role_id, office_id; return user_id (restricted endpoint)\n3. POST /auth/associate - Accept join_code; return chiro_id and office_id\n\nImplement role-based access control for different user types (chiropractor, office manager, billing admin, patient). Set up middleware for authentication and authorization. Connect to database using containerized connection string. Ensure HTTPS implementation for transit encryption.",
+      "testStrategy": "Write unit tests for authentication endpoints. Test JWT token generation and validation. Verify role-based access restrictions work correctly. Test user registration and login flows. Specifically test each endpoint:\n- POST /auth/login\n- POST /auth/register\n- POST /auth/associate\n\nVerify secure HTTPS connections are working properly. Test database connectivity using containerized connection string."
+    },
+    {
+      "id": 4,
+      "title": "User Management API Endpoints",
+      "description": "Implement API endpoints for managing users (patients, chiropractors, office managers) within the system.",
+      "status": "done",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "Create CRUD endpoints for user management. Implement endpoints for adding/removing patients associated with chiropractors. Develop endpoints for managing chiropractor accounts within an office. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table.",
+      "testStrategy": "Test each endpoint with various role permissions. Verify proper error handling for unauthorized access. Test join code generation and validation. Ensure proper data validation for user creation and updates. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities. Validate RBAC implementation by testing access restrictions for each user role type.",
+      "subtasks": [
+        {
+          "id": 4.1,
+          "title": "Implement GET /users/me endpoint",
+          "description": "Create an endpoint that returns the authenticated user's details",
+          "status": "done"
+        },
+        {
+          "id": 4.2,
+          "title": "Implement PUT /users/me endpoint",
+          "description": "Create an endpoint that allows users to update their name, email, and password",
+          "status": "done"
+        },
+        {
+          "id": 4.3,
+          "title": "Implement RBAC for user roles",
+          "description": "Set up role-based access control for different user types (chiropractor, office_manager, billing, patient) using the Roles table",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Company and Office Management API",
+      "description": "Implement API endpoints for managing the hierarchical structure of companies and their offices.",
+      "status": "done",
+      "dependencies": [
+        3
+      ],
+      "priority": "medium",
+      "details": "Create endpoints for company creation and management. Implement office management within companies. Develop API for assigning managers to offices. Set up relationships between offices, chiropractors, and patients. Implement configuration options for company-wide vs. office-specific settings.",
+      "testStrategy": "Test the creation of multi-level hierarchies. Verify proper assignment of users to offices. Test permission inheritance through the hierarchy. Ensure office-specific settings override company defaults when configured."
+    },
+    {
+      "id": 6,
+      "title": "Therapy Plan Management API",
+      "description": "Develop API endpoints for creating, editing, and managing therapy plans according to SDP specifications.",
+      "status": "done",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Implement the following SDP-compliant endpoints:\n\n1. POST /plans - Create new therapy plans\n2. GET /plans - List plans with role-based filtering\n3. GET /plans/{id} - Retrieve detailed plan information\n4. PUT /plans/{id} - Update existing plans\n5. DELETE /plans/{id} - Remove plans\n6. POST /plans/{id}/assign - Assign plans to patients\n\nEnsure all endpoints follow SDP request/response formats. Implement functionality for adding exercises with text, images, and videos. Develop API for assigning plans to patients. Create endpoints for retrieving plans assigned to a specific patient. Implement versioning for therapy plans to track changes.",
+      "testStrategy": "Test all endpoints against SDP specifications. Verify request/response formats match documentation. Test creation of plans with various media types. Verify plan assignment to patients. Test retrieval of plans with proper filtering and role-based access. Ensure plan updates don't affect historical data.",
+      "subtasks": [
+        {
+          "id": "6.1",
+          "title": "Define SDP-compliant request/response schemas",
+          "status": "done"
+        },
+        {
+          "id": "6.2",
+          "title": "Implement POST /plans endpoint",
+          "status": "done"
+        },
+        {
+          "id": "6.3",
+          "title": "Implement GET /plans with role-based filtering",
+          "status": "done"
+        },
+        {
+          "id": "6.4",
+          "title": "Implement GET /plans/{id} endpoint",
+          "status": "done"
+        },
+        {
+          "id": "6.5",
+          "title": "Implement PUT /plans/{id} endpoint",
+          "status": "done"
+        },
+        {
+          "id": "6.6",
+          "title": "Implement DELETE /plans/{id} endpoint",
+          "status": "done"
+        },
+        {
+          "id": "6.7",
+          "title": "Implement POST /plans/{id}/assign endpoint",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Media Storage Integration (AWS S3)",
+      "description": "Implement secure storage for therapy plan media (images and videos) using AWS S3, with URLs stored in the PlanExercises table.",
+      "status": "done",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "Set up AWS S3 bucket for media storage. Implement secure upload endpoints for images and videos. Create signed URLs for secure media access. Implement media deletion and management. Handle media compression and optimization for mobile delivery. Add image_url and video_url fields to the PlanExercises table to store references to the S3 media files. Ensure API properly handles uploads and generates appropriate URLs for storage in the database.",
+      "testStrategy": "Test upload and retrieval of various media types and sizes. Verify secure access control to media files. Test signed URL generation and expiration. Confirm proper cleanup of unused media. Validate that image_url and video_url are correctly stored in the PlanExercises table and that they properly link to the files in S3. Test API endpoints for media upload functionality and URL generation.",
+      "subtasks": [
+        {
+          "id": 7.1,
+          "title": "Add image_url and video_url fields to PlanExercises table",
+          "status": "done",
+          "description": "Modify the database schema to include image_url and video_url fields in the PlanExercises table to store references to media files in S3."
+        },
+        {
+          "id": 7.2,
+          "title": "Implement API endpoints for media uploads",
+          "status": "done",
+          "description": "Create API endpoints that handle media uploads to S3 and return the generated URLs for storage in the database."
+        },
+        {
+          "id": 7.3,
+          "title": "Update exercise creation/editing to support media URLs",
+          "status": "done",
+          "description": "Modify the exercise creation and editing functionality to support uploading and associating media files with exercises."
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Patient Progress Tracking API",
+      "description": "Implement API endpoints for tracking and reporting patient progress with therapy plans.",
+      "status": "done",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "Create endpoints for recording exercise completion, specifically:\n- POST /progress: For batch updating exercise completion status from mobile app\n- GET /progress/{patient_id}: For chiropractors to view patient progress\n\nImplement progress synchronization from mobile app. Develop reporting endpoints for chiropractors to view patient adherence. Implement analytics for therapy plan effectiveness. Create notification triggers based on patient progress.\n\nAll request and response formats must follow SDP (Standard Data Protocol) specifications.",
+      "testStrategy": "Test progress recording with various scenarios (online/offline sync). Verify accurate reporting of completion percentages. Test data aggregation for analytics. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors.",
+      "subtasks": [
+        {
+          "id": "8.1",
+          "title": "Define API endpoint specifications",
+          "description": "Document the detailed specifications for POST /progress and GET /progress/{patient_id} endpoints including request/response formats according to SDP",
+          "status": "done"
+        },
+        {
+          "id": "8.2",
+          "title": "Implement batch progress update endpoint",
+          "description": "Create the POST /progress endpoint for updating exercise completion status in batches from the mobile app",
+          "status": "done"
+        },
+        {
+          "id": "8.3",
+          "title": "Implement patient progress retrieval endpoint",
+          "description": "Create the GET /progress/{patient_id} endpoint for chiropractors to view patient progress with proper authorization checks",
+          "status": "done"
+        },
+        {
+          "id": "8.4",
+          "title": "Implement SDP validation",
+          "description": "Add validation to ensure all requests and responses conform to SDP specifications",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Payment Processing API",
+      "description": "Implement payment handling functionality for services at company or office level.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field. Create endpoints for payment processing and subscription management based on company/office structure. Implement billing records and invoice generation. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events.",
+      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy.",
+      "subtasks": [
+        {
+          "id": 9.1,
+          "title": "Implement secure storage for payment configuration",
+          "description": "Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field",
+          "status": "pending"
+        },
+        {
+          "id": 9.2,
+          "title": "Develop company/office payment structure",
+          "description": "Implement logic to determine payment handling based on company vs. office level configuration",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Branding Customization API",
+      "description": "Implement API endpoints for customizing the mobile app's appearance for each office or company.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "low",
+      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table. Implement color scheme customization options. Develop API for retrieving branding information for mobile app. Set up default branding fallbacks. Implement validation for uploaded assets.",
+      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided.",
+      "subtasks": [
+        {
+          "id": 10.1,
+          "title": "Create POST /branding endpoint",
+          "description": "Implement endpoint that accepts logo_url and colors JSON parameters",
+          "status": "pending"
+        },
+        {
+          "id": 10.2,
+          "title": "Set up Branding database table",
+          "description": "Create table structure to store branding information with foreign key relationship to Office ID",
+          "status": "pending"
+        },
+        {
+          "id": 10.3,
+          "title": "Implement branding retrieval logic",
+          "description": "Create endpoint to fetch branding information for a specific office with appropriate fallbacks",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Notification Configuration API",
+      "description": "Implement API endpoints for configuring patient notification schedules.",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "Create endpoints for setting up notification schedules for therapy plans. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app.",
+      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app."
+    },
+    {
+      "id": 12,
+      "title": "React Web Application Setup",
+      "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation.",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "Initialize React application with proper project structure. Set up routing with React Router. Implement state management with Redux or Context API. Create authentication flows and protected routes for login and account management. Implement responsive design framework. Set up API client for backend communication. Develop interfaces for therapy plan creation. Consider optional Dockerization using Node.js and Nginx for deployment if desired.",
+      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens. Validate therapy plan creation workflow. If Dockerized, test container deployment and configuration.",
+      "subtasks": [
+        {
+          "id": "12.1",
+          "title": "Set up basic React application structure",
+          "status": "pending"
+        },
+        {
+          "id": "12.2",
+          "title": "Implement authentication and login interface",
+          "status": "pending"
+        },
+        {
+          "id": "12.3",
+          "title": "Create account management screens",
+          "status": "pending"
+        },
+        {
+          "id": "12.4",
+          "title": "Develop therapy plan creation interface",
+          "status": "pending"
+        },
+        {
+          "id": "12.5",
+          "title": "Set up API client for backend communication",
+          "status": "pending"
+        },
+        {
+          "id": "12.6",
+          "title": "Create Dockerfile and Nginx configuration (optional)",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Web App User Management Interface",
+      "description": "Implement user management interfaces for the web application.",
+      "status": "pending",
+      "dependencies": [
+        12,
+        4
+      ],
+      "priority": "high",
+      "details": "Create interfaces for user listing, creation, editing, and deletion. Implement role assignment functionality. Develop patient management screens for chiropractors. Create join code generation and management UI. Implement search and filtering for user lists.",
+      "testStrategy": "Test user CRUD operations through the UI. Verify proper display of role-specific information. Test join code generation and display. Ensure proper error handling and user feedback."
+    },
+    {
+      "id": 14,
+      "title": "Web App Therapy Plan Creation Interface",
+      "description": "Implement interfaces for creating and managing therapy plans.",
+      "status": "pending",
+      "dependencies": [
+        12,
+        6,
+        7
+      ],
+      "priority": "high",
+      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients. Implement plan templates and duplication features.",
+      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data. Test media uploads and previews. Ensure proper validation of required fields."
+    },
+    {
+      "id": 15,
+      "title": "Web App Analytics and Reporting Dashboard",
+      "description": "Implement analytics and reporting interfaces for tracking patient progress.",
+      "status": "pending",
+      "dependencies": [
+        12,
+        8
+      ],
+      "priority": "medium",
+      "details": "Create dashboard for viewing patient adherence metrics. Implement charts and visualizations for progress data. Develop filtering and date range selection tools. Create patient-specific progress reports. Implement export functionality for reports.",
+      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality. Ensure exports contain correct and complete data."
+    },
+    {
+      "id": 16,
+      "title": "Web App Payment and Billing Interface",
+      "description": "Implement payment management and billing interfaces for the web application.",
+      "status": "pending",
+      "dependencies": [
+        12,
+        9
+      ],
+      "priority": "medium",
+      "details": "Create payment configuration screens for company and office settings. Implement subscription management interface. Develop invoice viewing and management tools. Create payment history and reporting screens. Implement payment method management UI.",
+      "testStrategy": "Test payment configuration options. Verify proper display of billing information. Test subscription management workflows. Ensure proper handling of payment errors and user feedback."
+    },
+    {
+      "id": 17,
+      "title": "React Native Mobile App Setup",
+      "description": "Set up the React Native mobile application for patients with navigation, state management, and offline capabilities for SDP Phase 3.",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "Initialize React Native application with proper project structure. Set up navigation with React Navigation. Implement state management with Redux or Context API. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data. Create authentication flows with login functionality. Set up API client with offline capabilities. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders.",
+      "testStrategy": "Test application initialization on both iOS and Android. Verify navigation between screens. Test offline data persistence using AsyncStorage or SQLite. Verify login functionality and authentication flows. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms.",
+      "subtasks": [
+        {
+          "id": "17.1",
+          "title": "Set up React Native project structure",
+          "status": "pending"
+        },
+        {
+          "id": "17.2",
+          "title": "Implement login screen and authentication flow",
+          "status": "pending"
+        },
+        {
+          "id": "17.3",
+          "title": "Set up AsyncStorage or SQLite for offline data caching",
+          "status": "pending"
+        },
+        {
+          "id": "17.4",
+          "title": "Create plan viewing screens for patients",
+          "status": "pending"
+        },
+        {
+          "id": "17.5",
+          "title": "Implement offline synchronization for plan data",
+          "status": "pending"
+        },
+        {
+          "id": "17.6",
+          "title": "Set up local notifications for plan reminders",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "Mobile App Authentication and Onboarding",
+      "description": "Implement patient authentication, registration, and chiropractor association.",
+      "status": "pending",
+      "dependencies": [
+        17,
+        4
+      ],
+      "priority": "high",
+      "details": "Create login and registration screens. Implement join code entry and validation. Develop onboarding flow for new patients. Create account management screens. Implement secure token storage and refresh mechanisms. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint.",
+      "testStrategy": "Test registration and login flows. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management. Ensure proper error handling and user feedback during the association process."
+    },
+    {
+      "id": 19,
+      "title": "Mobile App Therapy Plan Viewer",
+      "description": "Implement the therapy plan viewer with offline capabilities using SQLite for local storage.",
+      "status": "pending",
+      "dependencies": [
+        17,
+        6,
+        7
+      ],
+      "priority": "high",
+      "details": "Create therapy plan listing screen. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection.",
+      "testStrategy": "Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints.",
+      "subtasks": [
+        {
+          "id": "19.1",
+          "title": "Implement SQLite database schema for therapy plans",
+          "status": "pending",
+          "description": "Design and implement SQLite database schema to store therapy plans, exercises, and progress tracking information locally."
+        },
+        {
+          "id": "19.2",
+          "title": "Create API synchronization service",
+          "status": "pending",
+          "description": "Develop service to fetch therapy plans from API and store them in local SQLite database. Include logic for determining when to update local data."
+        },
+        {
+          "id": "19.3",
+          "title": "Implement media download and caching system",
+          "status": "pending",
+          "description": "Create system to download and cache media files (images/videos) when online for offline viewing. Include storage management to prevent excessive space usage."
+        },
+        {
+          "id": "19.4",
+          "title": "Update UI components to work with offline data",
+          "status": "pending",
+          "description": "Modify therapy plan listing and detail views to retrieve data from local SQLite database instead of directly from API."
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Mobile App Notification and Progress Sync",
+      "description": "Implement local notifications and progress synchronization.",
+      "status": "pending",
+      "dependencies": [
+        19,
+        8,
+        11
+      ],
+      "priority": "medium",
+      "details": "Create background synchronization service for progress data using SQLite for local storage and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking.",
+      "testStrategy": "Test notification triggering at scheduled times. Verify progress synchronization after offline usage. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence.",
+      "subtasks": [
+        {
+          "id": "20.1",
+          "title": "Implement local storage with SQLite",
+          "description": "Set up SQLite database schema for storing progress data locally",
+          "status": "pending"
+        },
+        {
+          "id": "20.2",
+          "title": "Integrate react-native-push-notification",
+          "description": "Add the library and configure it for local notifications based on therapy plan schedule",
+          "status": "pending"
+        },
+        {
+          "id": "20.3",
+          "title": "Create sync service",
+          "description": "Implement background service to sync local progress data with server via POST /progress endpoint when online",
+          "status": "pending"
+        },
+        {
+          "id": "20.4",
+          "title": "Develop interactive checklist UI",
+          "description": "Create user interface for progress tracking with interactive checklist components",
+          "status": "pending"
+        },
+        {
+          "id": "20.5",
+          "title": "Implement conflict resolution",
+          "description": "Add logic to handle conflicts between local and server data during synchronization",
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectName": "Chiropractic Practice Management System",
+    "totalTasks": 20,
+    "sourceFile": "/Users/jchristman/dev/tirado-chiro-app/docs/prd.md",
+    "generatedAt": "2023-11-10"
+  }
+}

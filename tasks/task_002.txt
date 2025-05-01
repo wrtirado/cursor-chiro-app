@@ -1,0 +1,30 @@
+# Task ID: 2
+# Title: Database Schema Design and Implementation
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Design and implement the PostgreSQL database schema to support the application's data requirements.
+# Details:
+Create database schemas for the SDP system with the following key tables:
+
+1. Companies - Base organizational entity
+2. Offices - Locations belonging to companies
+3. Users - All system users (patients, chiropractors, office managers, billing admins)
+4. Roles - User role definitions
+5. TherapyPlans - Treatment plans created by chiropractors
+6. PlanExercises - Exercises included in therapy plans
+7. PlanAssignments - Assignment of plans to patients
+8. Progress - Patient progress tracking
+9. Branding - Company/office branding information
+
+Implement the following relationships:
+- Company -> Offices (one-to-many)
+- Office -> Users (one-to-many)
+- User (chiropractor) -> TherapyPlans (one-to-many)
+- TherapyPlan -> PlanExercises/PlanAssignments (one-to-many)
+- PlanAssignment -> Progress (one-to-many)
+
+Set up migrations for schema changes. Configure PostgreSQL with appropriate indexes and constraints. Initial schema may be implemented via manual migration.
+
+# Test Strategy:
+Write and execute database migration tests. Verify all required tables (Companies, Offices, Users, Roles, TherapyPlans, PlanExercises, PlanAssignments, Progress, Branding) are created with correct relationships. Test CRUD operations on each table to ensure proper functionality. Validate relationship constraints between entities (e.g., cascading deletes where appropriate).

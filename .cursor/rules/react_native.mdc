@@ -1,0 +1,165 @@
+---
+description: React Native and TypeScript standards for consistent mobile development
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+
+- **Component Structure**
+  - Use functional components with hooks rather than class components
+  - Use TypeScript interfaces to define component props
+  - Place styled components in separate files for complex components
+  ```typescript
+  // ✅ DO: Use functional components with typed props
+  interface ButtonProps {
+    title: string;
+    onPress: () => void;
+    disabled?: boolean;
+  }
+  
+  const PrimaryButton: React.FC<ButtonProps> = ({ title, onPress, disabled = false }) => {
+    return (
+      <TouchableOpacity 
+        style={[styles.button, disabled && styles.disabled]} 
+        onPress={onPress}
+        disabled={disabled}
+      >
+        <Text style={styles.buttonText}>{title}</Text>
+      </TouchableOpacity>
+    );
+  };
+  
+  // ❌ DON'T: Use untyped props or class components
+  class Button extends React.Component {
+    render() {
+      return (
+        <TouchableOpacity onPress={this.props.onPress}>
+          <Text>{this.props.title}</Text>
+        </TouchableOpacity>
+      );
+    }
+  }
+  ```
+
+- **File Organization**
+  - Follow a feature-based directory structure
+  - Keep related files (component, styles, tests) together
+  - Use index files to simplify imports
+  ```
+  src/
+  ├── components/        # Reusable UI components
+  │   ├── Button/
+  │   │   ├── index.tsx  # Main component
+  │   │   ├── styles.ts  # Component styles
+  │   │   └── tests/     # Component tests
+  │   └── index.ts       # Exports all components
+  ├── screens/           # Screen components
+  │   ├── GroceryList/
+  │   ├── Stores/
+  │   └── Settings/
+  ├── navigation/        # Navigation configuration
+  ├── services/          # API clients, local storage, etc.
+  ├── store/             # State management
+  ├── hooks/             # Custom hooks
+  ├── types/             # TypeScript type definitions
+  └── utils/             # Helper functions
+  ```
+
+- **Styling Guidelines**
+  - Use StyleSheet.create for performance benefits
+  - Implement a consistent color and spacing system
+  - Extract common styles to reusable theme files
+  ```typescript
+  // ✅ DO: Use StyleSheet.create with theme variables
+  import { colors, spacing } from '@/theme';
+  
+  const styles = StyleSheet.create({
+    container: {
+      padding: spacing.medium,
+      backgroundColor: colors.background,
+    },
+    text: {
+      color: colors.text,
+      fontSize: typography.fontSize.regular,
+      fontFamily: typography.fontFamily.regular,
+    },
+  });
+  
+  // ❌ DON'T: Use inline styles or hardcoded values
+  <View style={{ padding: 16, backgroundColor: '#f8f8f8' }}>
+    <Text style={{ color: '#333', fontSize: 14 }}>Some text</Text>
+  </View>
+  ```
+
+- **Navigation Patterns**
+  - Use React Navigation for consistent navigation
+  - Type all route parameters with TypeScript
+  - Extract route names to constants
+  ```typescript
+  // ✅ DO: Type route params and use constants
+  export enum Routes {
+    HOME = 'Home',
+    GROCERY_LIST = 'GroceryList',
+    LIST_DETAIL = 'ListDetail',
+    STORE_LIST = 'StoreList',
+    SETTINGS = 'Settings',
+  }
+  
+  type RootStackParamList = {
+    [Routes.HOME]: undefined;
+    [Routes.GROCERY_LIST]: undefined;
+    [Routes.LIST_DETAIL]: { listId: string };
+    [Routes.STORE_LIST]: undefined;
+    [Routes.SETTINGS]: undefined;
+  };
+  
+  // In navigation:
+  navigation.navigate(Routes.LIST_DETAIL, { listId: '123' });
+  
+  // ❌ DON'T: Use untyped navigation or string literals
+  navigation.navigate('ListDetail', { id: 123 });
+  ```
+
+- **Performance Considerations**
+  - Use React.memo for complex components
+  - Implement useCallback for functions passed as props
+  - Utilize useMemo for expensive calculations
+  - Optimize list rendering with FlatList or SectionList
+  ```typescript
+  // ✅ DO: Optimize component rendering
+  const GroceryItem = React.memo(({ item, onToggle }: GroceryItemProps) => {
+    const handleToggle = useCallback(() => {
+      onToggle(item.id);
+    }, [item.id, onToggle]);
+    
+    return (
+      <TouchableOpacity onPress={handleToggle}>
+        <Text>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  });
+  
+  // Use FlatList for lists
+  <FlatList
+    data={groceryItems}
+    renderItem={({ item }) => <GroceryItem item={item} onToggle={toggleItem} />}
+    keyExtractor={item => item.id}
+  />
+  ```
+
+- **Image Handling**
+  - Optimize images for different screen densities
+  - Use FastImage for improved performance with remote images
+  - Implement loading placeholders for better UX
+  ```typescript
+  // ✅ DO: Use FastImage with proper caching
+  import FastImage from 'react-native-fast-image';
+  
+  <FastImage
+    style={styles.image}
+    source={{
+      uri: imageUrl,
+      priority: FastImage.priority.normal,
+    }}
+    resizeMode={FastImage.resizeMode.cover}
+  />
+  ```
