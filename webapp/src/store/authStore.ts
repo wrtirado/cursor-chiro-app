@@ -16,12 +16,10 @@ interface User {
 
 interface AuthState {
   token: string | null;
-  isAuthenticated: boolean;
   user: User | null;
   login: (token: string) => void;
   logout: () => void;
-  fetchUser: () => Promise<void>; // Action to fetch user data
-  // setUser: (user: User | null) => void; // Keep internal potentially
+  fetchUser: () => Promise<void>;
 }
 
 // We use persist middleware to save the token
@@ -29,66 +27,44 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       token: null,
-      isAuthenticated: false,
       user: null,
 
       login: (token: string) => {
-        set({ token, isAuthenticated: true });
-        // After setting token, fetch user details
+        set({ token: token, user: null }); 
         get().fetchUser();
       },
 
       logout: () => {
-        set({ token: null, user: null, isAuthenticated: false });
-        // Also remove from storage explicitly if needed, persist might handle it
-        // localStorage.removeItem('authToken'); // Handled by persist middleware typically
-        // Optionally clear axios header? Persist ensures it's removed on next load
+        set({ token: null, user: null });
       },
 
-      // Action to fetch user data using the stored token
       fetchUser: async () => {
         const token = get().token;
-        if (!token) return; // No token, cannot fetch user
-
+        if (!token) { 
+           if (get().user !== null) {
+               set({ user: null });
+           }
+           return; 
+        }
         try {
-          // Use the configured apiClient which includes the interceptor
           const response = await apiClient.get("/auth/me");
           if (response.data) {
             set({ user: response.data });
           } else {
-            // Handle case where API returns success but no data?
-            throw new Error("No user data received");
+            console.warn("AuthStore: fetchUser - No user data received despite success response.");
+            get().logout();
           }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-          // If fetching fails (e.g., token expired), log out
-          get().logout();
+        } catch (error: any) {
+          console.error("AuthStore: fetchUser - Failed to fetch user:", error.message);
+          get().logout(); 
         }
       },
-
-      // setUser: (user: User | null) => set({ user }), // Can be used internally or exposed if needed
     }),
     {
-      name: "auth-storage", // name of the item in storage
-      storage: createJSONStorage(() => localStorage), // use localStorage
-      partialize: (state) => ({ token: state.token }), // Only persist the token
-      // Custom function to run on rehydration (when app loads)
-      onRehydrateStorage: (state) => {
-        console.log("Hydration finished");
-        // Update isAuthenticated based on rehydrated token
-        if (state?.token) {
-          state.isAuthenticated = true;
-          // Fetch user data upon rehydration if token exists
-          useAuthStore.getState().fetchUser();
-        }
-        return (state, error) => {
-          if (error) {
-            console.log("An error happened during hydration", error);
-          } else {
-            // state.hasHydrated = true; // Could add a flag if needed
-          }
-        };
-      },
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ token: state.token }),
+      onRehydrateStorage: undefined,
     }
   )
 );
@@ -100,3 +76,7 @@ export const useAuthStore = create<AuthState>()(
 //    useAuthStore.setState({ token: initialToken, isAuthenticated: true });
 //    useAuthStore.getState().fetchUser();
 // }
+
+// Optional: Trigger hydration check manually if needed outside component context
+// This helps ensure the hydration process starts early.
+// useAuthStore.getState().setHasHydrated(false); // Reset hydration state on initial script load if needed, though middleware handles it

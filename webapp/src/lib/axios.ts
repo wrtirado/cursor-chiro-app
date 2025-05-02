@@ -35,16 +35,31 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Check if it's a 401 error
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized access - trigger logout action from auth store
-      console.error("Unauthorized access - 401. Logging out.");
-      // Check if logout is already being processed to avoid loops
-      if (useAuthStore.getState().isAuthenticated) {
-        useAuthStore.getState().logout();
-        // No need for manual redirect here as components reacting to
-        // isAuthenticated changing should handle the redirect.
+      // Check if the error came from the password update request
+      const originalRequest = error.config;
+      const isPasswordUpdateAttempt = 
+        originalRequest.method === 'put' && 
+        originalRequest.url === '/auth/me' && // Use relative path as configured in apiClient
+        originalRequest.data && 
+        JSON.parse(originalRequest.data).password; // Check if password field was being sent
+
+      // Only trigger automatic logout for 401s that are NOT failed password updates
+      if (!isPasswordUpdateAttempt) {
+        console.error("Unauthorized access (401) detected. Logging out.", originalRequest.url);
+        // Check if logout is already being processed to avoid loops
+        if (useAuthStore.getState().isAuthenticated) {
+          useAuthStore.getState().logout();
+          // No need for manual redirect here as components reacting to
+          // isAuthenticated changing should handle the redirect.
+        }
+      } else {
+        // Log that we caught a 401 from password update but didn't auto-logout
+        console.warn("Caught 401 from password update. Letting component handle error display.");
       }
     }
+    // Always reject the promise so the component's catch block can handle the error
     return Promise.reject(error);
   }
 );

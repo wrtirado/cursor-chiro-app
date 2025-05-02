@@ -1,6 +1,6 @@
 # Task ID: 12
 # Title: React Web Application Setup
-# Status: pending
+# Status: in-progress
 # Dependencies: 3
 # Priority: high
 # Description: Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation.

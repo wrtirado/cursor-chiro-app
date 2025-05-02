@@ -291,7 +291,7 @@
       "id": 12,
       "title": "React Web Application Setup",
       "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation.",
-      "status": "pending",
+      "status": "in-progress",
       "dependencies": [
         3
       ],
