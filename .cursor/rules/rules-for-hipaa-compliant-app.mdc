@@ -1,0 +1,52 @@
+---
+description: This rule should be referenced anytime ePHI is being handled.
+globs: 
+alwaysApply: false
+---
+# Cursor Project Rules for HIPAA-Compliant Healthcare App
+
+> **Note**: Before deploying the app, ensure that a Business Associate Agreement (BAA) is signed between you (the Business Associate) and the Covered Entity (chiropractor's practice). This is a critical legal step for handling ePHI as a Business Associate under HIPAA.
+
+The following rules are designed to enforce HIPAA Privacy and Security Rule adherence, secure handling of ePHI, and provide actionable guidance for coding within your Cursor project:
+
+1. **Database Rule**  
+   All database fields containing ePHI must be encrypted using industry-standard encryption methods (e.g., AES-256).  
+   *Example*: Encrypt patient records, treatment notes, and appointment details in the database schema.
+
+2. **API Security Rule**  
+   All API endpoints that handle ePHI must implement authentication (e.g., JWT tokens) and authorization checks to restrict access to authorized users only.  
+   *Example*: Add middleware to verify user roles before granting access to patient data endpoints.
+
+3. **Logging Rule**  
+   All functions or methods that access, modify, or transmit ePHI must include logging statements capturing the action, user, and timestamp for audit purposes.  
+   *Example*: Log when a chiropractor views a patient’s treatment history or updates a record.
+
+4. **Transmission Security Rule**  
+   All data transmissions involving ePHI must use secure protocols such as HTTPS or TLS to protect data in transit.  
+   *Example*: Configure the app’s API to be accessible only via HTTPS.
+
+5. **Authentication Rule**  
+   Implement strong authentication mechanisms, including multi-factor authentication (MFA) where feasible, to verify user identities.  
+   *Example*: Require chiropractors to log in with a password and a one-time code sent to their mobile device.
+
+6. **Incident Response Rule**  
+   Include mechanisms to detect and log potential security incidents, such as unauthorized access attempts or breaches, to comply with HIPAA breach notification requirements.  
+   *Example*: Set up alerts for multiple failed login attempts or unusual access patterns.
+
+7. **Documentation Rule**  
+   Add comments in the code explaining how specific functions or modules comply with HIPAA requirements, referencing relevant standards where applicable.  
+   *Example*: `// Encrypts ePHI at rest per HIPAA Security Rule §164.312(a)(2)(iv)`.
+
+8. **Third-Party Services Rule**  
+   Any third-party service or library handling ePHI must be vetted for HIPAA compliance, and a BAA must be in place if the service processes or stores ePHI.  
+   *Example*: If using a cloud provider for storage, confirm they offer a BAA and meet HIPAA standards.
+
+9. **Client-Side Security Rule**  
+   Client-side code (e.g., web or mobile interfaces) must not store ePHI without encryption and should minimize ePHI exposure.  
+   *Example*: Avoid storing patient data in browser local storage; fetch it securely from the server as needed.
+
+## Additional Guidance for Taskmaster-AI MCP
+
+- While these rules focus on code-level compliance, consider using taskmaster-ai MCP to track tasks related to HIPAA compliance, such as "Review third-party services for BAA eligibility" or "Implement MFA for user authentication." Include compliance considerations in task descriptions to maintain alignment with these rules.
+
+> **Disclaimer**: These rules are guidelines to support the development of a HIPAA-compliant app and do not constitute legal advice. Consult a HIPAA compliance expert to ensure full adherence to all applicable regulations and to validate your specific implementation.

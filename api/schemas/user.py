@@ -34,7 +34,7 @@ class UserInDBBase(UserBase):
     updated_at: datetime.datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema for returning User data to clients (omits password)

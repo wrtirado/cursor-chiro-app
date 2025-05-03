@@ -130,7 +130,7 @@ function TherapyPlanCreatePage() {
         // navigate('/plans');
       } else {
          // Handle unexpected success statuses if necessary
-         throw new Error(response.data?.detail || `Failed to create plan with status: ${response.status}`);
+        throw new Error(response.data?.detail || `Failed to create plan with status: ${response.status}`);
       }
     } catch (err: any) {
       console.error("Plan creation error:", err);
@@ -191,11 +191,11 @@ function TherapyPlanCreatePage() {
             <Typography variant="h6" gutterBottom>
               Manage Exercises
             </Typography>
-             {plan.exercises.length === 0 && (
+              {plan.exercises.length === 0 && (
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     No exercises added yet.
                 </Typography>
-             )}
+              )}
             {/* Map over plan.exercises to render exercise input fields */}
             {plan.exercises.map((exercise: ExerciseInput, index: number) => (
                 <Paper key={index} sx={{ p: 2, mb: 2, border: '1px solid #eee' }}>
@@ -224,15 +224,15 @@ function TherapyPlanCreatePage() {
                             />
                         </Grid>
                         <Grid item xs={12} sm={2} sx={{ textAlign: 'right' }}>
-                             <Typography variant="caption" display="block">Order: {exercise.sequence_order}</Typography>
-                             <IconButton
-                                aria-label="Remove exercise"
-                                onClick={() => removeExercise(index)}
-                                disabled={loading}
-                                color="error"
-                             >
-                                <DeleteIcon />
-                             </IconButton>
+                          <Typography variant="caption" display="block">Order: {exercise.sequence_order}</Typography>
+                          <IconButton
+                              aria-label="Remove exercise"
+                              onClick={() => removeExercise(index)}
+                              disabled={loading}
+                              color="error"
+                          >
+                              <DeleteIcon />
+                          </IconButton>
                         </Grid>
                     </Grid>
                      {/* TODO: Add inputs for image/video later */}
