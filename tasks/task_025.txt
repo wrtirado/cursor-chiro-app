@@ -1,0 +1,79 @@
+# Task ID: 25
+# Title: Retrofit HIPAA Compliance for Media Handling System
+# Status: pending
+# Dependencies: 7
+# Priority: high
+# Description: Modify the existing S3/MinIO media handling features to ensure HIPAA compliance by implementing secure access controls, encryption, audit logging, and secure transmission protocols for media files that may contain or be linked to ePHI.
+# Details:
+This task requires updating the existing media handling system to meet HIPAA compliance requirements as outlined in docs/healthcare-compliance.md. Specific implementation details include:
+
+1. Access Controls:
+   - Implement role-based access control (RBAC) for all media files
+   - Create permission checks before any media access, ensuring only authorized users can view/download files
+   - Add patient-provider relationship validation before granting access to therapy-related media
+   - Implement time-limited access tokens for temporary file access
+
+2. Encryption:
+   - Configure server-side encryption (SSE) for all files stored in S3/MinIO
+   - Implement AES-256 encryption standard
+   - Establish secure key management procedures
+   - Ensure encryption at rest for all stored media
+
+3. Audit Logging:
+   - Create comprehensive audit logs capturing all media interactions:
+     - File uploads (who, when, file metadata)
+     - File access/downloads (who, when, access context)
+     - File modifications or deletions
+   - Ensure logs contain sufficient detail for compliance reporting
+   - Make logs tamper-evident and immutable
+   - Implement log retention policies per HIPAA requirements
+
+4. Secure Transmission:
+   - Enforce HTTPS/TLS 1.2+ for all media transfers
+   - Implement secure URL generation with appropriate expiration
+   - Add integrity verification for uploaded/downloaded files
+
+5. Additional Requirements:
+   - Update privacy notices and terms of service
+   - Create documentation for the security measures implemented
+   - Ensure proper error handling that doesn't expose sensitive information
+
+Review the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible.
+
+# Test Strategy:
+Testing should verify all HIPAA compliance aspects of the media handling system:
+
+1. Access Control Testing:
+   - Verify unauthorized users cannot access protected media files
+   - Test that users can only access files they have permissions for
+   - Verify access tokens expire correctly and cannot be reused
+   - Test edge cases like terminated staff accounts and transferred patients
+
+2. Encryption Testing:
+   - Verify server-side encryption is properly configured
+   - Confirm encryption headers in S3/MinIO responses
+   - Attempt to access raw storage to confirm files are encrypted
+   - Validate key rotation procedures work correctly
+
+3. Audit Log Testing:
+   - Verify all media operations generate appropriate audit logs
+   - Confirm logs contain required fields (user ID, timestamp, action, resource ID)
+   - Test log integrity and immutability
+   - Verify log retention policies are enforced
+
+4. Secure Transmission Testing:
+   - Use tools like OWASP ZAP to verify secure connections
+   - Test for TLS configuration issues
+   - Verify secure URL generation and expiration
+   - Attempt to intercept traffic to confirm encryption
+
+5. Compliance Testing:
+   - Create a compliance checklist based on docs/healthcare-compliance.md
+   - Perform a security review with the compliance team
+   - Document all security measures for potential audit
+
+6. Regression Testing:
+   - Verify all existing media functionality still works
+   - Test performance impact of new security measures
+
+Create automated tests where possible and document manual test procedures for aspects that cannot be automated.

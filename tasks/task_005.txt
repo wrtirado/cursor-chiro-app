@@ -1,11 +1,11 @@
 # Task ID: 5
-# Title: Company and Office Management API
+# Title: Company and Office Management API with HIPAA Compliance
 # Status: done
 # Dependencies: 3
 # Priority: medium
-# Description: Implement API endpoints for managing the hierarchical structure of companies and their offices.
+# Description: Implement API endpoints for managing the hierarchical structure of companies and their offices with HIPAA-compliant data handling.
 # Details:
-Create endpoints for company creation and management. Implement office management within companies. Develop API for assigning managers to offices. Set up relationships between offices, chiropractors, and patients. Implement configuration options for company-wide vs. office-specific settings.
+Create endpoints for company creation and management with encryption for sensitive data. Implement office management within companies with RBAC controls. Develop API for assigning managers to offices with detailed audit logging. Set up relationships between offices, chiropractors, and patients with proper access controls. Implement configuration options for company-wide vs. office-specific settings. Ensure all operations involving organizational structure are logged for HIPAA compliance. Implement data minimization practices to limit ePHI exposure. Add encryption for sensitive data both at rest and in transit. Ensure proper RBAC to prevent unauthorized access to company and office data.
 
 # Test Strategy:
-Test the creation of multi-level hierarchies. Verify proper assignment of users to offices. Test permission inheritance through the hierarchy. Ensure office-specific settings override company defaults when configured.
+Test the creation of multi-level hierarchies with security controls. Verify proper assignment of users to offices with audit logging. Test permission inheritance through the hierarchy with RBAC validation. Ensure office-specific settings override company defaults when configured. Validate encryption of sensitive data both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to company and office data. Test data minimization practices to ensure ePHI exposure is limited according to the Privacy Rule.

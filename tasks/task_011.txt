@@ -1,11 +1,49 @@
 # Task ID: 11
-# Title: Notification Configuration API
+# Title: Notification Configuration API with HIPAA Compliance
 # Status: pending
 # Dependencies: 6
 # Priority: medium
-# Description: Implement API endpoints for configuring patient notification schedules.
+# Description: Implement API endpoints for configuring patient notification schedules with HIPAA-compliant data handling.
 # Details:
-Create endpoints for setting up notification schedules for therapy plans. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app.
+Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements.
 
 # Test Strategy:
-Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app.
+Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements.
+
+# Subtasks:
+## 11.1. Create notification schedule endpoints [pending]
+### Dependencies: None
+### Description: Implement endpoints for creating and managing notification schedules
+### Details:
+
+
+## 11.2. Implement HIPAA-compliant notification content [pending]
+### Dependencies: None
+### Description: Ensure notification templates do not contain ePHI
+### Details:
+
+
+## 11.3. Add RBAC for notification configuration [pending]
+### Dependencies: None
+### Description: Implement role-based access controls for notification management
+### Details:
+
+
+## 11.4. Implement audit logging [pending]
+### Dependencies: None
+### Description: Add detailed audit trails for all notification configuration operations
+### Details:
+
+
+## 11.5. Add data encryption [pending]
+### Dependencies: None
+### Description: Implement encryption for notification data at rest and in transit
+### Details:
+
+
+## 11.6. Verify HIPAA compliance for delivery mechanisms [pending]
+### Dependencies: None
+### Description: Ensure notification delivery methods comply with HIPAA requirements
+### Details:
+
+

@@ -1,20 +1,20 @@
 # Task ID: 8
-# Title: Patient Progress Tracking API
+# Title: Patient Progress Tracking API with HIPAA Compliance
 # Status: done
 # Dependencies: 6
 # Priority: medium
-# Description: Implement API endpoints for tracking and reporting patient progress with therapy plans.
+# Description: Implement API endpoints for tracking and reporting patient progress with therapy plans, ensuring HIPAA-compliant data handling.
 # Details:
-Create endpoints for recording exercise completion, specifically:
-- POST /progress: For batch updating exercise completion status from mobile app
-- GET /progress/{patient_id}: For chiropractors to view patient progress
+Create endpoints for recording exercise completion with encryption for ePHI, specifically:
+- POST /progress: For batch updating exercise completion status from mobile app with audit logging
+- GET /progress/{patient_id}: For chiropractors to view patient progress with RBAC controls
 
-Implement progress synchronization from mobile app. Develop reporting endpoints for chiropractors to view patient adherence. Implement analytics for therapy plan effectiveness. Create notification triggers based on patient progress.
+Implement progress synchronization from mobile app with encryption in transit. Develop reporting endpoints for chiropractors to view patient adherence with data minimization. Implement analytics for therapy plan effectiveness with de-identified data where possible. Create notification triggers based on patient progress with no ePHI in notification content.
 
-All request and response formats must follow SDP (Standard Data Protocol) specifications.
+All request and response formats must follow SDP (Standard Data Protocol) specifications. Implement detailed audit logging for all progress tracking operations. Ensure all data is encrypted both at rest and in transit. Implement access controls to ensure only authorized providers can access patient progress data.
 
 # Test Strategy:
-Test progress recording with various scenarios (online/offline sync). Verify accurate reporting of completion percentages. Test data aggregation for analytics. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors.
+Test progress recording with various scenarios (online/offline sync) and verify encryption. Verify accurate reporting of completion percentages with RBAC controls. Test data aggregation for analytics with privacy safeguards. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors with audit logging. Verify encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to progress data. Test that notifications do not contain ePHI.
 
 # Subtasks:
 ## 8.1. Define API endpoint specifications [done]
@@ -38,6 +38,30 @@ Test progress recording with various scenarios (online/offline sync). Verify acc
 ## 8.4. Implement SDP validation [done]
 ### Dependencies: None
 ### Description: Add validation to ensure all requests and responses conform to SDP specifications
+### Details:
+
+
+## 8.5. Add HIPAA-compliant audit logging [done]
+### Dependencies: None
+### Description: Implement detailed audit logging for all progress tracking operations
+### Details:
+
+
+## 8.6. Implement data encryption [done]
+### Dependencies: None
+### Description: Add encryption for all progress data at rest and in transit
+### Details:
+
+
+## 8.7. Enhance RBAC for progress data [done]
+### Dependencies: None
+### Description: Implement strict access controls to ensure only authorized providers can access patient progress
+### Details:
+
+
+## 8.8. Add data minimization for reports [done]
+### Dependencies: None
+### Description: Implement practices to limit ePHI exposure in progress reports according to the Privacy Rule
 ### Details:
 
 

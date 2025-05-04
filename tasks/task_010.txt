@@ -1,14 +1,14 @@
 # Task ID: 10
-# Title: Branding Customization API
+# Title: Branding Customization API with HIPAA Compliance
 # Status: pending
 # Dependencies: 5
 # Priority: low
-# Description: Implement API endpoints for customizing the mobile app's appearance for each office or company.
+# Description: Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.
 # Details:
-Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table. Implement color scheme customization options. Develop API for retrieving branding information for mobile app. Set up default branding fallbacks. Implement validation for uploaded assets.
+Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure.
 
 # Test Strategy:
-Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided.
+Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption.
 
 # Subtasks:
 ## 10.1. Create POST /branding endpoint [pending]
@@ -26,6 +26,30 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 ## 10.3. Implement branding retrieval logic [pending]
 ### Dependencies: None
 ### Description: Create endpoint to fetch branding information for a specific office with appropriate fallbacks
+### Details:
+
+
+## 10.4. Add RBAC to branding endpoints [pending]
+### Dependencies: None
+### Description: Implement role-based access controls for all branding operations
+### Details:
+
+
+## 10.5. Implement audit logging for branding changes [pending]
+### Dependencies: None
+### Description: Add detailed audit trails for all branding-related operations
+### Details:
+
+
+## 10.6. Implement secure file handling [pending]
+### Dependencies: None
+### Description: Add secure handling for uploaded assets to prevent PHI exposure
+### Details:
+
+
+## 10.7. Add encryption for branding data [pending]
+### Dependencies: None
+### Description: Implement encryption for branding information at rest
 ### Details:
 
 

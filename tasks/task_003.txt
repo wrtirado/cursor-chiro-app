@@ -1,21 +1,21 @@
 # Task ID: 3
-# Title: FastAPI Backend Setup and Authentication
+# Title: FastAPI Backend Setup and Authentication with HIPAA Compliance
 # Status: done
 # Dependencies: 2
 # Priority: high
-# Description: Set up the FastAPI backend with authentication endpoints for both web and mobile applications.
+# Description: Set up the FastAPI backend with authentication endpoints for both web and mobile applications, ensuring HIPAA compliance for all data handling.
 # Details:
-Initialize FastAPI application with proper project structure. Implement JWT-based authentication system for secure sessions. Create the following authentication endpoints:
+Initialize FastAPI application with proper project structure. Implement JWT-based authentication system for secure sessions with encryption in transit and at rest. Create the following authentication endpoints:
 1. POST /auth/login - Accept email and password, return access_token
 2. POST /auth/register - Accept name, email, password, role_id, office_id; return user_id (restricted endpoint)
 3. POST /auth/associate - Accept join_code; return chiro_id and office_id
 
-Implement role-based access control for different user types (chiropractor, office manager, billing admin, patient). Set up middleware for authentication and authorization. Connect to database using containerized connection string. Ensure HTTPS implementation for transit encryption.
+Implement role-based access control for different user types (chiropractor, office manager, billing admin, patient) following principle of least privilege. Set up middleware for authentication and authorization with detailed audit logging. Connect to database using containerized connection string with encrypted connections. Ensure HTTPS implementation with TLS 1.2+ for transit encryption. Implement automatic session timeouts to protect ePHI. Add detailed audit logging for all authentication events including login attempts, successes, and failures.
 
 # Test Strategy:
-Write unit tests for authentication endpoints. Test JWT token generation and validation. Verify role-based access restrictions work correctly. Test user registration and login flows. Specifically test each endpoint:
+Write unit tests for authentication endpoints with HIPAA compliance verification. Test JWT token generation, validation, and encryption. Verify role-based access restrictions work correctly with proper audit logging. Test user registration and login flows with security controls. Specifically test each endpoint:
 - POST /auth/login
 - POST /auth/register
 - POST /auth/associate
 
-Verify secure HTTPS connections are working properly. Test database connectivity using containerized connection string.
+Verify secure HTTPS connections with TLS 1.2+ are working properly. Test database connectivity using containerized connection string with encryption. Validate audit logging captures all required HIPAA information. Test session timeout functionality. Verify encryption of sensitive data both in transit and at rest.

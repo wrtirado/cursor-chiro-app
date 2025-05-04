@@ -1,11 +1,61 @@
 # Task ID: 18
-# Title: Mobile App Authentication and Onboarding
+# Title: Mobile App Authentication and Onboarding with HIPAA Compliance
 # Status: pending
 # Dependencies: 17, 4
 # Priority: high
-# Description: Implement patient authentication, registration, and chiropractor association.
+# Description: Implement patient authentication, registration, and chiropractor association with HIPAA-compliant security measures.
 # Details:
-Create login and registration screens. Implement join code entry and validation. Develop onboarding flow for new patients. Create account management screens. Implement secure token storage and refresh mechanisms. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint.
+Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail.
 
 # Test Strategy:
-Test registration and login flows. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management. Ensure proper error handling and user feedback during the association process.
+Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption.
+
+# Subtasks:
+## 18.1. Create login and registration screens [pending]
+### Dependencies: None
+### Description: Implement secure authentication UI with proper validation
+### Details:
+
+
+## 18.2. Implement join code validation [pending]
+### Dependencies: None
+### Description: Add functionality to validate join codes through the POST /auth/associate endpoint
+### Details:
+
+
+## 18.3. Develop patient onboarding flow [pending]
+### Dependencies: None
+### Description: Create step-by-step onboarding process including consent collection
+### Details:
+
+
+## 18.4. Implement secure token storage [pending]
+### Dependencies: None
+### Description: Add encrypted storage for authentication tokens
+### Details:
+
+
+## 18.5. Add biometric authentication [pending]
+### Dependencies: None
+### Description: Implement fingerprint/face recognition for app access on supported devices
+### Details:
+
+
+## 18.6. Create session timeout functionality [pending]
+### Dependencies: None
+### Description: Add automatic logout after period of inactivity
+### Details:
+
+
+## 18.7. Implement audit logging [pending]
+### Dependencies: None
+### Description: Add detailed logging of all authentication operations for HIPAA compliance
+### Details:
+
+
+## 18.8. Add consent management [pending]
+### Dependencies: None
+### Description: Implement system to track and store patient consent for data handling
+### Details:
+
+

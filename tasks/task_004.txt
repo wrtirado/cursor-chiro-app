@@ -1,14 +1,14 @@
 # Task ID: 4
-# Title: User Management API Endpoints
+# Title: User Management API Endpoints with HIPAA Compliance
 # Status: done
 # Dependencies: 3
 # Priority: high
-# Description: Implement API endpoints for managing users (patients, chiropractors, office managers) within the system.
+# Description: Implement API endpoints for managing users (patients, chiropractors, office managers) within the system with HIPAA-compliant data handling.
 # Details:
-Create CRUD endpoints for user management. Implement endpoints for adding/removing patients associated with chiropractors. Develop endpoints for managing chiropractor accounts within an office. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table.
+Create CRUD endpoints for user management with encryption for ePHI at rest and in transit. Implement endpoints for adding/removing patients associated with chiropractors with detailed audit logging. Develop endpoints for managing chiropractor accounts within an office with RBAC controls. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles following principle of least privilege. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password with audit logging. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table. Ensure all operations involving ePHI are logged in detail for HIPAA compliance. Implement data minimization practices to limit ePHI exposure according to the Privacy Rule.
 
 # Test Strategy:
-Test each endpoint with various role permissions. Verify proper error handling for unauthorized access. Test join code generation and validation. Ensure proper data validation for user creation and updates. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities. Validate RBAC implementation by testing access restrictions for each user role type.
+Test each endpoint with various role permissions and verify proper audit logging. Verify proper error handling for unauthorized access with security controls. Test join code generation and validation with encryption. Ensure proper data validation for user creation and updates with HIPAA compliance. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities with audit trails. Validate RBAC implementation by testing access restrictions for each user role type. Verify encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information including who accessed what data and when.
 
 # Subtasks:
 ## 4.1. Implement GET /users/me endpoint [done]
@@ -26,6 +26,24 @@ Test each endpoint with various role permissions. Verify proper error handling f
 ## 4.3. Implement RBAC for user roles [done]
 ### Dependencies: None
 ### Description: Set up role-based access control for different user types (chiropractor, office_manager, billing, patient) using the Roles table
+### Details:
+
+
+## 4.4. Add HIPAA-compliant audit logging [done]
+### Dependencies: None
+### Description: Implement detailed audit logging for all user management operations involving ePHI
+### Details:
+
+
+## 4.5. Implement data encryption [done]
+### Dependencies: None
+### Description: Add encryption for all ePHI at rest and in transit
+### Details:
+
+
+## 4.6. Add data minimization controls [done]
+### Dependencies: None
+### Description: Implement practices to limit ePHI exposure according to the Privacy Rule
 ### Details:
 
 

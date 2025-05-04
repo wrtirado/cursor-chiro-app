@@ -1,14 +1,14 @@
 # Task ID: 7
-# Title: Media Storage Integration (AWS S3)
+# Title: Media Storage Integration (AWS S3) with HIPAA Compliance
 # Status: done
 # Dependencies: 6
 # Priority: medium
-# Description: Implement secure storage for therapy plan media (images and videos) using AWS S3, with URLs stored in the PlanExercises table.
+# Description: Implement secure storage for therapy plan media (images and videos) using AWS S3 with HIPAA-compliant encryption and access controls.
 # Details:
-Set up AWS S3 bucket for media storage. Implement secure upload endpoints for images and videos. Create signed URLs for secure media access. Implement media deletion and management. Handle media compression and optimization for mobile delivery. Add image_url and video_url fields to the PlanExercises table to store references to the S3 media files. Ensure API properly handles uploads and generates appropriate URLs for storage in the database.
+Set up AWS S3 bucket for media storage with server-side encryption and proper BAA in place. Implement secure upload endpoints for images and videos with encryption in transit. Create signed URLs for secure media access with short expiration times. Implement media deletion and management with audit logging. Handle media compression and optimization for mobile delivery. Add image_url and video_url fields to the PlanExercises table to store references to the S3 media files. Ensure API properly handles uploads and generates appropriate URLs for storage in the database. Implement detailed audit logging for all media operations. Ensure S3 bucket policies enforce encryption and restrict access. Verify AWS BAA covers S3 storage for HIPAA compliance. Implement access controls to ensure patients can only access their own media files.
 
 # Test Strategy:
-Test upload and retrieval of various media types and sizes. Verify secure access control to media files. Test signed URL generation and expiration. Confirm proper cleanup of unused media. Validate that image_url and video_url are correctly stored in the PlanExercises table and that they properly link to the files in S3. Test API endpoints for media upload functionality and URL generation.
+Test upload and retrieval of various media types and sizes with encryption verification. Verify secure access control to media files with RBAC. Test signed URL generation and expiration with security controls. Confirm proper cleanup of unused media with audit trails. Validate that image_url and video_url are correctly stored in the PlanExercises table and that they properly link to the files in S3 with encryption. Test API endpoints for media upload functionality and URL generation. Verify S3 bucket encryption settings. Test that audit logs capture all required HIPAA information for media operations. Verify that access controls prevent unauthorized access to media files.
 
 # Subtasks:
 ## 7.1. Add image_url and video_url fields to PlanExercises table [done]
@@ -26,6 +26,30 @@ Test upload and retrieval of various media types and sizes. Verify secure access
 ## 7.3. Update exercise creation/editing to support media URLs [done]
 ### Dependencies: None
 ### Description: Modify the exercise creation and editing functionality to support uploading and associating media files with exercises.
+### Details:
+
+
+## 7.4. Configure S3 bucket with server-side encryption [done]
+### Dependencies: None
+### Description: Set up AWS S3 bucket with server-side encryption for HIPAA compliance
+### Details:
+
+
+## 7.5. Implement signed URLs with short expiration [done]
+### Dependencies: None
+### Description: Create system for generating signed URLs with short expiration times for secure media access
+### Details:
+
+
+## 7.6. Add HIPAA-compliant audit logging [done]
+### Dependencies: None
+### Description: Implement detailed audit logging for all media operations
+### Details:
+
+
+## 7.7. Verify AWS BAA for S3 [done]
+### Dependencies: None
+### Description: Ensure Business Associate Agreement with AWS covers S3 storage for HIPAA compliance
 ### Details:
 
 

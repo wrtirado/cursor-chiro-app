@@ -1,14 +1,14 @@
 # Task ID: 12
-# Title: React Web Application Setup
+# Title: React Web Application Setup with HIPAA Compliance
 # Status: in-progress
 # Dependencies: 3
 # Priority: high
-# Description: Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation.
+# Description: Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance.
 # Details:
-Initialize React application with proper project structure. Set up routing with React Router. Implement state management with Redux or Context API. Create authentication flows and protected routes for login and account management. Implement responsive design framework. Set up API client for backend communication. Develop interfaces for therapy plan creation. Consider optional Dockerization using Node.js and Nginx for deployment if desired.
+Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information.
 
 # Test Strategy:
-Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens. Validate therapy plan creation workflow. If Dockerized, test container deployment and configuration.
+Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations.
 
 # Subtasks:
 ## 12.1. Set up basic React application structure [pending]
@@ -44,6 +44,42 @@ Test application initialization and routing. Verify protected routes redirect un
 ## 12.6. Create Dockerfile and Nginx configuration (optional) [pending]
 ### Dependencies: None
 ### Description: 
+### Details:
+
+
+## 12.7. Implement HIPAA-compliant session management [pending]
+### Dependencies: None
+### Description: Add automatic session timeouts and secure session handling
+### Details:
+
+
+## 12.8. Set up client-side RBAC implementation [pending]
+### Dependencies: None
+### Description: Implement role-based access controls for UI components and routes
+### Details:
+
+
+## 12.9. Implement secure local storage handling [pending]
+### Dependencies: None
+### Description: Ensure no ePHI is cached in browser storage
+### Details:
+
+
+## 12.10. Add client-side audit logging [pending]
+### Dependencies: None
+### Description: Implement detailed logging of user actions for HIPAA compliance
+### Details:
+
+
+## 12.11. Implement multi-factor authentication [pending]
+### Dependencies: None
+### Description: Add MFA options for enhanced security of ePHI access
+### Details:
+
+
+## 12.12. Add client-side data encryption [pending]
+### Dependencies: None
+### Description: Implement encryption for any sensitive data handled in the browser
 ### Details:
 
 

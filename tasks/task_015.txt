@@ -1,11 +1,61 @@
 # Task ID: 15
-# Title: Web App Analytics and Reporting Dashboard
+# Title: Web App Analytics and Reporting Dashboard with HIPAA Compliance
 # Status: pending
 # Dependencies: 12, 8
 # Priority: medium
-# Description: Implement analytics and reporting interfaces for tracking patient progress.
+# Description: Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling.
 # Details:
-Create dashboard for viewing patient adherence metrics. Implement charts and visualizations for progress data. Develop filtering and date range selection tools. Create patient-specific progress reports. Implement export functionality for reports.
+Create dashboard for viewing patient adherence metrics with RBAC controls. Implement charts and visualizations for progress data with de-identification where appropriate. Develop filtering and date range selection tools with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data.
 
 # Test Strategy:
-Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality. Ensure exports contain correct and complete data.
+Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features.
+
+# Subtasks:
+## 15.1. Create analytics dashboard UI [pending]
+### Dependencies: None
+### Description: Implement main dashboard interface with adherence metrics and visualizations
+### Details:
+
+
+## 15.2. Develop filtering and date range tools [pending]
+### Dependencies: None
+### Description: Add controls for filtering data with audit logging
+### Details:
+
+
+## 15.3. Implement patient progress reports [pending]
+### Dependencies: None
+### Description: Create detailed reports with minimal ePHI exposure
+### Details:
+
+
+## 15.4. Add secure export functionality [pending]
+### Dependencies: None
+### Description: Implement encrypted exports with access controls
+### Details:
+
+
+## 15.5. Implement RBAC for analytics [pending]
+### Dependencies: None
+### Description: Add role-based access controls for dashboard and reports
+### Details:
+
+
+## 15.6. Add audit logging [pending]
+### Dependencies: None
+### Description: Implement detailed logging of all reporting operations for HIPAA compliance
+### Details:
+
+
+## 15.7. Create consent verification system [pending]
+### Dependencies: None
+### Description: Add checks to verify patient consent before generating reports
+### Details:
+
+
+## 15.8. Implement data de-identification [pending]
+### Dependencies: None
+### Description: Add functionality to de-identify data for certain reporting scenarios
+### Details:
+
+

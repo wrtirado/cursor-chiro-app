@@ -1,14 +1,14 @@
 # Task ID: 17
-# Title: React Native Mobile App Setup
+# Title: React Native Mobile App Setup with HIPAA Compliance
 # Status: pending
 # Dependencies: 3
 # Priority: high
-# Description: Set up the React Native mobile application for patients with navigation, state management, and offline capabilities for SDP Phase 3.
+# Description: Set up the React Native mobile application for patients with navigation, state management, and offline capabilities for SDP Phase 3, ensuring HIPAA compliance.
 # Details:
-Initialize React Native application with proper project structure. Set up navigation with React Navigation. Implement state management with Redux or Context API. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data. Create authentication flows with login functionality. Set up API client with offline capabilities. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders.
+Initialize React Native application with proper project structure. Set up navigation with React Navigation including RBAC for protected screens. Implement state management with Redux or Context API with secure handling of ePHI. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data with encryption at rest. Create authentication flows with biometric options and automatic session timeouts. Set up API client with offline capabilities and TLS 1.2+ encryption. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders with no ePHI in notification content. Ensure secure local storage with encryption for any ePHI. Implement detailed audit logging for all data access operations.
 
 # Test Strategy:
-Test application initialization on both iOS and Android. Verify navigation between screens. Test offline data persistence using AsyncStorage or SQLite. Verify login functionality and authentication flows. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms.
+Test application initialization on both iOS and Android. Verify navigation between screens with RBAC controls. Test offline data persistence using AsyncStorage or SQLite with encryption. Verify login functionality, biometric authentication, and session timeout features. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms without exposing ePHI. Validate secure storage implementation with encryption. Test audit logging for all data access operations. Verify that the app handles security appropriately in both online and offline modes.
 
 # Subtasks:
 ## 17.1. Set up React Native project structure [pending]
@@ -44,6 +44,30 @@ Test application initialization on both iOS and Android. Verify navigation betwe
 ## 17.6. Set up local notifications for plan reminders [pending]
 ### Dependencies: None
 ### Description: 
+### Details:
+
+
+## 17.7. Implement encrypted local storage [pending]
+### Dependencies: None
+### Description: Add encryption for all locally stored ePHI using secure encryption libraries
+### Details:
+
+
+## 17.8. Add biometric authentication option [pending]
+### Dependencies: None
+### Description: Implement fingerprint/face recognition for app access on supported devices
+### Details:
+
+
+## 17.9. Implement session timeout functionality [pending]
+### Dependencies: None
+### Description: Add automatic logout after period of inactivity to protect ePHI
+### Details:
+
+
+## 17.10. Set up mobile audit logging [pending]
+### Dependencies: None
+### Description: Implement detailed logging of all data access operations for HIPAA compliance
 ### Details:
 
 

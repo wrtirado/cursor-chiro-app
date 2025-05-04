@@ -1,14 +1,14 @@
 # Task ID: 9
-# Title: Payment Processing API
+# Title: Payment Processing API with HIPAA Compliance
 # Status: pending
 # Dependencies: 5
 # Priority: medium
-# Description: Implement payment handling functionality for services at company or office level.
+# Description: Implement payment handling functionality for services at company or office level with HIPAA-compliant data handling.
 # Details:
-Integrate with a payment gateway (e.g., Stripe) for processing payments. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field. Create endpoints for payment processing and subscription management based on company/office structure. Implement billing records and invoice generation. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events.
+Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions.
 
 # Test Strategy:
-Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy.
+Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption.
 
 # Subtasks:
 ## 9.1. Implement secure storage for payment configuration [pending]
@@ -20,6 +20,36 @@ Test payment processing with test credentials. Verify proper recording of paymen
 ## 9.2. Develop company/office payment structure [pending]
 ### Dependencies: None
 ### Description: Implement logic to determine payment handling based on company vs. office level configuration
+### Details:
+
+
+## 9.3. Implement HIPAA-compliant audit logging [pending]
+### Dependencies: None
+### Description: Add detailed audit trails for all payment-related operations
+### Details:
+
+
+## 9.4. Implement RBAC for payment endpoints [pending]
+### Dependencies: None
+### Description: Ensure payment endpoints enforce proper role-based access controls
+### Details:
+
+
+## 9.5. Verify BAA with payment processor [pending]
+### Dependencies: None
+### Description: Ensure Business Associate Agreement is in place with payment gateway provider
+### Details:
+
+
+## 9.6. Implement data encryption [pending]
+### Dependencies: None
+### Description: Add encryption for all payment data at rest and in transit
+### Details:
+
+
+## 9.7. Add data minimization for invoices [pending]
+### Dependencies: None
+### Description: Implement practices to limit ePHI exposure in billing documents according to the Privacy Rule
 ### Details:
 
 

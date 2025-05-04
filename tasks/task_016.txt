@@ -1,11 +1,61 @@
 # Task ID: 16
-# Title: Web App Payment and Billing Interface
+# Title: Web App Payment and Billing Interface with HIPAA Compliance
 # Status: pending
 # Dependencies: 12, 9
 # Priority: medium
-# Description: Implement payment management and billing interfaces for the web application.
+# Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling.
 # Details:
-Create payment configuration screens for company and office settings. Implement subscription management interface. Develop invoice viewing and management tools. Create payment history and reporting screens. Implement payment method management UI.
+Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements.
 
 # Test Strategy:
-Test payment configuration options. Verify proper display of billing information. Test subscription management workflows. Ensure proper handling of payment errors and user feedback.
+Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements.
+
+# Subtasks:
+## 16.1. Create payment configuration UI [pending]
+### Dependencies: None
+### Description: Implement screens for managing payment settings at company and office levels
+### Details:
+
+
+## 16.2. Develop subscription management interface [pending]
+### Dependencies: None
+### Description: Add UI for creating and managing subscriptions
+### Details:
+
+
+## 16.3. Implement invoice management [pending]
+### Dependencies: None
+### Description: Create screens for viewing and managing invoices with minimal ePHI
+### Details:
+
+
+## 16.4. Add payment history reporting [pending]
+### Dependencies: None
+### Description: Implement reporting screens for payment history with audit logging
+### Details:
+
+
+## 16.5. Create payment method UI [pending]
+### Dependencies: None
+### Description: Add interface for securely managing payment methods
+### Details:
+
+
+## 16.6. Implement RBAC for payment features [pending]
+### Dependencies: None
+### Description: Add role-based access controls for all payment functionality
+### Details:
+
+
+## 16.7. Add audit logging [pending]
+### Dependencies: None
+### Description: Implement detailed logging of all payment operations for HIPAA compliance
+### Details:
+
+
+## 16.8. Ensure HIPAA-compliant billing documents [pending]
+### Dependencies: None
+### Description: Verify that invoices and other billing documents limit ePHI exposure
+### Details:
+
+

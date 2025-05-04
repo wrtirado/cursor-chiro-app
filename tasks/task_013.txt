@@ -1,11 +1,49 @@
 # Task ID: 13
-# Title: Web App User Management Interface
+# Title: Web App User Management Interface with HIPAA Compliance
 # Status: pending
 # Dependencies: 12, 4
 # Priority: high
-# Description: Implement user management interfaces for the web application.
+# Description: Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls.
 # Details:
-Create interfaces for user listing, creation, editing, and deletion. Implement role assignment functionality. Develop patient management screens for chiropractors. Create join code generation and management UI. Implement search and filtering for user lists.
+Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling.
 
 # Test Strategy:
-Test user CRUD operations through the UI. Verify proper display of role-specific information. Test join code generation and display. Ensure proper error handling and user feedback.
+Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features.
+
+# Subtasks:
+## 13.1. Create user listing interface with RBAC [pending]
+### Dependencies: None
+### Description: Implement UI for viewing users with role-based filtering and access controls
+### Details:
+
+
+## 13.2. Develop user creation/editing forms [pending]
+### Dependencies: None
+### Description: Create forms for adding and modifying users with proper validation
+### Details:
+
+
+## 13.3. Implement join code generation UI [pending]
+### Dependencies: None
+### Description: Add interface for generating and managing patient join codes
+### Details:
+
+
+## 13.4. Add search and filtering with audit logging [pending]
+### Dependencies: None
+### Description: Implement search functionality with detailed logging for HIPAA compliance
+### Details:
+
+
+## 13.5. Create consent management interface [pending]
+### Dependencies: None
+### Description: Develop UI for tracking and managing patient consent for data handling
+### Details:
+
+
+## 13.6. Implement data minimization in UI [pending]
+### Dependencies: None
+### Description: Ensure interfaces limit display of ePHI according to the Privacy Rule
+### Details:
+
+

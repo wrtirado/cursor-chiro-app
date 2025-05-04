@@ -1,14 +1,14 @@
 # Task ID: 20
-# Title: Mobile App Notification and Progress Sync
+# Title: Mobile App Notification and Progress Sync with HIPAA Compliance
 # Status: pending
 # Dependencies: 19, 8, 11
 # Priority: medium
-# Description: Implement local notifications and progress synchronization.
+# Description: Implement local notifications and progress synchronization with HIPAA-compliant data handling.
 # Details:
-Create background synchronization service for progress data using SQLite for local storage and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking.
+Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server.
 
 # Test Strategy:
-Test notification triggering at scheduled times. Verify progress synchronization after offline usage. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence.
+Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization.
 
 # Subtasks:
 ## 20.1. Implement local storage with SQLite [pending]
@@ -38,6 +38,30 @@ Test notification triggering at scheduled times. Verify progress synchronization
 ## 20.5. Implement conflict resolution [pending]
 ### Dependencies: None
 ### Description: Add logic to handle conflicts between local and server data during synchronization
+### Details:
+
+
+## 20.6. Add encryption to local storage [pending]
+### Dependencies: None
+### Description: Implement encryption for all locally stored progress data
+### Details:
+
+
+## 20.7. Create HIPAA-compliant notifications [pending]
+### Dependencies: None
+### Description: Ensure notifications do not contain any ePHI in their content
+### Details:
+
+
+## 20.8. Implement audit logging [pending]
+### Dependencies: None
+### Description: Add detailed logging of all progress tracking and synchronization operations
+### Details:
+
+
+## 20.9. Add consent verification [pending]
+### Dependencies: None
+### Description: Implement check for valid consent before syncing data to server
 ### Details:
 
 

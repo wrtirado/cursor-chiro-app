@@ -44,27 +44,27 @@
     },
     {
       "id": 3,
-      "title": "FastAPI Backend Setup and Authentication",
-      "description": "Set up the FastAPI backend with authentication endpoints for both web and mobile applications.",
+      "title": "FastAPI Backend Setup and Authentication with HIPAA Compliance",
+      "description": "Set up the FastAPI backend with authentication endpoints for both web and mobile applications, ensuring HIPAA compliance for all data handling.",
       "status": "done",
       "dependencies": [
         2
       ],
       "priority": "high",
-      "details": "Initialize FastAPI application with proper project structure. Implement JWT-based authentication system for secure sessions. Create the following authentication endpoints:\n1. POST /auth/login - Accept email and password, return access_token\n2. POST /auth/register - Accept name, email, password, role_id, office_id; return user_id (restricted endpoint)\n3. POST /auth/associate - Accept join_code; return chiro_id and office_id\n\nImplement role-based access control for different user types (chiropractor, office manager, billing admin, patient). Set up middleware for authentication and authorization. Connect to database using containerized connection string. Ensure HTTPS implementation for transit encryption.",
-      "testStrategy": "Write unit tests for authentication endpoints. Test JWT token generation and validation. Verify role-based access restrictions work correctly. Test user registration and login flows. Specifically test each endpoint:\n- POST /auth/login\n- POST /auth/register\n- POST /auth/associate\n\nVerify secure HTTPS connections are working properly. Test database connectivity using containerized connection string."
+      "details": "Initialize FastAPI application with proper project structure. Implement JWT-based authentication system for secure sessions with encryption in transit and at rest. Create the following authentication endpoints:\n1. POST /auth/login - Accept email and password, return access_token\n2. POST /auth/register - Accept name, email, password, role_id, office_id; return user_id (restricted endpoint)\n3. POST /auth/associate - Accept join_code; return chiro_id and office_id\n\nImplement role-based access control for different user types (chiropractor, office manager, billing admin, patient) following principle of least privilege. Set up middleware for authentication and authorization with detailed audit logging. Connect to database using containerized connection string with encrypted connections. Ensure HTTPS implementation with TLS 1.2+ for transit encryption. Implement automatic session timeouts to protect ePHI. Add detailed audit logging for all authentication events including login attempts, successes, and failures.",
+      "testStrategy": "Write unit tests for authentication endpoints with HIPAA compliance verification. Test JWT token generation, validation, and encryption. Verify role-based access restrictions work correctly with proper audit logging. Test user registration and login flows with security controls. Specifically test each endpoint:\n- POST /auth/login\n- POST /auth/register\n- POST /auth/associate\n\nVerify secure HTTPS connections with TLS 1.2+ are working properly. Test database connectivity using containerized connection string with encryption. Validate audit logging captures all required HIPAA information. Test session timeout functionality. Verify encryption of sensitive data both in transit and at rest."
     },
     {
       "id": 4,
-      "title": "User Management API Endpoints",
-      "description": "Implement API endpoints for managing users (patients, chiropractors, office managers) within the system.",
+      "title": "User Management API Endpoints with HIPAA Compliance",
+      "description": "Implement API endpoints for managing users (patients, chiropractors, office managers) within the system with HIPAA-compliant data handling.",
       "status": "done",
       "dependencies": [
         3
       ],
       "priority": "high",
-      "details": "Create CRUD endpoints for user management. Implement endpoints for adding/removing patients associated with chiropractors. Develop endpoints for managing chiropractor accounts within an office. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table.",
-      "testStrategy": "Test each endpoint with various role permissions. Verify proper error handling for unauthorized access. Test join code generation and validation. Ensure proper data validation for user creation and updates. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities. Validate RBAC implementation by testing access restrictions for each user role type.",
+      "details": "Create CRUD endpoints for user management with encryption for ePHI at rest and in transit. Implement endpoints for adding/removing patients associated with chiropractors with detailed audit logging. Develop endpoints for managing chiropractor accounts within an office with RBAC controls. Add functionality for generating unique join codes for patients. Implement proper permission checks based on user roles following principle of least privilege. Define and implement self-service account management endpoints: GET /users/me for retrieving user details and PUT /users/me for updating name, email, and password with audit logging. Implement Role-Based Access Control (RBAC) for different user roles (chiropractor, office_manager, billing, patient) based on the Roles table. Ensure all operations involving ePHI are logged in detail for HIPAA compliance. Implement data minimization practices to limit ePHI exposure according to the Privacy Rule.",
+      "testStrategy": "Test each endpoint with various role permissions and verify proper audit logging. Verify proper error handling for unauthorized access with security controls. Test join code generation and validation with encryption. Ensure proper data validation for user creation and updates with HIPAA compliance. Test the GET /users/me and PUT /users/me endpoints with different user roles to verify correct data access and update capabilities with audit trails. Validate RBAC implementation by testing access restrictions for each user role type. Verify encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information including who accessed what data and when.",
       "subtasks": [
         {
           "id": 4.1,
@@ -83,32 +83,50 @@
           "title": "Implement RBAC for user roles",
           "description": "Set up role-based access control for different user types (chiropractor, office_manager, billing, patient) using the Roles table",
           "status": "done"
+        },
+        {
+          "id": 4.4,
+          "title": "Add HIPAA-compliant audit logging",
+          "description": "Implement detailed audit logging for all user management operations involving ePHI",
+          "status": "done"
+        },
+        {
+          "id": 4.5,
+          "title": "Implement data encryption",
+          "description": "Add encryption for all ePHI at rest and in transit",
+          "status": "done"
+        },
+        {
+          "id": 4.6,
+          "title": "Add data minimization controls",
+          "description": "Implement practices to limit ePHI exposure according to the Privacy Rule",
+          "status": "done"
         }
       ]
     },
     {
       "id": 5,
-      "title": "Company and Office Management API",
-      "description": "Implement API endpoints for managing the hierarchical structure of companies and their offices.",
+      "title": "Company and Office Management API with HIPAA Compliance",
+      "description": "Implement API endpoints for managing the hierarchical structure of companies and their offices with HIPAA-compliant data handling.",
       "status": "done",
       "dependencies": [
         3
       ],
       "priority": "medium",
-      "details": "Create endpoints for company creation and management. Implement office management within companies. Develop API for assigning managers to offices. Set up relationships between offices, chiropractors, and patients. Implement configuration options for company-wide vs. office-specific settings.",
-      "testStrategy": "Test the creation of multi-level hierarchies. Verify proper assignment of users to offices. Test permission inheritance through the hierarchy. Ensure office-specific settings override company defaults when configured."
+      "details": "Create endpoints for company creation and management with encryption for sensitive data. Implement office management within companies with RBAC controls. Develop API for assigning managers to offices with detailed audit logging. Set up relationships between offices, chiropractors, and patients with proper access controls. Implement configuration options for company-wide vs. office-specific settings. Ensure all operations involving organizational structure are logged for HIPAA compliance. Implement data minimization practices to limit ePHI exposure. Add encryption for sensitive data both at rest and in transit. Ensure proper RBAC to prevent unauthorized access to company and office data.",
+      "testStrategy": "Test the creation of multi-level hierarchies with security controls. Verify proper assignment of users to offices with audit logging. Test permission inheritance through the hierarchy with RBAC validation. Ensure office-specific settings override company defaults when configured. Validate encryption of sensitive data both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to company and office data. Test data minimization practices to ensure ePHI exposure is limited according to the Privacy Rule."
     },
     {
       "id": 6,
-      "title": "Therapy Plan Management API",
-      "description": "Develop API endpoints for creating, editing, and managing therapy plans according to SDP specifications.",
+      "title": "Therapy Plan Management API with HIPAA Compliance",
+      "description": "Develop API endpoints for creating, editing, and managing therapy plans according to SDP specifications with HIPAA-compliant data handling.",
       "status": "done",
       "dependencies": [
         4
       ],
       "priority": "high",
-      "details": "Implement the following SDP-compliant endpoints:\n\n1. POST /plans - Create new therapy plans\n2. GET /plans - List plans with role-based filtering\n3. GET /plans/{id} - Retrieve detailed plan information\n4. PUT /plans/{id} - Update existing plans\n5. DELETE /plans/{id} - Remove plans\n6. POST /plans/{id}/assign - Assign plans to patients\n\nEnsure all endpoints follow SDP request/response formats. Implement functionality for adding exercises with text, images, and videos. Develop API for assigning plans to patients. Create endpoints for retrieving plans assigned to a specific patient. Implement versioning for therapy plans to track changes.",
-      "testStrategy": "Test all endpoints against SDP specifications. Verify request/response formats match documentation. Test creation of plans with various media types. Verify plan assignment to patients. Test retrieval of plans with proper filtering and role-based access. Ensure plan updates don't affect historical data.",
+      "details": "Implement the following SDP-compliant endpoints with HIPAA safeguards:\n\n1. POST /plans - Create new therapy plans with audit logging\n2. GET /plans - List plans with role-based filtering and access controls\n3. GET /plans/{id} - Retrieve detailed plan information with authorization checks\n4. PUT /plans/{id} - Update existing plans with audit trails\n5. DELETE /plans/{id} - Remove plans with secure deletion practices\n6. POST /plans/{id}/assign - Assign plans to patients with consent tracking\n\nEnsure all endpoints follow SDP request/response formats. Implement functionality for adding exercises with text, images, and videos with encryption for any ePHI. Develop API for assigning plans to patients with detailed audit logging. Create endpoints for retrieving plans assigned to a specific patient with RBAC controls. Implement versioning for therapy plans to track changes for HIPAA compliance. Ensure all data is encrypted both at rest and in transit. Implement data minimization practices to limit ePHI exposure according to the Privacy Rule.",
+      "testStrategy": "Test all endpoints against SDP specifications with HIPAA compliance verification. Verify request/response formats match documentation and include proper security controls. Test creation of plans with various media types and verify encryption. Verify plan assignment to patients with audit logging. Test retrieval of plans with proper filtering and role-based access controls. Ensure plan updates don't affect historical data and create appropriate audit trails. Validate encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to therapy plans. Test data minimization practices to ensure ePHI exposure is limited.",
       "subtasks": [
         {
           "id": "6.1",
@@ -144,20 +162,38 @@
           "id": "6.7",
           "title": "Implement POST /plans/{id}/assign endpoint",
           "status": "done"
+        },
+        {
+          "id": "6.8",
+          "title": "Add HIPAA-compliant audit logging",
+          "description": "Implement detailed audit logging for all therapy plan operations",
+          "status": "done"
+        },
+        {
+          "id": "6.9",
+          "title": "Implement data encryption",
+          "description": "Add encryption for all ePHI in therapy plans at rest and in transit",
+          "status": "done"
+        },
+        {
+          "id": "6.10",
+          "title": "Add consent tracking",
+          "description": "Implement system to track patient consent for therapy plans",
+          "status": "done"
         }
       ]
     },
     {
       "id": 7,
-      "title": "Media Storage Integration (AWS S3)",
-      "description": "Implement secure storage for therapy plan media (images and videos) using AWS S3, with URLs stored in the PlanExercises table.",
+      "title": "Media Storage Integration (AWS S3) with HIPAA Compliance",
+      "description": "Implement secure storage for therapy plan media (images and videos) using AWS S3 with HIPAA-compliant encryption and access controls.",
       "status": "done",
       "dependencies": [
         6
       ],
       "priority": "medium",
-      "details": "Set up AWS S3 bucket for media storage. Implement secure upload endpoints for images and videos. Create signed URLs for secure media access. Implement media deletion and management. Handle media compression and optimization for mobile delivery. Add image_url and video_url fields to the PlanExercises table to store references to the S3 media files. Ensure API properly handles uploads and generates appropriate URLs for storage in the database.",
-      "testStrategy": "Test upload and retrieval of various media types and sizes. Verify secure access control to media files. Test signed URL generation and expiration. Confirm proper cleanup of unused media. Validate that image_url and video_url are correctly stored in the PlanExercises table and that they properly link to the files in S3. Test API endpoints for media upload functionality and URL generation.",
+      "details": "Set up AWS S3 bucket for media storage with server-side encryption and proper BAA in place. Implement secure upload endpoints for images and videos with encryption in transit. Create signed URLs for secure media access with short expiration times. Implement media deletion and management with audit logging. Handle media compression and optimization for mobile delivery. Add image_url and video_url fields to the PlanExercises table to store references to the S3 media files. Ensure API properly handles uploads and generates appropriate URLs for storage in the database. Implement detailed audit logging for all media operations. Ensure S3 bucket policies enforce encryption and restrict access. Verify AWS BAA covers S3 storage for HIPAA compliance. Implement access controls to ensure patients can only access their own media files.",
+      "testStrategy": "Test upload and retrieval of various media types and sizes with encryption verification. Verify secure access control to media files with RBAC. Test signed URL generation and expiration with security controls. Confirm proper cleanup of unused media with audit trails. Validate that image_url and video_url are correctly stored in the PlanExercises table and that they properly link to the files in S3 with encryption. Test API endpoints for media upload functionality and URL generation. Verify S3 bucket encryption settings. Test that audit logs capture all required HIPAA information for media operations. Verify that access controls prevent unauthorized access to media files.",
       "subtasks": [
         {
           "id": 7.1,
@@ -176,20 +212,44 @@
           "title": "Update exercise creation/editing to support media URLs",
           "status": "done",
           "description": "Modify the exercise creation and editing functionality to support uploading and associating media files with exercises."
+        },
+        {
+          "id": 7.4,
+          "title": "Configure S3 bucket with server-side encryption",
+          "description": "Set up AWS S3 bucket with server-side encryption for HIPAA compliance",
+          "status": "done"
+        },
+        {
+          "id": 7.5,
+          "title": "Implement signed URLs with short expiration",
+          "description": "Create system for generating signed URLs with short expiration times for secure media access",
+          "status": "done"
+        },
+        {
+          "id": 7.6,
+          "title": "Add HIPAA-compliant audit logging",
+          "description": "Implement detailed audit logging for all media operations",
+          "status": "done"
+        },
+        {
+          "id": 7.7,
+          "title": "Verify AWS BAA for S3",
+          "description": "Ensure Business Associate Agreement with AWS covers S3 storage for HIPAA compliance",
+          "status": "done"
         }
       ]
     },
     {
       "id": 8,
-      "title": "Patient Progress Tracking API",
-      "description": "Implement API endpoints for tracking and reporting patient progress with therapy plans.",
+      "title": "Patient Progress Tracking API with HIPAA Compliance",
+      "description": "Implement API endpoints for tracking and reporting patient progress with therapy plans, ensuring HIPAA-compliant data handling.",
       "status": "done",
       "dependencies": [
         6
       ],
       "priority": "medium",
-      "details": "Create endpoints for recording exercise completion, specifically:\n- POST /progress: For batch updating exercise completion status from mobile app\n- GET /progress/{patient_id}: For chiropractors to view patient progress\n\nImplement progress synchronization from mobile app. Develop reporting endpoints for chiropractors to view patient adherence. Implement analytics for therapy plan effectiveness. Create notification triggers based on patient progress.\n\nAll request and response formats must follow SDP (Standard Data Protocol) specifications.",
-      "testStrategy": "Test progress recording with various scenarios (online/offline sync). Verify accurate reporting of completion percentages. Test data aggregation for analytics. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors.",
+      "details": "Create endpoints for recording exercise completion with encryption for ePHI, specifically:\n- POST /progress: For batch updating exercise completion status from mobile app with audit logging\n- GET /progress/{patient_id}: For chiropractors to view patient progress with RBAC controls\n\nImplement progress synchronization from mobile app with encryption in transit. Develop reporting endpoints for chiropractors to view patient adherence with data minimization. Implement analytics for therapy plan effectiveness with de-identified data where possible. Create notification triggers based on patient progress with no ePHI in notification content.\n\nAll request and response formats must follow SDP (Standard Data Protocol) specifications. Implement detailed audit logging for all progress tracking operations. Ensure all data is encrypted both at rest and in transit. Implement access controls to ensure only authorized providers can access patient progress data.",
+      "testStrategy": "Test progress recording with various scenarios (online/offline sync) and verify encryption. Verify accurate reporting of completion percentages with RBAC controls. Test data aggregation for analytics with privacy safeguards. Ensure proper handling of timezone differences in progress tracking. Validate all request/response formats against SDP specifications. Test authorization to ensure patient progress data is only accessible to authorized chiropractors with audit logging. Verify encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to progress data. Test that notifications do not contain ePHI.",
       "subtasks": [
         {
           "id": "8.1",
@@ -214,20 +274,44 @@
           "title": "Implement SDP validation",
           "description": "Add validation to ensure all requests and responses conform to SDP specifications",
           "status": "done"
+        },
+        {
+          "id": "8.5",
+          "title": "Add HIPAA-compliant audit logging",
+          "description": "Implement detailed audit logging for all progress tracking operations",
+          "status": "done"
+        },
+        {
+          "id": "8.6",
+          "title": "Implement data encryption",
+          "description": "Add encryption for all progress data at rest and in transit",
+          "status": "done"
+        },
+        {
+          "id": "8.7",
+          "title": "Enhance RBAC for progress data",
+          "description": "Implement strict access controls to ensure only authorized providers can access patient progress",
+          "status": "done"
+        },
+        {
+          "id": "8.8",
+          "title": "Add data minimization for reports",
+          "description": "Implement practices to limit ePHI exposure in progress reports according to the Privacy Rule",
+          "status": "done"
         }
       ]
     },
     {
       "id": 9,
-      "title": "Payment Processing API",
-      "description": "Implement payment handling functionality for services at company or office level.",
+      "title": "Payment Processing API with HIPAA Compliance",
+      "description": "Implement payment handling functionality for services at company or office level with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field. Create endpoints for payment processing and subscription management based on company/office structure. Implement billing records and invoice generation. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events.",
-      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy.",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions.",
+      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption.",
       "subtasks": [
         {
           "id": 9.1,
@@ -240,20 +324,50 @@
           "title": "Develop company/office payment structure",
           "description": "Implement logic to determine payment handling based on company vs. office level configuration",
           "status": "pending"
+        },
+        {
+          "id": 9.3,
+          "title": "Implement HIPAA-compliant audit logging",
+          "description": "Add detailed audit trails for all payment-related operations",
+          "status": "pending"
+        },
+        {
+          "id": 9.4,
+          "title": "Implement RBAC for payment endpoints",
+          "description": "Ensure payment endpoints enforce proper role-based access controls",
+          "status": "pending"
+        },
+        {
+          "id": 9.5,
+          "title": "Verify BAA with payment processor",
+          "description": "Ensure Business Associate Agreement is in place with payment gateway provider",
+          "status": "pending"
+        },
+        {
+          "id": 9.6,
+          "title": "Implement data encryption",
+          "description": "Add encryption for all payment data at rest and in transit",
+          "status": "pending"
+        },
+        {
+          "id": 9.7,
+          "title": "Add data minimization for invoices",
+          "description": "Implement practices to limit ePHI exposure in billing documents according to the Privacy Rule",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 10,
-      "title": "Branding Customization API",
-      "description": "Implement API endpoints for customizing the mobile app's appearance for each office or company.",
+      "title": "Branding Customization API with HIPAA Compliance",
+      "description": "Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "low",
-      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table. Implement color scheme customization options. Develop API for retrieving branding information for mobile app. Set up default branding fallbacks. Implement validation for uploaded assets.",
-      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided.",
+      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure.",
+      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption.",
       "subtasks": [
         {
           "id": 10.1,
@@ -272,32 +386,94 @@
           "title": "Implement branding retrieval logic",
           "description": "Create endpoint to fetch branding information for a specific office with appropriate fallbacks",
           "status": "pending"
+        },
+        {
+          "id": 10.4,
+          "title": "Add RBAC to branding endpoints",
+          "description": "Implement role-based access controls for all branding operations",
+          "status": "pending"
+        },
+        {
+          "id": 10.5,
+          "title": "Implement audit logging for branding changes",
+          "description": "Add detailed audit trails for all branding-related operations",
+          "status": "pending"
+        },
+        {
+          "id": 10.6,
+          "title": "Implement secure file handling",
+          "description": "Add secure handling for uploaded assets to prevent PHI exposure",
+          "status": "pending"
+        },
+        {
+          "id": 10.7,
+          "title": "Add encryption for branding data",
+          "description": "Implement encryption for branding information at rest",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 11,
-      "title": "Notification Configuration API",
-      "description": "Implement API endpoints for configuring patient notification schedules.",
+      "title": "Notification Configuration API with HIPAA Compliance",
+      "description": "Implement API endpoints for configuring patient notification schedules with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         6
       ],
       "priority": "medium",
-      "details": "Create endpoints for setting up notification schedules for therapy plans. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app.",
-      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app."
+      "details": "Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements.",
+      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements.",
+      "subtasks": [
+        {
+          "id": 11.1,
+          "title": "Create notification schedule endpoints",
+          "description": "Implement endpoints for creating and managing notification schedules",
+          "status": "pending"
+        },
+        {
+          "id": 11.2,
+          "title": "Implement HIPAA-compliant notification content",
+          "description": "Ensure notification templates do not contain ePHI",
+          "status": "pending"
+        },
+        {
+          "id": 11.3,
+          "title": "Add RBAC for notification configuration",
+          "description": "Implement role-based access controls for notification management",
+          "status": "pending"
+        },
+        {
+          "id": 11.4,
+          "title": "Implement audit logging",
+          "description": "Add detailed audit trails for all notification configuration operations",
+          "status": "pending"
+        },
+        {
+          "id": 11.5,
+          "title": "Add data encryption",
+          "description": "Implement encryption for notification data at rest and in transit",
+          "status": "pending"
+        },
+        {
+          "id": 11.6,
+          "title": "Verify HIPAA compliance for delivery mechanisms",
+          "description": "Ensure notification delivery methods comply with HIPAA requirements",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 12,
-      "title": "React Web Application Setup",
-      "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation.",
+      "title": "React Web Application Setup with HIPAA Compliance",
+      "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance.",
       "status": "in-progress",
       "dependencies": [
         3
       ],
       "priority": "high",
-      "details": "Initialize React application with proper project structure. Set up routing with React Router. Implement state management with Redux or Context API. Create authentication flows and protected routes for login and account management. Implement responsive design framework. Set up API client for backend communication. Develop interfaces for therapy plan creation. Consider optional Dockerization using Node.js and Nginx for deployment if desired.",
-      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens. Validate therapy plan creation workflow. If Dockerized, test container deployment and configuration.",
+      "details": "Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information.",
+      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations.",
       "subtasks": [
         {
           "id": "12.1",
@@ -328,26 +504,100 @@
           "id": "12.6",
           "title": "Create Dockerfile and Nginx configuration (optional)",
           "status": "pending"
+        },
+        {
+          "id": "12.7",
+          "title": "Implement HIPAA-compliant session management",
+          "description": "Add automatic session timeouts and secure session handling",
+          "status": "pending"
+        },
+        {
+          "id": "12.8",
+          "title": "Set up client-side RBAC implementation",
+          "description": "Implement role-based access controls for UI components and routes",
+          "status": "pending"
+        },
+        {
+          "id": "12.9",
+          "title": "Implement secure local storage handling",
+          "description": "Ensure no ePHI is cached in browser storage",
+          "status": "pending"
+        },
+        {
+          "id": "12.10",
+          "title": "Add client-side audit logging",
+          "description": "Implement detailed logging of user actions for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": "12.11",
+          "title": "Implement multi-factor authentication",
+          "description": "Add MFA options for enhanced security of ePHI access",
+          "status": "pending"
+        },
+        {
+          "id": "12.12",
+          "title": "Add client-side data encryption",
+          "description": "Implement encryption for any sensitive data handled in the browser",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 13,
-      "title": "Web App User Management Interface",
-      "description": "Implement user management interfaces for the web application.",
+      "title": "Web App User Management Interface with HIPAA Compliance",
+      "description": "Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls.",
       "status": "pending",
       "dependencies": [
         12,
         4
       ],
       "priority": "high",
-      "details": "Create interfaces for user listing, creation, editing, and deletion. Implement role assignment functionality. Develop patient management screens for chiropractors. Create join code generation and management UI. Implement search and filtering for user lists.",
-      "testStrategy": "Test user CRUD operations through the UI. Verify proper display of role-specific information. Test join code generation and display. Ensure proper error handling and user feedback."
+      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling.",
+      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features.",
+      "subtasks": [
+        {
+          "id": 13.1,
+          "title": "Create user listing interface with RBAC",
+          "description": "Implement UI for viewing users with role-based filtering and access controls",
+          "status": "pending"
+        },
+        {
+          "id": 13.2,
+          "title": "Develop user creation/editing forms",
+          "description": "Create forms for adding and modifying users with proper validation",
+          "status": "pending"
+        },
+        {
+          "id": 13.3,
+          "title": "Implement join code generation UI",
+          "description": "Add interface for generating and managing patient join codes",
+          "status": "pending"
+        },
+        {
+          "id": 13.4,
+          "title": "Add search and filtering with audit logging",
+          "description": "Implement search functionality with detailed logging for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": 13.5,
+          "title": "Create consent management interface",
+          "description": "Develop UI for tracking and managing patient consent for data handling",
+          "status": "pending"
+        },
+        {
+          "id": 13.6,
+          "title": "Implement data minimization in UI",
+          "description": "Ensure interfaces limit display of ePHI according to the Privacy Rule",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 14,
-      "title": "Web App Therapy Plan Creation Interface",
-      "description": "Implement interfaces for creating and managing therapy plans.",
+      "title": "Web App Therapy Plan Creation Interface with HIPAA Compliance",
+      "description": "Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         12,
@@ -355,46 +605,190 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients. Implement plan templates and duplication features.",
-      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data. Test media uploads and previews. Ensure proper validation of required fields."
+      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans.",
+      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption.",
+      "subtasks": [
+        {
+          "id": 14.1,
+          "title": "Create therapy plan editor UI",
+          "description": "Implement interface for creating and editing therapy plans with all required sections",
+          "status": "pending"
+        },
+        {
+          "id": 14.2,
+          "title": "Implement secure media upload",
+          "description": "Add functionality for uploading images and videos with encryption and secure handling",
+          "status": "pending"
+        },
+        {
+          "id": 14.3,
+          "title": "Develop plan assignment interface",
+          "description": "Create UI for assigning plans to patients with proper consent tracking",
+          "status": "pending"
+        },
+        {
+          "id": 14.4,
+          "title": "Add template functionality",
+          "description": "Implement ability to create and use plan templates",
+          "status": "pending"
+        },
+        {
+          "id": 14.5,
+          "title": "Implement RBAC for therapy plans",
+          "description": "Add role-based access controls to limit plan access to authorized users",
+          "status": "pending"
+        },
+        {
+          "id": 14.6,
+          "title": "Add audit logging",
+          "description": "Implement detailed logging of all therapy plan operations for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": 14.7,
+          "title": "Create consent tracking UI",
+          "description": "Add interface for tracking patient consent for therapy plans",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 15,
-      "title": "Web App Analytics and Reporting Dashboard",
-      "description": "Implement analytics and reporting interfaces for tracking patient progress.",
+      "title": "Web App Analytics and Reporting Dashboard with HIPAA Compliance",
+      "description": "Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         12,
         8
       ],
       "priority": "medium",
-      "details": "Create dashboard for viewing patient adherence metrics. Implement charts and visualizations for progress data. Develop filtering and date range selection tools. Create patient-specific progress reports. Implement export functionality for reports.",
-      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality. Ensure exports contain correct and complete data."
+      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls. Implement charts and visualizations for progress data with de-identification where appropriate. Develop filtering and date range selection tools with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data.",
+      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features.",
+      "subtasks": [
+        {
+          "id": 15.1,
+          "title": "Create analytics dashboard UI",
+          "description": "Implement main dashboard interface with adherence metrics and visualizations",
+          "status": "pending"
+        },
+        {
+          "id": 15.2,
+          "title": "Develop filtering and date range tools",
+          "description": "Add controls for filtering data with audit logging",
+          "status": "pending"
+        },
+        {
+          "id": 15.3,
+          "title": "Implement patient progress reports",
+          "description": "Create detailed reports with minimal ePHI exposure",
+          "status": "pending"
+        },
+        {
+          "id": 15.4,
+          "title": "Add secure export functionality",
+          "description": "Implement encrypted exports with access controls",
+          "status": "pending"
+        },
+        {
+          "id": 15.5,
+          "title": "Implement RBAC for analytics",
+          "description": "Add role-based access controls for dashboard and reports",
+          "status": "pending"
+        },
+        {
+          "id": 15.6,
+          "title": "Add audit logging",
+          "description": "Implement detailed logging of all reporting operations for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": 15.7,
+          "title": "Create consent verification system",
+          "description": "Add checks to verify patient consent before generating reports",
+          "status": "pending"
+        },
+        {
+          "id": 15.8,
+          "title": "Implement data de-identification",
+          "description": "Add functionality to de-identify data for certain reporting scenarios",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 16,
-      "title": "Web App Payment and Billing Interface",
-      "description": "Implement payment management and billing interfaces for the web application.",
+      "title": "Web App Payment and Billing Interface with HIPAA Compliance",
+      "description": "Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         12,
         9
       ],
       "priority": "medium",
-      "details": "Create payment configuration screens for company and office settings. Implement subscription management interface. Develop invoice viewing and management tools. Create payment history and reporting screens. Implement payment method management UI.",
-      "testStrategy": "Test payment configuration options. Verify proper display of billing information. Test subscription management workflows. Ensure proper handling of payment errors and user feedback."
+      "details": "Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements.",
+      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements.",
+      "subtasks": [
+        {
+          "id": 16.1,
+          "title": "Create payment configuration UI",
+          "description": "Implement screens for managing payment settings at company and office levels",
+          "status": "pending"
+        },
+        {
+          "id": 16.2,
+          "title": "Develop subscription management interface",
+          "description": "Add UI for creating and managing subscriptions",
+          "status": "pending"
+        },
+        {
+          "id": 16.3,
+          "title": "Implement invoice management",
+          "description": "Create screens for viewing and managing invoices with minimal ePHI",
+          "status": "pending"
+        },
+        {
+          "id": 16.4,
+          "title": "Add payment history reporting",
+          "description": "Implement reporting screens for payment history with audit logging",
+          "status": "pending"
+        },
+        {
+          "id": 16.5,
+          "title": "Create payment method UI",
+          "description": "Add interface for securely managing payment methods",
+          "status": "pending"
+        },
+        {
+          "id": 16.6,
+          "title": "Implement RBAC for payment features",
+          "description": "Add role-based access controls for all payment functionality",
+          "status": "pending"
+        },
+        {
+          "id": 16.7,
+          "title": "Add audit logging",
+          "description": "Implement detailed logging of all payment operations for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": 16.8,
+          "title": "Ensure HIPAA-compliant billing documents",
+          "description": "Verify that invoices and other billing documents limit ePHI exposure",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 17,
-      "title": "React Native Mobile App Setup",
-      "description": "Set up the React Native mobile application for patients with navigation, state management, and offline capabilities for SDP Phase 3.",
+      "title": "React Native Mobile App Setup with HIPAA Compliance",
+      "description": "Set up the React Native mobile application for patients with navigation, state management, and offline capabilities for SDP Phase 3, ensuring HIPAA compliance.",
       "status": "pending",
       "dependencies": [
         3
       ],
       "priority": "high",
-      "details": "Initialize React Native application with proper project structure. Set up navigation with React Navigation. Implement state management with Redux or Context API. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data. Create authentication flows with login functionality. Set up API client with offline capabilities. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders.",
-      "testStrategy": "Test application initialization on both iOS and Android. Verify navigation between screens. Test offline data persistence using AsyncStorage or SQLite. Verify login functionality and authentication flows. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms.",
+      "details": "Initialize React Native application with proper project structure. Set up navigation with React Navigation including RBAC for protected screens. Implement state management with Redux or Context API with secure handling of ePHI. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data with encryption at rest. Create authentication flows with biometric options and automatic session timeouts. Set up API client with offline capabilities and TLS 1.2+ encryption. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders with no ePHI in notification content. Ensure secure local storage with encryption for any ePHI. Implement detailed audit logging for all data access operations.",
+      "testStrategy": "Test application initialization on both iOS and Android. Verify navigation between screens with RBAC controls. Test offline data persistence using AsyncStorage or SQLite with encryption. Verify login functionality, biometric authentication, and session timeout features. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms without exposing ePHI. Validate secure storage implementation with encryption. Test audit logging for all data access operations. Verify that the app handles security appropriately in both online and offline modes.",
       "subtasks": [
         {
           "id": "17.1",
@@ -425,26 +819,100 @@
           "id": "17.6",
           "title": "Set up local notifications for plan reminders",
           "status": "pending"
+        },
+        {
+          "id": "17.7",
+          "title": "Implement encrypted local storage",
+          "description": "Add encryption for all locally stored ePHI using secure encryption libraries",
+          "status": "pending"
+        },
+        {
+          "id": "17.8",
+          "title": "Add biometric authentication option",
+          "description": "Implement fingerprint/face recognition for app access on supported devices",
+          "status": "pending"
+        },
+        {
+          "id": "17.9",
+          "title": "Implement session timeout functionality",
+          "description": "Add automatic logout after period of inactivity to protect ePHI",
+          "status": "pending"
+        },
+        {
+          "id": "17.10",
+          "title": "Set up mobile audit logging",
+          "description": "Implement detailed logging of all data access operations for HIPAA compliance",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 18,
-      "title": "Mobile App Authentication and Onboarding",
-      "description": "Implement patient authentication, registration, and chiropractor association.",
+      "title": "Mobile App Authentication and Onboarding with HIPAA Compliance",
+      "description": "Implement patient authentication, registration, and chiropractor association with HIPAA-compliant security measures.",
       "status": "pending",
       "dependencies": [
         17,
         4
       ],
       "priority": "high",
-      "details": "Create login and registration screens. Implement join code entry and validation. Develop onboarding flow for new patients. Create account management screens. Implement secure token storage and refresh mechanisms. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint.",
-      "testStrategy": "Test registration and login flows. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management. Ensure proper error handling and user feedback during the association process."
+      "details": "Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail.",
+      "testStrategy": "Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption.",
+      "subtasks": [
+        {
+          "id": 18.1,
+          "title": "Create login and registration screens",
+          "description": "Implement secure authentication UI with proper validation",
+          "status": "pending"
+        },
+        {
+          "id": 18.2,
+          "title": "Implement join code validation",
+          "description": "Add functionality to validate join codes through the POST /auth/associate endpoint",
+          "status": "pending"
+        },
+        {
+          "id": 18.3,
+          "title": "Develop patient onboarding flow",
+          "description": "Create step-by-step onboarding process including consent collection",
+          "status": "pending"
+        },
+        {
+          "id": 18.4,
+          "title": "Implement secure token storage",
+          "description": "Add encrypted storage for authentication tokens",
+          "status": "pending"
+        },
+        {
+          "id": 18.5,
+          "title": "Add biometric authentication",
+          "description": "Implement fingerprint/face recognition for app access on supported devices",
+          "status": "pending"
+        },
+        {
+          "id": 18.6,
+          "title": "Create session timeout functionality",
+          "description": "Add automatic logout after period of inactivity",
+          "status": "pending"
+        },
+        {
+          "id": 18.7,
+          "title": "Implement audit logging",
+          "description": "Add detailed logging of all authentication operations for HIPAA compliance",
+          "status": "pending"
+        },
+        {
+          "id": 18.8,
+          "title": "Add consent management",
+          "description": "Implement system to track and store patient consent for data handling",
+          "status": "pending"
+        }
+      ]
     },
     {
       "id": 19,
-      "title": "Mobile App Therapy Plan Viewer",
-      "description": "Implement the therapy plan viewer with offline capabilities using SQLite for local storage.",
+      "title": "Mobile App Therapy Plan Viewer with HIPAA Compliance",
+      "description": "Implement the therapy plan viewer with offline capabilities using SQLite for local storage, ensuring HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         17,
@@ -452,8 +920,8 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan listing screen. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection.",
-      "testStrategy": "Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints.",
+      "details": "Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans.",
+      "testStrategy": "Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest.",
       "subtasks": [
         {
           "id": "19.1",
@@ -478,13 +946,43 @@
           "title": "Update UI components to work with offline data",
           "status": "pending",
           "description": "Modify therapy plan listing and detail views to retrieve data from local SQLite database instead of directly from API."
+        },
+        {
+          "id": "19.5",
+          "title": "Implement database encryption",
+          "status": "pending",
+          "description": "Add encryption for SQLite database to protect ePHI at rest"
+        },
+        {
+          "id": "19.6",
+          "title": "Add audit logging for data access",
+          "status": "pending",
+          "description": "Implement detailed logging of all therapy plan access and viewing operations"
+        },
+        {
+          "id": "19.7",
+          "title": "Create secure data wiping functionality",
+          "status": "pending",
+          "description": "Implement feature to securely delete all patient data when requested or when consent is withdrawn"
+        },
+        {
+          "id": "19.8",
+          "title": "Implement access controls",
+          "status": "pending",
+          "description": "Add controls to ensure patients can only access their own plans"
+        },
+        {
+          "id": "19.9",
+          "title": "Add data minimization for plan display",
+          "status": "pending",
+          "description": "Implement practices to limit ePHI exposure in plan listings and details"
         }
       ]
     },
     {
       "id": 20,
-      "title": "Mobile App Notification and Progress Sync",
-      "description": "Implement local notifications and progress synchronization.",
+      "title": "Mobile App Notification and Progress Sync with HIPAA Compliance",
+      "description": "Implement local notifications and progress synchronization with HIPAA-compliant data handling.",
       "status": "pending",
       "dependencies": [
         19,
@@ -492,8 +990,8 @@
         11
       ],
       "priority": "medium",
-      "details": "Create background synchronization service for progress data using SQLite for local storage and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking.",
-      "testStrategy": "Test notification triggering at scheduled times. Verify progress synchronization after offline usage. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence.",
+      "details": "Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server.",
+      "testStrategy": "Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization.",
       "subtasks": [
         {
           "id": "20.1",
@@ -524,8 +1022,104 @@
           "title": "Implement conflict resolution",
           "description": "Add logic to handle conflicts between local and server data during synchronization",
           "status": "pending"
+        },
+        {
+          "id": "20.6",
+          "title": "Add encryption to local storage",
+          "description": "Implement encryption for all locally stored progress data",
+          "status": "pending"
+        },
+        {
+          "id": "20.7",
+          "title": "Create HIPAA-compliant notifications",
+          "description": "Ensure notifications do not contain any ePHI in their content",
+          "status": "pending"
+        },
+        {
+          "id": "20.8",
+          "title": "Implement audit logging",
+          "description": "Add detailed logging of all progress tracking and synchronization operations",
+          "status": "pending"
+        },
+        {
+          "id": "20.9",
+          "title": "Add consent verification",
+          "description": "Implement check for valid consent before syncing data to server",
+          "status": "pending"
         }
       ]
+    },
+    {
+      "id": 21,
+      "title": "Implement HIPAA Compliance Foundations in API Core",
+      "description": "Integrate foundational HIPAA compliance measures into the API core structure to ensure secure handling of protected health information (PHI) according to regulatory requirements.",
+      "details": "This task requires implementing several key HIPAA compliance components at the API core level:\n\n1. **Security Configuration Review**:\n   - Audit existing API configurations and modify defaults to enforce secure settings\n   - Implement automatic session timeouts after periods of inactivity\n   - Configure proper TLS/SSL settings with modern cipher suites\n   - Disable any insecure defaults that may exist in the framework\n\n2. **Audit Logging Infrastructure**:\n   - Implement comprehensive audit logging for all PHI access, modifications, and transmissions\n   - Log user actions with timestamps, user IDs, actions performed, and affected resources\n   - Ensure logs cannot be modified or deleted by regular users\n   - Create log rotation and retention policies compliant with HIPAA's 6-year retention requirement\n\n3. **Encryption Implementation**:\n   - Apply encryption at rest for all PHI stored in databases or file systems\n   - Implement encryption in transit using TLS 1.2+ for all API communications\n   - Create key management procedures for encryption keys\n   - Document encryption standards used for compliance documentation\n\n4. **Data Handling Controls**:\n   - Implement input validation and sanitization for all API endpoints\n   - Create mechanisms to detect and prevent PHI from appearing in error logs\n   - Establish proper content-type headers and response structures\n   - Implement minimum necessary principle by filtering response data based on user roles\n\n5. **Documentation Updates**:\n   - Update technical documentation to reflect HIPAA compliance measures\n   - Create developer guidelines for maintaining compliance when modifying the API\n\nRefer to docs/healthcare-compliance.md for complete requirements and implementation standards. This implementation should be done at the core/foundation level to ensure all API components inherit these security controls.",
+      "testStrategy": "Testing should verify all HIPAA compliance measures are correctly implemented:\n\n1. **Security Configuration Tests**:\n   - Verify TLS configuration using tools like SSL Labs or testssl.sh\n   - Test session timeout functionality by monitoring inactive sessions\n   - Attempt to use deprecated/insecure methods to confirm they're disabled\n\n2. **Audit Logging Tests**:\n   - Perform various API operations and verify appropriate audit logs are generated\n   - Attempt to modify logs directly to confirm immutability\n   - Verify log format contains all required HIPAA elements (who, what, when, where)\n   - Test log rotation and confirm older logs remain accessible\n\n3. **Encryption Tests**:\n   - Use database inspection tools to verify data is encrypted at rest\n   - Perform network traffic analysis to confirm all API traffic is encrypted\n   - Test key rotation procedures to ensure they work without data loss\n\n4. **Data Handling Tests**:\n   - Submit malformed/malicious inputs to verify proper validation\n   - Trigger errors and verify PHI is not exposed in error messages\n   - Test with different user roles to confirm minimum necessary principle\n   - Verify all PHI transmissions are properly secured\n\n5. **Compliance Verification**:\n   - Create a test checklist derived from docs/healthcare-compliance.md\n   - Perform a mock HIPAA audit against the implementation\n   - Document all test results for compliance evidence\n\nAll tests should be automated where possible and included in the CI/CD pipeline to ensure ongoing compliance.",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "high"
+    },
+    {
+      "id": 22,
+      "title": "Retrofit HIPAA Compliance to User Management System",
+      "description": "Modify the existing User Management features to ensure HIPAA compliance by implementing strict RBAC, audit logging, secure handling of ePHI, and field-level encryption where necessary.",
+      "details": "This task requires retrofitting HIPAA compliance onto the existing User Management system:\n\n1. **Role-Based Access Controls (RBAC)**:\n   - Implement granular permission checks for all user data access endpoints\n   - Create distinct roles (Admin, Provider, Staff, Patient) with appropriate access levels\n   - Modify all user data endpoints to verify role permissions before allowing access/modification\n   - Implement the principle of least privilege across all user operations\n\n2. **Audit Logging**:\n   - Add comprehensive audit logging for all user CRUD operations\n   - Log must include: timestamp, user ID performing action, action type, affected data, IP address\n   - Ensure logs cannot be modified or deleted by regular users\n   - Implement log rotation and secure storage policies\n\n3. **Privacy Rule Compliance**:\n   - Review all user fields to identify potential ePHI\n   - Implement data minimization practices\n   - Add consent tracking mechanisms for data usage\n   - Ensure proper disclosure limitations\n   - Add functionality for patients to request their records\n\n4. **Data Encryption**:\n   - Implement field-level encryption for sensitive user data (SSN, DOB, medical record numbers)\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management\n   - Ensure data is encrypted both at rest and in transit\n\nRefer to docs/healthcare-compliance.md for complete requirements. This implementation must be done without disrupting existing functionality.",
+      "testStrategy": "Testing should verify HIPAA compliance across all aspects of the User Management system:\n\n1. **RBAC Testing**:\n   - Create test users for each role (Admin, Provider, Staff, Patient)\n   - Verify each role can only access permitted data and operations\n   - Test boundary cases where permissions overlap\n   - Attempt unauthorized access and verify proper rejection\n   - Verify role elevation requires proper authentication\n\n2. **Audit Logging Tests**:\n   - Verify all user CRUD operations generate appropriate audit logs\n   - Validate log content includes all required fields\n   - Test log integrity by attempting to modify logs\n   - Verify log retention policies are enforced\n   - Test log search and retrieval functionality\n\n3. **Privacy Compliance Tests**:\n   - Verify patient data access requests work correctly\n   - Test consent management functionality\n   - Verify data minimization in API responses\n   - Test disclosure limitation mechanisms\n\n4. **Encryption Tests**:\n   - Verify sensitive fields are properly encrypted in database\n   - Test that encrypted data can be properly decrypted with appropriate access\n   - Verify encryption in transit using network analysis tools\n   - Test key rotation procedures\n\n5. **Integration Tests**:\n   - Verify all existing functionality continues to work with new compliance features\n   - Test performance impact of added security measures\n   - Conduct penetration testing to identify potential vulnerabilities\n\nAll tests should be documented for compliance auditing purposes.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high"
+    },
+    {
+      "id": 23,
+      "title": "Retrofit HIPAA Compliance to Authentication System",
+      "description": "Modify the existing authentication system to ensure HIPAA compliance by implementing secure session management, audit logging, evaluating MFA options, and enhancing credential security throughout the application.",
+      "details": "This task requires updating the authentication system to meet HIPAA security requirements:\n\n1. Secure Session Management:\n   - Implement strict session timeouts (15-30 minutes of inactivity)\n   - Develop secure token handling with proper encryption\n   - Ensure tokens are invalidated on logout and timeout\n   - Add automatic session termination after a defined period (8-12 hours max)\n\n2. Comprehensive Audit Logging:\n   - Create detailed audit logs for all authentication events\n   - Log login attempts (both successful and failed)\n   - Track registration activities\n   - Record password changes and reset requests\n   - Ensure logs include timestamp, user ID, IP address, and action type\n   - Implement tamper-evident logging mechanisms\n\n3. Multi-Factor Authentication:\n   - Evaluate MFA options (SMS, email, authenticator apps, hardware tokens)\n   - Implement the selected MFA solution\n   - Create recovery mechanisms for MFA\n   - Make MFA configurable (required/optional) based on user role\n\n4. Secure Credential Handling:\n   - Review and update password hashing algorithms (use bcrypt or Argon2)\n   - Implement password complexity requirements\n   - Ensure credentials are never logged or stored in plaintext\n   - Add protection against brute force attacks (account lockouts)\n   - Secure the password reset workflow\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. All changes must maintain backward compatibility with existing authentication flows while enhancing security.",
+      "testStrategy": "Testing should verify both security compliance and functionality:\n\n1. Session Management Tests:\n   - Verify sessions expire after the configured inactivity period\n   - Confirm tokens are properly invalidated on logout\n   - Test that expired tokens cannot be reused\n   - Validate that concurrent sessions are handled according to policy\n\n2. Audit Logging Tests:\n   - Verify all required authentication events are logged with correct details\n   - Test log integrity and tamper resistance\n   - Confirm logs contain all required HIPAA fields\n   - Validate log storage and retention meets compliance requirements\n\n3. MFA Testing:\n   - Test each implemented MFA method for proper functionality\n   - Verify MFA bypass attempts are blocked and logged\n   - Test MFA recovery workflows\n   - Confirm MFA enforcement based on user role configuration\n\n4. Security Testing:\n   - Conduct penetration testing focused on authentication\n   - Perform automated security scanning\n   - Test password policies enforcement\n   - Verify protection against common attacks (brute force, credential stuffing)\n   - Ensure no credentials are exposed in logs or error messages\n\n5. Compliance Validation:\n   - Create a compliance checklist based on HIPAA requirements\n   - Perform a formal review against this checklist\n   - Document evidence of compliance for each requirement\n\nAll tests should be automated where possible and included in the CI/CD pipeline.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "high"
+    },
+    {
+      "id": 24,
+      "title": "Retrofit HIPAA Compliance to Company and Office Management Features",
+      "description": "Implement HIPAA compliance measures for existing Company and Office Management functionality by adding Role-Based Access Controls (RBAC) and comprehensive audit logging for all data operations.",
+      "details": "This task requires modifying the existing Company and Office Management features to ensure HIPAA compliance by:\n\n1. Implementing strict Role-Based Access Controls (RBAC):\n   - Restrict company/office management capabilities to users with Admin role only\n   - Modify all controller endpoints to verify user permissions before allowing operations\n   - Update UI components to hide management options from unauthorized users\n   - Create permission constants in a central location for consistency\n\n2. Adding comprehensive audit logging:\n   - Implement detailed audit trails for all company/office CRUD operations\n   - Log must include: timestamp, user ID, action type, affected entity, before/after states\n   - Ensure logs are tamper-evident and cannot be modified\n   - Store logs in a separate, secure database table with appropriate retention policies\n\n3. Data access patterns:\n   - Implement data access filters at the repository/service layer to enforce permissions\n   - Add middleware to verify permissions for all API routes related to companies/offices\n\n4. Documentation updates:\n   - Update API documentation to reflect new permission requirements\n   - Document the audit logging format and retention policies\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6.",
+      "testStrategy": "Testing should verify both the RBAC implementation and audit logging functionality:\n\n1. RBAC Testing:\n   - Unit tests for each permission check in services and controllers\n   - Integration tests that verify users with Admin role can perform all operations\n   - Integration tests that verify users without Admin role receive 403 Forbidden responses\n   - UI tests to confirm management options are only visible to authorized users\n\n2. Audit Logging Tests:\n   - Unit tests to verify log entries are created for each CRUD operation\n   - Tests to verify log entries contain all required fields (timestamp, user, action, etc.)\n   - Integration tests that perform operations and verify corresponding log entries\n   - Tests to verify logs cannot be modified or deleted through normal application interfaces\n\n3. Security Testing:\n   - Attempt to bypass RBAC by directly calling APIs with unauthorized credentials\n   - Verify that all routes are protected, including any that might have been overlooked\n   - Test for SQL injection and other security vulnerabilities in the logging system\n\n4. Compliance Verification:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Verify each requirement is met through manual testing\n   - Document evidence of compliance for each requirement",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "high"
+    },
+    {
+      "id": 25,
+      "title": "Retrofit HIPAA Compliance for Media Handling System",
+      "description": "Modify the existing S3/MinIO media handling features to ensure HIPAA compliance by implementing secure access controls, encryption, audit logging, and secure transmission protocols for media files that may contain or be linked to ePHI.",
+      "details": "This task requires updating the existing media handling system to meet HIPAA compliance requirements as outlined in docs/healthcare-compliance.md. Specific implementation details include:\n\n1. Access Controls:\n   - Implement role-based access control (RBAC) for all media files\n   - Create permission checks before any media access, ensuring only authorized users can view/download files\n   - Add patient-provider relationship validation before granting access to therapy-related media\n   - Implement time-limited access tokens for temporary file access\n\n2. Encryption:\n   - Configure server-side encryption (SSE) for all files stored in S3/MinIO\n   - Implement AES-256 encryption standard\n   - Establish secure key management procedures\n   - Ensure encryption at rest for all stored media\n\n3. Audit Logging:\n   - Create comprehensive audit logs capturing all media interactions:\n     - File uploads (who, when, file metadata)\n     - File access/downloads (who, when, access context)\n     - File modifications or deletions\n   - Ensure logs contain sufficient detail for compliance reporting\n   - Make logs tamper-evident and immutable\n   - Implement log retention policies per HIPAA requirements\n\n4. Secure Transmission:\n   - Enforce HTTPS/TLS 1.2+ for all media transfers\n   - Implement secure URL generation with appropriate expiration\n   - Add integrity verification for uploaded/downloaded files\n\n5. Additional Requirements:\n   - Update privacy notices and terms of service\n   - Create documentation for the security measures implemented\n   - Ensure proper error handling that doesn't expose sensitive information\n\nReview the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible.",
+      "testStrategy": "Testing should verify all HIPAA compliance aspects of the media handling system:\n\n1. Access Control Testing:\n   - Verify unauthorized users cannot access protected media files\n   - Test that users can only access files they have permissions for\n   - Verify access tokens expire correctly and cannot be reused\n   - Test edge cases like terminated staff accounts and transferred patients\n\n2. Encryption Testing:\n   - Verify server-side encryption is properly configured\n   - Confirm encryption headers in S3/MinIO responses\n   - Attempt to access raw storage to confirm files are encrypted\n   - Validate key rotation procedures work correctly\n\n3. Audit Log Testing:\n   - Verify all media operations generate appropriate audit logs\n   - Confirm logs contain required fields (user ID, timestamp, action, resource ID)\n   - Test log integrity and immutability\n   - Verify log retention policies are enforced\n\n4. Secure Transmission Testing:\n   - Use tools like OWASP ZAP to verify secure connections\n   - Test for TLS configuration issues\n   - Verify secure URL generation and expiration\n   - Attempt to intercept traffic to confirm encryption\n\n5. Compliance Testing:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Perform a security review with the compliance team\n   - Document all security measures for potential audit\n\n6. Regression Testing:\n   - Verify all existing media functionality still works\n   - Test performance impact of new security measures\n\nCreate automated tests where possible and document manual test procedures for aspects that cannot be automated.",
+      "status": "pending",
+      "dependencies": [
+        7
+      ],
+      "priority": "high"
+    },
+    {
+      "id": 26,
+      "title": "Retrofit HIPAA Compliance for Therapy Plan Management",
+      "description": "Modify the existing Therapy Plan Management features to ensure HIPAA compliance through implementing strict RBAC, comprehensive audit logging, data encryption at rest, and secure transmission protocols.",
+      "details": "This task requires retrofitting HIPAA compliance onto the existing Therapy Plan Management system (from Task 8) with the following specific requirements:\n\n1. Role-Based Access Control (RBAC):\n   - Implement granular permission system for therapy plans with distinct roles (Chiropractor/Creator, Patient, Assistant, Administrator)\n   - Enforce ownership model where plan creators have full access rights\n   - Limit patient access to view-only for assigned plans\n   - Create middleware to validate access permissions before any plan operation\n   - Implement access control checks in all plan-related API endpoints\n\n2. Audit Logging:\n   - Create comprehensive logging system capturing all plan interactions\n   - Log must include: user ID, action type, timestamp, IP address, affected resource ID, and before/after states\n   - Implement logs for plan creation, viewing, modification, assignment, and deletion\n   - Ensure exercise addition/modification/removal is logged\n   - Create admin interface for log review with filtering capabilities\n   - Ensure logs are tamper-proof and cannot be modified\n\n3. Data Encryption:\n   - Implement field-level encryption for sensitive plan data including titles, descriptions, instructions, and patient-specific notes\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management system with rotation capabilities\n   - Ensure database backups are also encrypted\n\n4. Secure Transmission:\n   - Enforce HTTPS for all API communications\n   - Implement proper Content Security Policy headers\n   - Add API rate limiting to prevent abuse\n   - Ensure all therapy plan data is encrypted during transmission\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols.",
+      "testStrategy": "Testing should verify all HIPAA compliance aspects:\n\n1. RBAC Testing:\n   - Unit tests for each permission level (create, read, update, delete) across all roles\n   - Integration tests simulating different user roles attempting various operations\n   - Negative testing to verify unauthorized access is properly rejected\n   - Test boundary cases (e.g., transferred ownership, deactivated accounts)\n\n2. Audit Logging Verification:\n   - Verify all required events generate appropriate log entries with complete information\n   - Test log integrity by attempting to modify logs directly\n   - Validate log retention policies are enforced\n   - Test log search and filtering functionality\n   - Verify logs capture before/after states for modifications\n\n3. Encryption Testing:\n   - Verify sensitive fields are encrypted in database using direct DB inspection\n   - Test encryption/decryption performance under load\n   - Verify key rotation procedures work correctly\n   - Ensure encrypted backups can be properly restored\n\n4. Security Testing:\n   - Perform penetration testing on API endpoints\n   - Verify all communications use HTTPS with proper certificate validation\n   - Test API rate limiting functionality\n   - Conduct man-in-the-middle attack simulations to verify data cannot be intercepted\n\n5. Compliance Validation:\n   - Create comprehensive test documentation mapping each test to specific HIPAA requirements\n   - Conduct end-to-end scenario testing with realistic patient data\n   - Perform security code review focused on the implemented changes\n   - Validate against HIPAA compliance checklist from docs/healthcare-compliance.md",
+      "status": "pending",
+      "dependencies": [
+        8
+      ],
+      "priority": "high"
     }
   ],
   "metadata": {

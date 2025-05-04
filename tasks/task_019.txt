@@ -1,14 +1,14 @@
 # Task ID: 19
-# Title: Mobile App Therapy Plan Viewer
+# Title: Mobile App Therapy Plan Viewer with HIPAA Compliance
 # Status: pending
 # Dependencies: 17, 6, 7
 # Priority: high
-# Description: Implement the therapy plan viewer with offline capabilities using SQLite for local storage.
+# Description: Implement the therapy plan viewer with offline capabilities using SQLite for local storage, ensuring HIPAA-compliant data handling.
 # Details:
-Create therapy plan listing screen. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection.
+Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans.
 
 # Test Strategy:
-Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints.
+Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest.
 
 # Subtasks:
 ## 19.1. Implement SQLite database schema for therapy plans [pending]
@@ -32,6 +32,36 @@ Test plan viewing with various media types. Verify offline functionality by disa
 ## 19.4. Update UI components to work with offline data [pending]
 ### Dependencies: None
 ### Description: Modify therapy plan listing and detail views to retrieve data from local SQLite database instead of directly from API.
+### Details:
+
+
+## 19.5. Implement database encryption [pending]
+### Dependencies: None
+### Description: Add encryption for SQLite database to protect ePHI at rest
+### Details:
+
+
+## 19.6. Add audit logging for data access [pending]
+### Dependencies: None
+### Description: Implement detailed logging of all therapy plan access and viewing operations
+### Details:
+
+
+## 19.7. Create secure data wiping functionality [pending]
+### Dependencies: None
+### Description: Implement feature to securely delete all patient data when requested or when consent is withdrawn
+### Details:
+
+
+## 19.8. Implement access controls [pending]
+### Dependencies: None
+### Description: Add controls to ensure patients can only access their own plans
+### Details:
+
+
+## 19.9. Add data minimization for plan display [pending]
+### Dependencies: None
+### Description: Implement practices to limit ePHI exposure in plan listings and details
 ### Details:
 
 

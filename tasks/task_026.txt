@@ -1,0 +1,71 @@
+# Task ID: 26
+# Title: Retrofit HIPAA Compliance for Therapy Plan Management
+# Status: pending
+# Dependencies: 8
+# Priority: high
+# Description: Modify the existing Therapy Plan Management features to ensure HIPAA compliance through implementing strict RBAC, comprehensive audit logging, data encryption at rest, and secure transmission protocols.
+# Details:
+This task requires retrofitting HIPAA compliance onto the existing Therapy Plan Management system (from Task 8) with the following specific requirements:
+
+1. Role-Based Access Control (RBAC):
+   - Implement granular permission system for therapy plans with distinct roles (Chiropractor/Creator, Patient, Assistant, Administrator)
+   - Enforce ownership model where plan creators have full access rights
+   - Limit patient access to view-only for assigned plans
+   - Create middleware to validate access permissions before any plan operation
+   - Implement access control checks in all plan-related API endpoints
+
+2. Audit Logging:
+   - Create comprehensive logging system capturing all plan interactions
+   - Log must include: user ID, action type, timestamp, IP address, affected resource ID, and before/after states
+   - Implement logs for plan creation, viewing, modification, assignment, and deletion
+   - Ensure exercise addition/modification/removal is logged
+   - Create admin interface for log review with filtering capabilities
+   - Ensure logs are tamper-proof and cannot be modified
+
+3. Data Encryption:
+   - Implement field-level encryption for sensitive plan data including titles, descriptions, instructions, and patient-specific notes
+   - Use industry-standard encryption algorithms (AES-256)
+   - Implement proper key management system with rotation capabilities
+   - Ensure database backups are also encrypted
+
+4. Secure Transmission:
+   - Enforce HTTPS for all API communications
+   - Implement proper Content Security Policy headers
+   - Add API rate limiting to prevent abuse
+   - Ensure all therapy plan data is encrypted during transmission
+
+Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols.
+
+# Test Strategy:
+Testing should verify all HIPAA compliance aspects:
+
+1. RBAC Testing:
+   - Unit tests for each permission level (create, read, update, delete) across all roles
+   - Integration tests simulating different user roles attempting various operations
+   - Negative testing to verify unauthorized access is properly rejected
+   - Test boundary cases (e.g., transferred ownership, deactivated accounts)
+
+2. Audit Logging Verification:
+   - Verify all required events generate appropriate log entries with complete information
+   - Test log integrity by attempting to modify logs directly
+   - Validate log retention policies are enforced
+   - Test log search and filtering functionality
+   - Verify logs capture before/after states for modifications
+
+3. Encryption Testing:
+   - Verify sensitive fields are encrypted in database using direct DB inspection
+   - Test encryption/decryption performance under load
+   - Verify key rotation procedures work correctly
+   - Ensure encrypted backups can be properly restored
+
+4. Security Testing:
+   - Perform penetration testing on API endpoints
+   - Verify all communications use HTTPS with proper certificate validation
+   - Test API rate limiting functionality
+   - Conduct man-in-the-middle attack simulations to verify data cannot be intercepted
+
+5. Compliance Validation:
+   - Create comprehensive test documentation mapping each test to specific HIPAA requirements
+   - Conduct end-to-end scenario testing with realistic patient data
+   - Perform security code review focused on the implemented changes
+   - Validate against HIPAA compliance checklist from docs/healthcare-compliance.md

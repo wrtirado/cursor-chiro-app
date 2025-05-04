@@ -1,23 +1,23 @@
 # Task ID: 6
-# Title: Therapy Plan Management API
+# Title: Therapy Plan Management API with HIPAA Compliance
 # Status: done
 # Dependencies: 4
 # Priority: high
-# Description: Develop API endpoints for creating, editing, and managing therapy plans according to SDP specifications.
+# Description: Develop API endpoints for creating, editing, and managing therapy plans according to SDP specifications with HIPAA-compliant data handling.
 # Details:
-Implement the following SDP-compliant endpoints:
+Implement the following SDP-compliant endpoints with HIPAA safeguards:
 
-1. POST /plans - Create new therapy plans
-2. GET /plans - List plans with role-based filtering
-3. GET /plans/{id} - Retrieve detailed plan information
-4. PUT /plans/{id} - Update existing plans
-5. DELETE /plans/{id} - Remove plans
-6. POST /plans/{id}/assign - Assign plans to patients
+1. POST /plans - Create new therapy plans with audit logging
+2. GET /plans - List plans with role-based filtering and access controls
+3. GET /plans/{id} - Retrieve detailed plan information with authorization checks
+4. PUT /plans/{id} - Update existing plans with audit trails
+5. DELETE /plans/{id} - Remove plans with secure deletion practices
+6. POST /plans/{id}/assign - Assign plans to patients with consent tracking
 
-Ensure all endpoints follow SDP request/response formats. Implement functionality for adding exercises with text, images, and videos. Develop API for assigning plans to patients. Create endpoints for retrieving plans assigned to a specific patient. Implement versioning for therapy plans to track changes.
+Ensure all endpoints follow SDP request/response formats. Implement functionality for adding exercises with text, images, and videos with encryption for any ePHI. Develop API for assigning plans to patients with detailed audit logging. Create endpoints for retrieving plans assigned to a specific patient with RBAC controls. Implement versioning for therapy plans to track changes for HIPAA compliance. Ensure all data is encrypted both at rest and in transit. Implement data minimization practices to limit ePHI exposure according to the Privacy Rule.
 
 # Test Strategy:
-Test all endpoints against SDP specifications. Verify request/response formats match documentation. Test creation of plans with various media types. Verify plan assignment to patients. Test retrieval of plans with proper filtering and role-based access. Ensure plan updates don't affect historical data.
+Test all endpoints against SDP specifications with HIPAA compliance verification. Verify request/response formats match documentation and include proper security controls. Test creation of plans with various media types and verify encryption. Verify plan assignment to patients with audit logging. Test retrieval of plans with proper filtering and role-based access controls. Ensure plan updates don't affect historical data and create appropriate audit trails. Validate encryption of ePHI both in transit and at rest. Test that audit logs capture all required HIPAA information. Verify that access controls prevent unauthorized access to therapy plans. Test data minimization practices to ensure ePHI exposure is limited.
 
 # Subtasks:
 ## 6.1. Define SDP-compliant request/response schemas [done]
@@ -59,6 +59,24 @@ Test all endpoints against SDP specifications. Verify request/response formats m
 ## 6.7. Implement POST /plans/{id}/assign endpoint [done]
 ### Dependencies: None
 ### Description: 
+### Details:
+
+
+## 6.8. Add HIPAA-compliant audit logging [done]
+### Dependencies: None
+### Description: Implement detailed audit logging for all therapy plan operations
+### Details:
+
+
+## 6.9. Implement data encryption [done]
+### Dependencies: None
+### Description: Add encryption for all ePHI in therapy plans at rest and in transit
+### Details:
+
+
+## 6.10. Add consent tracking [done]
+### Dependencies: None
+### Description: Implement system to track patient consent for therapy plans
 ### Details:
 
 

@@ -1,0 +1,55 @@
+# Task ID: 24
+# Title: Retrofit HIPAA Compliance to Company and Office Management Features
+# Status: pending
+# Dependencies: 6
+# Priority: high
+# Description: Implement HIPAA compliance measures for existing Company and Office Management functionality by adding Role-Based Access Controls (RBAC) and comprehensive audit logging for all data operations.
+# Details:
+This task requires modifying the existing Company and Office Management features to ensure HIPAA compliance by:
+
+1. Implementing strict Role-Based Access Controls (RBAC):
+   - Restrict company/office management capabilities to users with Admin role only
+   - Modify all controller endpoints to verify user permissions before allowing operations
+   - Update UI components to hide management options from unauthorized users
+   - Create permission constants in a central location for consistency
+
+2. Adding comprehensive audit logging:
+   - Implement detailed audit trails for all company/office CRUD operations
+   - Log must include: timestamp, user ID, action type, affected entity, before/after states
+   - Ensure logs are tamper-evident and cannot be modified
+   - Store logs in a separate, secure database table with appropriate retention policies
+
+3. Data access patterns:
+   - Implement data access filters at the repository/service layer to enforce permissions
+   - Add middleware to verify permissions for all API routes related to companies/offices
+
+4. Documentation updates:
+   - Update API documentation to reflect new permission requirements
+   - Document the audit logging format and retention policies
+
+Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6.
+
+# Test Strategy:
+Testing should verify both the RBAC implementation and audit logging functionality:
+
+1. RBAC Testing:
+   - Unit tests for each permission check in services and controllers
+   - Integration tests that verify users with Admin role can perform all operations
+   - Integration tests that verify users without Admin role receive 403 Forbidden responses
+   - UI tests to confirm management options are only visible to authorized users
+
+2. Audit Logging Tests:
+   - Unit tests to verify log entries are created for each CRUD operation
+   - Tests to verify log entries contain all required fields (timestamp, user, action, etc.)
+   - Integration tests that perform operations and verify corresponding log entries
+   - Tests to verify logs cannot be modified or deleted through normal application interfaces
+
+3. Security Testing:
+   - Attempt to bypass RBAC by directly calling APIs with unauthorized credentials
+   - Verify that all routes are protected, including any that might have been overlooked
+   - Test for SQL injection and other security vulnerabilities in the logging system
+
+4. Compliance Verification:
+   - Create a compliance checklist based on docs/healthcare-compliance.md
+   - Verify each requirement is met through manual testing
+   - Document evidence of compliance for each requirement

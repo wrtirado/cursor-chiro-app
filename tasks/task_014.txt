@@ -1,11 +1,55 @@
 # Task ID: 14
-# Title: Web App Therapy Plan Creation Interface
+# Title: Web App Therapy Plan Creation Interface with HIPAA Compliance
 # Status: pending
 # Dependencies: 12, 6, 7
 # Priority: high
-# Description: Implement interfaces for creating and managing therapy plans.
+# Description: Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling.
 # Details:
-Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients. Implement plan templates and duplication features.
+Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans.
 
 # Test Strategy:
-Test creation of plans with various media types. Verify proper saving and retrieval of plan data. Test media uploads and previews. Ensure proper validation of required fields.
+Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption.
+
+# Subtasks:
+## 14.1. Create therapy plan editor UI [pending]
+### Dependencies: None
+### Description: Implement interface for creating and editing therapy plans with all required sections
+### Details:
+
+
+## 14.2. Implement secure media upload [pending]
+### Dependencies: None
+### Description: Add functionality for uploading images and videos with encryption and secure handling
+### Details:
+
+
+## 14.3. Develop plan assignment interface [pending]
+### Dependencies: None
+### Description: Create UI for assigning plans to patients with proper consent tracking
+### Details:
+
+
+## 14.4. Add template functionality [pending]
+### Dependencies: None
+### Description: Implement ability to create and use plan templates
+### Details:
+
+
+## 14.5. Implement RBAC for therapy plans [pending]
+### Dependencies: None
+### Description: Add role-based access controls to limit plan access to authorized users
+### Details:
+
+
+## 14.6. Add audit logging [pending]
+### Dependencies: None
+### Description: Implement detailed logging of all therapy plan operations for HIPAA compliance
+### Details:
+
+
+## 14.7. Create consent tracking UI [pending]
+### Dependencies: None
+### Description: Add interface for tracking patient consent for therapy plans
+### Details:
+
+
