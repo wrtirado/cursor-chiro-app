@@ -1413,66 +1413,7 @@
       "dependencies": [
         8
       ],
-      "priority": "high",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Implement Role-Based Access Control (RBAC) System",
-          "description": "Design and implement a granular RBAC system for the Therapy Plan Management features with distinct roles and permissions.",
-          "dependencies": [],
-          "details": "Implementation details:\n1. Create a permission model with defined roles (Chiropractor/Creator, Patient, Assistant, Administrator)\n2. Define granular permissions for each role (create, read, update, delete, assign)\n3. Implement ownership model where plan creators have full access rights\n4. Create middleware to validate access permissions before any plan operation\n5. Modify existing API endpoints to include permission checks\n6. Update database schema to track ownership and permissions\n7. Create role assignment functionality for administrators\n\nTesting approach:\n- Unit tests for permission validation logic\n- Integration tests for middleware functionality\n- End-to-end tests simulating different user roles accessing protected resources\n- Security penetration testing to verify unauthorized access is prevented",
-          "status": "pending",
-          "parentTaskId": 26
-        },
-        {
-          "id": 2,
-          "title": "Develop Comprehensive Audit Logging System",
-          "description": "Create a tamper-proof audit logging system that captures all interactions with therapy plans.",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation details:\n1. Design database schema for audit logs with fields for user ID, action type, timestamp, IP address, resource ID, and before/after states\n2. Implement logging service to capture all plan interactions\n3. Add logging hooks to all plan-related operations (creation, viewing, modification, assignment, deletion)\n4. Ensure exercise addition/modification/removal is logged\n5. Implement tamper-proof mechanisms (e.g., cryptographic signatures, sequential IDs)\n6. Create admin interface for log review with filtering and search capabilities\n7. Implement log retention policies according to HIPAA requirements\n\nTesting approach:\n- Unit tests for logging service\n- Integration tests to verify logs are created for all operations\n- Verification tests for tamper-proof mechanisms\n- UI tests for admin interface functionality\n- Performance tests to ensure logging doesn't impact system performance",
-          "status": "pending",
-          "parentTaskId": 26
-        },
-        {
-          "id": 3,
-          "title": "Implement Data Encryption at Rest",
-          "description": "Add field-level encryption for sensitive therapy plan data using industry-standard encryption algorithms.",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation details:\n1. Identify all sensitive fields requiring encryption (plan titles, descriptions, instructions, patient notes)\n2. Implement encryption/decryption service using AES-256 algorithm\n3. Create key management system with secure storage and rotation capabilities\n4. Modify database access layer to transparently encrypt/decrypt data\n5. Update database schema to store encrypted data\n6. Ensure database backups are also encrypted\n7. Implement key rotation procedures\n8. Document encryption implementation for compliance audits\n\nTesting approach:\n- Unit tests for encryption/decryption functions\n- Integration tests verifying data is properly encrypted in database\n- Performance tests to measure impact of encryption/decryption operations\n- Security tests to verify encrypted data cannot be accessed without proper keys\n- Backup and restore tests with encrypted data",
-          "status": "pending",
-          "parentTaskId": 26
-        },
-        {
-          "id": 4,
-          "title": "Enhance Secure Data Transmission",
-          "description": "Implement secure transmission protocols for all therapy plan data communications.",
-          "dependencies": [
-            1,
-            3
-          ],
-          "details": "Implementation details:\n1. Configure and enforce HTTPS for all API communications\n2. Implement proper Content Security Policy headers\n3. Add API rate limiting to prevent abuse\n4. Implement transport layer encryption for all therapy plan data\n5. Update API endpoints to validate secure connections\n6. Configure secure cookie attributes (Secure, HttpOnly, SameSite)\n7. Implement HSTS headers\n8. Add protection against common web vulnerabilities (XSS, CSRF)\n\nTesting approach:\n- Security scans to verify HTTPS implementation\n- API tests to verify rate limiting functionality\n- Penetration testing to identify potential security vulnerabilities\n- Performance testing under rate limiting conditions\n- Compatibility testing across different browsers and clients",
-          "status": "pending",
-          "parentTaskId": 26
-        },
-        {
-          "id": 5,
-          "title": "Create HIPAA Compliance Documentation and Verification",
-          "description": "Develop comprehensive documentation and verification procedures to ensure HIPAA compliance of the therapy plan management system.",
-          "dependencies": [
-            1,
-            2,
-            3,
-            4
-          ],
-          "details": "Implementation details:\n1. Create detailed documentation of all implemented HIPAA compliance measures\n2. Develop verification procedures to test compliance features\n3. Implement automated compliance checks as part of CI/CD pipeline\n4. Create user training materials for HIPAA-compliant system usage\n5. Develop incident response procedures for potential data breaches\n6. Create compliance reports for auditing purposes\n7. Implement regular compliance scanning and reporting\n8. Document all security measures for regulatory review\n\nTesting approach:\n- Comprehensive system audit against HIPAA requirements\n- Simulated breach scenarios to test incident response\n- User acceptance testing with compliance-focused scenarios\n- Documentation review by legal/compliance team\n- Verification that all requirements from healthcare-compliance.md are satisfied",
-          "status": "pending",
-          "parentTaskId": 26
-        }
-      ]
+      "priority": "high"
     }
   ],
   "metadata": {

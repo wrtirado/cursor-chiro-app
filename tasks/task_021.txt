@@ -10,7 +10,7 @@ This task requires implementing several key HIPAA compliance components at the A
 1. **Security Configuration Review**:
    - Audit existing API configurations and modify defaults to enforce secure settings
    - Implement automatic session timeouts after periods of inactivity
-   - Configure proper TLS/SSL settings with modern cipher suites
+   - Configure proper TLS/SSL settings with modern cipher suites (to be enforced in staging/production)
    - Disable any insecure defaults that may exist in the framework
 
 2. **Audit Logging Infrastructure**:
@@ -21,7 +21,8 @@ This task requires implementing several key HIPAA compliance components at the A
 
 3. **Encryption Implementation**:
    - Apply encryption at rest for all PHI stored in databases or file systems
-   - Implement encryption in transit using TLS 1.2+ for all API communications
+   - Configure the application to support TLS 1.2+ for encryption in transit
+   - Support HTTP for local development while ensuring the application is ready for HTTPS in staging/production
    - Create key management procedures for encryption keys
    - Document encryption standards used for compliance documentation
 
@@ -30,10 +31,12 @@ This task requires implementing several key HIPAA compliance components at the A
    - Create mechanisms to detect and prevent PHI from appearing in error logs
    - Establish proper content-type headers and response structures
    - Implement minimum necessary principle by filtering response data based on user roles
+   - Ensure all data handling code assumes secure transmission in production environments
 
 5. **Documentation Updates**:
    - Update technical documentation to reflect HIPAA compliance measures
    - Create developer guidelines for maintaining compliance when modifying the API
+   - Document the environment-specific security configurations (local vs. staging/production)
 
 Refer to docs/healthcare-compliance.md for complete requirements and implementation standards. This implementation should be done at the core/foundation level to ensure all API components inherit these security controls.
 
@@ -41,9 +44,11 @@ Refer to docs/healthcare-compliance.md for complete requirements and implementat
 Testing should verify all HIPAA compliance measures are correctly implemented:
 
 1. **Security Configuration Tests**:
-   - Verify TLS configuration using tools like SSL Labs or testssl.sh
+   - Verify the application is properly configured to support TLS when deployed
+   - Confirm the application works correctly over HTTP in local development
    - Test session timeout functionality by monitoring inactive sessions
    - Attempt to use deprecated/insecure methods to confirm they're disabled
+   - Document TLS verification tests to be performed in staging/production environments
 
 2. **Audit Logging Tests**:
    - Perform various API operations and verify appropriate audit logs are generated
@@ -53,18 +58,124 @@ Testing should verify all HIPAA compliance measures are correctly implemented:
 
 3. **Encryption Tests**:
    - Use database inspection tools to verify data is encrypted at rest
-   - Perform network traffic analysis to confirm all API traffic is encrypted
+   - Verify the application is configured to support TLS 1.2+ for production use
    - Test key rotation procedures to ensure they work without data loss
+   - Defer actual TLS connection testing (using tools like SSL Labs or testssl.sh) to deployed environments
 
 4. **Data Handling Tests**:
    - Submit malformed/malicious inputs to verify proper validation
    - Trigger errors and verify PHI is not exposed in error messages
    - Test with different user roles to confirm minimum necessary principle
-   - Verify all PHI transmissions are properly secured
+   - Verify all PHI transmissions are properly structured for secure handling
+   - Confirm the application correctly handles both HTTP (dev) and HTTPS (prod) contexts
 
 5. **Compliance Verification**:
    - Create a test checklist derived from docs/healthcare-compliance.md
    - Perform a mock HIPAA audit against the implementation
    - Document all test results for compliance evidence
+   - Create separate verification procedures for local development vs. production environments
 
-All tests should be automated where possible and included in the CI/CD pipeline to ensure ongoing compliance.
+All tests should be automated where possible and included in the CI/CD pipeline to ensure ongoing compliance. Environment-specific tests (like TLS verification) should be clearly marked for execution only in the appropriate environments.
+
+# Subtasks:
+## 1. Implement Security Configuration Framework [pending]
+### Dependencies: None
+### Description: Create a security configuration framework that enforces HIPAA-compliant settings across different environments (development, staging, production).
+### Details:
+Implementation details:
+1. Create a `SecurityConfigService` class to manage security configurations
+2. Implement environment-specific configuration profiles (dev, staging, prod)
+3. Configure session timeout settings (30 minutes for production, configurable for dev)
+4. Set up TLS/SSL configuration with modern cipher suites
+5. Create middleware to enforce secure headers (Content-Security-Policy, X-XSS-Protection, etc.)
+6. Disable insecure defaults in the framework
+7. Implement configuration validation to ensure security settings meet HIPAA requirements
+
+Testing approach:
+- Unit test each configuration setting
+- Create integration tests that verify security headers are properly applied
+- Test environment switching to ensure production settings cannot be bypassed
+- Validate session timeout functionality works as expected
+
+## 2. Build Comprehensive Audit Logging System [pending]
+### Dependencies: 21.1
+### Description: Develop a robust audit logging system that captures all PHI access, modifications, and transmissions with appropriate metadata.
+### Details:
+Implementation details:
+1. Create an `AuditLogger` service that integrates with the security framework
+2. Implement logging middleware to capture API requests and responses
+3. Log critical user events: authentication, PHI access, modifications, and transmissions
+4. Include metadata with each log: timestamp, user ID, IP address, action performed, resources affected
+5. Implement tamper-evident logging (e.g., using sequential IDs or checksums)
+6. Create log rotation and archiving system with 6-year retention capability
+7. Implement log access controls to prevent unauthorized modification
+8. Add configuration for log storage location (file system vs. database)
+
+Testing approach:
+- Unit test logging functions with mock data
+- Create integration tests that verify all required metadata is captured
+- Test log rotation and retention policies
+- Verify logs cannot be modified by regular users
+- Performance test logging system under load
+
+## 3. Implement PHI Encryption Framework [pending]
+### Dependencies: 21.1
+### Description: Create a comprehensive encryption framework for protecting PHI both at rest and in transit.
+### Details:
+Implementation details:
+1. Develop an `EncryptionService` that provides standardized encryption/decryption methods
+2. Implement database-level encryption for PHI fields using industry-standard algorithms (AES-256)
+3. Create key management utilities for secure key generation, storage, and rotation
+4. Configure the application to enforce TLS 1.2+ for all API communications
+5. Implement environment-aware encryption (relaxed for development, strict for production)
+6. Create utilities to verify encryption status of PHI data
+7. Document all encryption standards and methods used
+
+Testing approach:
+- Unit test encryption/decryption functions
+- Create integration tests that verify PHI is properly encrypted in the database
+- Test key rotation procedures
+- Verify TLS configuration works correctly in different environments
+- Benchmark encryption/decryption performance
+
+## 4. Develop Secure Data Handling Controls [pending]
+### Dependencies: 21.1, 21.2, 21.3
+### Description: Implement controls to ensure PHI is properly validated, sanitized, and filtered according to the minimum necessary principle.
+### Details:
+Implementation details:
+1. Create a `DataSanitizationService` to handle input validation and sanitization
+2. Implement middleware to detect and redact PHI in error logs and responses
+3. Develop a role-based data filtering system to enforce minimum necessary principle
+4. Create request validators for all API endpoints that handle PHI
+5. Implement proper content-type headers and response structures
+6. Add PHI detection patterns to identify potential data leakage
+7. Create utilities to mask/redact PHI in logs when necessary
+
+Testing approach:
+- Unit test all sanitization and validation functions
+- Create integration tests with various user roles to verify proper data filtering
+- Test error handling to ensure PHI is not leaked in error responses
+- Verify content-type headers are properly set
+- Test with malformed input to ensure robust handling
+
+## 5. Create HIPAA Compliance Documentation and Developer Guidelines [pending]
+### Dependencies: 21.1, 21.2, 21.3, 21.4
+### Description: Develop comprehensive documentation for the HIPAA compliance measures implemented and create guidelines for developers to maintain compliance.
+### Details:
+Implementation details:
+1. Update technical documentation to reflect all implemented HIPAA compliance measures
+2. Create developer guidelines for maintaining compliance when modifying the API
+3. Document environment-specific security configurations
+4. Create a compliance checklist for code reviews
+5. Develop training materials for new developers
+6. Document the encryption standards and key management procedures
+7. Create API usage examples that demonstrate proper handling of PHI
+8. Document audit logging capabilities and retention policies
+
+Testing approach:
+- Review documentation with security team
+- Validate all implemented features are properly documented
+- Have developers follow guidelines to implement a test feature to verify clarity
+- Create automated tests that verify documentation examples work as described
+- Ensure all configuration options are documented with proper defaults
+

@@ -1,0 +1,1 @@
+2025-05-04 23:23:13,180 - app - ERROR - FATAL: Invalid ENCRYPTION_KEY configured. Application cannot start securely. Error: Invalid ENCRYPTION_KEY length or format. Must be 32 url-safe base64-encoded bytes.
