@@ -1,1 +1,152 @@
 2025-05-04 23:23:13,180 - app - ERROR - FATAL: Invalid ENCRYPTION_KEY configured. Application cannot start securely. Error: Invalid ENCRYPTION_KEY length or format. Must be 32 url-safe base64-encoded bytes.
+2025-05-05 03:39:00,483 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-05 03:39:00,681 - app - ERROR - Unhandled exception during request to /api/v1/auth/register: (psycopg2.errors.ForeignKeyViolation) insert or update on table "users" violates foreign key constraint "users_role_id_fkey"
+DETAIL:  Key (role_id)=(5) is not present in table "roles".
+
+[SQL: INSERT INTO users (office_id, role_id, name, email, password_hash, join_code) VALUES (%(office_id)s, %(role_id)s, %(name)s, %(email)s, %(password_hash)s, %(join_code)s) RETURNING users.user_id, users.created_at, users.updated_at]
+[parameters: {'office_id': None, 'role_id': 5, 'name': 'gAAAAABoGDLUJzxKLD_lcty7rrft169qYevSgDhz8qTetruynYWHNGcCtq_0CtogvD7RJiInqn6BcAa6MAdY0wGRtx7Bl5z1sw==', 'email': 'gAAAAABoGDLUIVpM5WG_pAHNsciWGeW8BUSA2oKj9sNLv3K19oHfMtfcLpPlY3KCBTI8d1kz2FIrmoyu65wXN-lVqjdhAfKNHQ==', 'password_hash': '$2b$12$Raji6Xs3UUFWB7EeOmH1R.4szp5dG2oLll97ra18C.N943E1IZN2C', 'join_code': None}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "users" violates foreign key constraint "users_role_id_fkey"
+DETAIL:  Key (role_id)=(5) is not present in table "roles".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 176, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/local/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_utils.py", line 82, in collapse_excgroups
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/api/core/middleware.py", line 8, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/api/auth/router.py", line 70, in register_user
+    created_user = crud_user.create_user(db=db, user=user_in)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/api/crud/crud_user.py", line 55, in create_user
+    db.commit()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "users" violates foreign key constraint "users_role_id_fkey"
+DETAIL:  Key (role_id)=(5) is not present in table "roles".
+
+[SQL: INSERT INTO users (office_id, role_id, name, email, password_hash, join_code) VALUES (%(office_id)s, %(role_id)s, %(name)s, %(email)s, %(password_hash)s, %(join_code)s) RETURNING users.user_id, users.created_at, users.updated_at]
+[parameters: {'office_id': None, 'role_id': 5, 'name': 'gAAAAABoGDLUJzxKLD_lcty7rrft169qYevSgDhz8qTetruynYWHNGcCtq_0CtogvD7RJiInqn6BcAa6MAdY0wGRtx7Bl5z1sw==', 'email': 'gAAAAABoGDLUIVpM5WG_pAHNsciWGeW8BUSA2oKj9sNLv3K19oHfMtfcLpPlY3KCBTI8d1kz2FIrmoyu65wXN-lVqjdhAfKNHQ==', 'password_hash': '$2b$12$Raji6Xs3UUFWB7EeOmH1R.4szp5dG2oLll97ra18C.N943E1IZN2C', 'join_code': None}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-05-05 03:46:13,786 - app - WARNING - HTTPException during request to /api/v1/companies/: Status=401, Detail='Not authenticated'
+2025-05-05 03:46:30,379 - app - WARNING - HTTPException during request to /api/v1/auth/login: Status=401, Detail='Incorrect email or password'
+2025-05-05 03:46:42,982 - app - WARNING - HTTPException during request to /api/v1/auth/login: Status=401, Detail='Incorrect email or password'
+2025-05-05 03:47:38,464 - app - WARNING - HTTPException during request to /api/v1/auth/login: Status=401, Detail='Incorrect email or password'

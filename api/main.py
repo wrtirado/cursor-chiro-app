@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # Import CORS Middleware
 
+# Import exception handlers
+from fastapi.exceptions import HTTPException
+from api.core.exceptions import generic_exception_handler, http_exception_handler
+
 # Import other routers as they are created
 from api.core.config import settings
 from api.core.middleware import SecureHeadersMiddleware  # Import the new middleware
@@ -19,6 +23,13 @@ app = FastAPI(
     description="API for the Tirado Chiropractic mobile and web applications.",
     version="0.1.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    # Register exception handlers
+    exception_handlers={
+        Exception: generic_exception_handler,
+        HTTPException: http_exception_handler,
+        # Add other handlers here if needed, e.g.:
+        # RequestValidationError: validation_exception_handler
+    },
 )
 
 # Set up CORS Middleware

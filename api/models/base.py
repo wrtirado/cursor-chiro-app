@@ -58,8 +58,17 @@ class User(Base):
     office_id = Column(Integer, ForeignKey("offices.office_id", ondelete="SET NULL"))
     role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
     name = Column(EncryptedType(String(255)), nullable=False)
-    email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False)
-    password_hash = Column(String(255), nullable=False)
+    # Encrypting email: Makes direct lookup via email complex.
+    # Consider if lookup is essential or if user_id is primary lookup key.
+    # If email lookup needed, maybe store a hash of the email for lookup and encrypt the actual email.
+    # For now, encrypting it. -> REVERTING: Removing encryption for login lookup
+    # email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False) # Encrypted
+    email = Column(
+        String(255), unique=True, index=True, nullable=False
+    )  # Plaintext for lookup
+    password_hash = Column(
+        String(255), nullable=False
+    )  # Password hashes are already secure
     join_code = Column(String(10), unique=True, index=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(

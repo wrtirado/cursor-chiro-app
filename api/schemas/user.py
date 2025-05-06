@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 import datetime
 
@@ -6,7 +6,7 @@ import datetime
 # Base User Schema
 class UserBase(BaseModel):
     email: EmailStr
-    name: str
+    name: str = Field(..., max_length=255)
     role_id: int
     office_id: Optional[int] = None
 
