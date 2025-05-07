@@ -52,31 +52,6 @@ services:
     # stdin_open: true
     # tty: true
 
-  webapp:
-    build:
-      context: ./webapp
-      dockerfile: Dockerfile
-      # args: # Build args usually not needed for dev mode
-      #   VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
-    volumes:
-      - ./webapp:/app # Mount webapp source code
-      # Prevent mounting node_modules from host, use container's modules
-      - /app/node_modules
-    ports:
-      - "3000:5173" # Map host port 3000 to Vite dev server port 5173
-    environment:
-      # Pass runtime environment variables needed by Vite/React app
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
-      # Ensure host is set for Vite to be accessible
-      HOST: 0.0.0.0
-    networks:
-      - app-network
-    # Keep container running and allow attaching
-    stdin_open: true
-    tty: true
-    # depends_on: # Frontend doesn't strictly need backend running unless hitting API immediately
-    #   - api
-
 volumes:
   postgres_data:
   minio_data:
