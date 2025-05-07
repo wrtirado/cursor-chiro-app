@@ -27,7 +27,7 @@ This task requires modifying the existing Company and Office Management features
    - Update API documentation to reflect new permission requirements
    - Document the audit logging format and retention policies
 
-Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6.
+Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.
 
 # Test Strategy:
 Testing should verify both the RBAC implementation and audit logging functionality:
@@ -54,6 +54,11 @@ Testing should verify both the RBAC implementation and audit logging functionali
    - Verify each requirement is met through manual testing
    - Document evidence of compliance for each requirement
 
+5. Database Compatibility Testing:
+   - Verify all operations work correctly with libSQL/SQLite
+   - Test performance of queries with the new database
+   - Ensure transaction integrity for critical operations
+
 # Subtasks:
 ## 1. Create RBAC Permission Constants and Core Infrastructure [pending]
 ### Dependencies: None
@@ -65,11 +70,13 @@ Implementation steps:
 3. Implement a `PermissionChecker` utility that can verify if a user has a specific permission based on their role
 4. Create middleware function `verifyPermission(requiredPermission)` that can be applied to routes to check permissions
 5. Set up the database schema for the audit logging table with fields: id, timestamp, userId, action, entityType, entityId, previousState, newState
+6. Adapt database schema to use libSQL/SQLite data types and constraints
 
 Testing approach:
 - Unit test the permission mapping to ensure Admin role has all required permissions
 - Test the PermissionChecker with various role/permission combinations
 - Verify the middleware correctly blocks/allows requests based on permissions
+- Test compatibility with libSQL/SQLite database
 
 ## 2. Implement Audit Logging Service [pending]
 ### Dependencies: 24.1
@@ -82,12 +89,14 @@ Implementation steps:
 4. Implement log retention policies according to HIPAA requirements (minimum 6 years)
 5. Create database access methods for storing and retrieving audit logs
 6. Add a method to verify log integrity to detect any tampering attempts
+7. Adapt logging service to use libSQL/SQLite for storage
 
 Testing approach:
 - Unit test the logging service with mock data for all CRUD operations
 - Verify that before/after states are correctly captured and stored
 - Test the encryption and tamper detection mechanisms
 - Ensure log retention policies are correctly applied
+- Test compatibility with libSQL/SQLite for log storage and retrieval
 
 ## 3. Modify Company Management Controllers and Services [pending]
 ### Dependencies: 24.1, 24.2
@@ -100,12 +109,14 @@ Implementation steps:
 4. Update repository methods to capture before/after states for audit logging
 5. Implement data access filters at the repository layer to enforce permissions
 6. Update error handling to provide appropriate responses for permission denied scenarios
+7. Adapt database queries to use libSQL/SQLite syntax
 
 Testing approach:
 - Integration tests for each endpoint with different user roles to verify permission enforcement
 - Verify audit logs are created for all operations with correct details
 - Test error scenarios and permission denied cases
 - Ensure data access filters correctly restrict data based on permissions
+- Test compatibility with libSQL/SQLite for all database operations
 
 ## 4. Modify Office Management Controllers and Services [pending]
 ### Dependencies: 24.1, 24.2
@@ -118,12 +129,14 @@ Implementation steps:
 4. Update repository methods to capture before/after states for audit logging
 5. Implement data access filters at the repository layer to enforce permissions
 6. Update error handling to provide appropriate responses for permission denied scenarios
+7. Adapt database queries to use libSQL/SQLite syntax
 
 Testing approach:
 - Integration tests for each endpoint with different user roles to verify permission enforcement
 - Verify audit logs are created for all operations with correct details
 - Test error scenarios and permission denied cases
 - Ensure data access filters correctly restrict data based on permissions
+- Test compatibility with libSQL/SQLite for all database operations
 
 ## 5. Update UI Components and Documentation [pending]
 ### Dependencies: 24.3, 24.4
@@ -136,6 +149,7 @@ Implementation steps:
 4. Document the audit logging format, fields, and retention policies
 5. Create developer documentation explaining the RBAC implementation and how to properly use it for new features
 6. Update the healthcare-compliance.md document with details on how the implementation satisfies HIPAA requirements
+7. Document any libSQL/SQLite specific considerations for developers
 
 Testing approach:
 - UI tests to verify management options are only visible to authorized users

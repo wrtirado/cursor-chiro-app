@@ -1,0 +1,143 @@
+# Task ID: 27
+# Title: Migrate Database Configuration from PostgreSQL to libSQL/SQLite
+# Status: pending
+# Dependencies: 1
+# Priority: medium
+# Description: Update the docker-compose.yml and environment variables to replace PostgreSQL with libSQL/SQLite as the database backend, following the guidelines in docs/switching-db-to-libsql.md.
+# Details:
+This task involves modifying the project's database configuration to use libSQL/SQLite instead of PostgreSQL:
+
+1. Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container
+
+2. Update the DATABASE_URL environment variable in the 'api' service to use the libSQL format:
+   - For file-based SQLite: `DATABASE_URL=sqlite:///path/to/db.sqlite`
+   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`
+
+3. Adjust volumes configuration in the 'api' service to ensure persistence of the SQLite database file if using file-based approach:
+   - Add a volume mapping like `- ./data:/app/data` if storing the SQLite file in a /data directory
+
+4. Remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed
+
+5. Update any database initialization scripts or commands in the docker-compose.yml to align with libSQL/SQLite requirements
+
+6. Ensure the libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file
+
+7. Document the changes made in a comment at the top of the docker-compose.yml file
+
+# Test Strategy:
+To verify the successful migration to libSQL/SQLite:
+
+1. Run `docker-compose up -d` to start the services with the new configuration
+
+2. Check that the application starts without database connection errors in the logs: `docker-compose logs api`
+
+3. Verify the API can perform basic database operations by:
+   - Creating a test record through an API endpoint
+   - Retrieving the created record
+   - Updating the record
+   - Deleting the record
+
+4. Confirm data persistence by:
+   - Creating data through the API
+   - Stopping all containers with `docker-compose down`
+   - Starting containers again with `docker-compose up -d`
+   - Verifying the previously created data is still accessible
+
+5. If using file-based SQLite, check that the database file exists in the expected location
+
+6. Verify the application works correctly when scaled (if applicable) to ensure there are no file locking issues with SQLite
+
+7. Run the application's existing test suite to ensure all database interactions continue to function correctly
+
+# Subtasks:
+## 1. Remove PostgreSQL service from docker-compose.yml [pending]
+### Dependencies: None
+### Description: Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container and document the change.
+### Details:
+Implementation steps:
+1. Open docker-compose.yml
+2. Locate the 'db' service section that defines the PostgreSQL container
+3. Either remove the entire section or comment it out using YAML comment syntax (# at the beginning of each line)
+4. Add a comment at the top of the file documenting the migration from PostgreSQL to libSQL/SQLite
+5. Verify the file still has valid YAML syntax after changes
+
+Testing approach:
+- Run 'docker-compose config' to validate the YAML syntax is still correct
+- Ensure the PostgreSQL container no longer starts when running 'docker-compose up'
+
+## 2. Update DATABASE_URL environment variable for libSQL/SQLite [pending]
+### Dependencies: 27.1
+### Description: Modify the DATABASE_URL environment variable in the 'api' service to use the appropriate libSQL/SQLite connection string format.
+### Details:
+Implementation steps:
+1. Open docker-compose.yml
+2. Locate the 'api' service section
+3. Find the DATABASE_URL environment variable
+4. Replace the PostgreSQL connection string with the appropriate libSQL format:
+   - For file-based SQLite: `DATABASE_URL=sqlite:///app/data/db.sqlite`
+   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`
+5. If using a remote libSQL instance, ensure any tokens or credentials are properly handled (e.g., using .env files)
+
+Testing approach:
+- Verify the connection string format matches the documentation in docs/switching-db-to-libsql.md
+- Test the connection string format with a simple database connection test
+
+## 3. Configure volume mapping for SQLite persistence [pending]
+### Dependencies: 27.1, 27.2
+### Description: Add or update volume configuration in the 'api' service to ensure SQLite database file persistence if using file-based approach.
+### Details:
+Implementation steps:
+1. Open docker-compose.yml
+2. Locate the 'api' service section
+3. Find or add the 'volumes' section under the 'api' service
+4. Add a volume mapping to ensure persistence of the SQLite database file:
+   - Add `- ./data:/app/data` if storing the SQLite file in a /data directory
+5. Create the local data directory if it doesn't exist
+6. Ensure proper permissions are set on the data directory
+
+Testing approach:
+- Run 'docker-compose up' and verify the volume is correctly mounted
+- Create a test file in the mounted directory and verify it persists between container restarts
+- Check that database changes persist after container restarts
+
+## 4. Remove PostgreSQL-specific environment variables [pending]
+### Dependencies: 27.1, 27.2
+### Description: Identify and remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed with libSQL/SQLite.
+### Details:
+Implementation steps:
+1. Open docker-compose.yml
+2. Locate the 'api' service section
+3. Review all environment variables and identify PostgreSQL-specific ones such as:
+   - POSTGRES_USER
+   - POSTGRES_PASSWORD
+   - POSTGRES_DB
+   - POSTGRES_HOST
+   - Any other PostgreSQL-specific configuration variables
+4. Remove or comment out these variables as they're no longer needed
+5. If there are any database initialization scripts or commands specific to PostgreSQL, update or remove them
+
+Testing approach:
+- Run 'docker-compose up' and verify the application starts without errors related to missing environment variables
+- Check application logs to ensure no PostgreSQL connection attempts are being made
+
+## 5. Update Dockerfile to include libSQL/SQLite dependencies [pending]
+### Dependencies: 27.1, 27.2, 27.3, 27.4
+### Description: Ensure the necessary libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file.
+### Details:
+Implementation steps:
+1. Review docs/switching-db-to-libsql.md to identify required libraries
+2. Open the application's Dockerfile
+3. Add necessary system packages if required (e.g., sqlite3-dev)
+4. Update the application's requirements file (e.g., requirements.txt) to include:
+   - sqlalchemy with appropriate drivers
+   - libsql-client or pysqlite3 as needed
+5. If using a specific ORM, ensure compatible versions are specified
+6. Remove any PostgreSQL-specific libraries that are no longer needed
+
+Testing approach:
+- Build the Docker image with 'docker-compose build'
+- Run the application with 'docker-compose up'
+- Verify the application can connect to the libSQL/SQLite database
+- Run a simple database query to confirm functionality
+- Check application logs for any dependency or import errors
+

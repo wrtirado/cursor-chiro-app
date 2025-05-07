@@ -5,10 +5,10 @@
 # Priority: low
 # Description: Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.
 # Details:
-Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure.
+Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure. Use libSQL/SQLite JSON1 extension for storing and querying the colors JSON data. Adapt SQLAlchemy models to use appropriate libSQL/SQLite data types and constraints.
 
 # Test Strategy:
-Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption.
+Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption. Verify JSON1 extension functionality with libSQL/SQLite for proper handling of colors JSON data.
 
 # Subtasks:
 ## 10.1. Create POST /branding endpoint [pending]
@@ -19,7 +19,7 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 
 ## 10.2. Set up Branding database table [pending]
 ### Dependencies: None
-### Description: Create table structure to store branding information with foreign key relationship to Office ID
+### Description: Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema
 ### Details:
 
 
@@ -37,7 +37,7 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 
 ## 10.5. Implement audit logging for branding changes [pending]
 ### Dependencies: None
-### Description: Add detailed audit trails for all branding-related operations
+### Description: Add detailed audit trails for all branding-related operations using libSQL/SQLite
 ### Details:
 
 
@@ -49,7 +49,7 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 
 ## 10.7. Add encryption for branding data [pending]
 ### Dependencies: None
-### Description: Implement encryption for branding information at rest
+### Description: Implement encryption for branding information at rest using methods compatible with libSQL/SQLite
 ### Details:
 
 

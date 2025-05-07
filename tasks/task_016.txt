@@ -5,10 +5,10 @@
 # Priority: medium
 # Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling.
 # Details:
-Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements.
+Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data.
 
 # Test Strategy:
-Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements.
+Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval.
 
 # Subtasks:
 ## 16.1. Create payment configuration UI [pending]
@@ -31,7 +31,7 @@ Test payment configuration options with different user roles. Verify proper disp
 
 ## 16.4. Add payment history reporting [pending]
 ### Dependencies: None
-### Description: Implement reporting screens for payment history with audit logging
+### Description: Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite
 ### Details:
 
 
@@ -49,7 +49,7 @@ Test payment configuration options with different user roles. Verify proper disp
 
 ## 16.7. Add audit logging [pending]
 ### Dependencies: None
-### Description: Implement detailed logging of all payment operations for HIPAA compliance
+### Description: Implement detailed logging of all payment operations for HIPAA compliance using libSQL/SQLite
 ### Details:
 
 

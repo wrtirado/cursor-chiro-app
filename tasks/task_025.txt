@@ -38,7 +38,7 @@ This task requires updating the existing media handling system to meet HIPAA com
    - Create documentation for the security measures implemented
    - Ensure proper error handling that doesn't expose sensitive information
 
-Review the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible.
+Review the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible. Adapt metadata storage and audit logging to use libSQL/SQLite instead of PostgreSQL, ensuring compatibility with the new database system.
 
 # Test Strategy:
 Testing should verify all HIPAA compliance aspects of the media handling system:
@@ -76,6 +76,11 @@ Testing should verify all HIPAA compliance aspects of the media handling system:
    - Verify all existing media functionality still works
    - Test performance impact of new security measures
 
+7. Database Compatibility Testing:
+   - Verify metadata storage works correctly with libSQL/SQLite
+   - Test audit logging with the new database system
+   - Ensure transaction integrity for critical operations
+
 Create automated tests where possible and document manual test procedures for aspects that cannot be automated.
 
 # Subtasks:
@@ -90,12 +95,14 @@ Implementation steps:
 4. Create middleware that intercepts all media requests to perform permission checks
 5. Implement time-limited access tokens for temporary file access using JWT with expiration
 6. Update existing media retrieval endpoints to use the new permission system
+7. Adapt database schema and queries to use libSQL/SQLite
 
 Testing approach:
 - Unit tests for the MediaAccessService with various permission scenarios
 - Integration tests verifying access control across the application
 - Security tests attempting unauthorized access to media files
 - Performance tests to ensure minimal overhead from permission checks
+- Test compatibility with libSQL/SQLite database
 
 ## 2. Configure Server-Side Encryption for S3/MinIO Storage [pending]
 ### Dependencies: 25.1
@@ -108,6 +115,7 @@ Implementation steps:
 4. Modify the file upload process to ensure encryption headers are properly set
 5. Implement a system to re-encrypt existing files to meet the new standards
 6. Create a verification process that confirms files are properly encrypted
+7. Store encryption metadata in libSQL/SQLite database
 
 Testing approach:
 - Unit tests for the encryption configuration
@@ -115,6 +123,7 @@ Testing approach:
 - Tests for key rotation functionality
 - Verification tests to confirm existing files are properly re-encrypted
 - Performance testing to measure impact of encryption on upload/download speeds
+- Test compatibility with libSQL/SQLite for metadata storage
 
 ## 3. Develop Comprehensive Audit Logging System [pending]
 ### Dependencies: 25.1
@@ -128,6 +137,7 @@ Implementation steps:
 5. Make logs tamper-evident by implementing digital signatures or blockchain techniques
 6. Create a log retention policy manager that archives/deletes logs according to HIPAA requirements
 7. Implement a secure log viewing interface for administrators and compliance officers
+8. Adapt logging system to use libSQL/SQLite for storage
 
 Testing approach:
 - Unit tests for the AuditLogService
@@ -135,6 +145,7 @@ Testing approach:
 - Tests for log immutability and tamper detection
 - Performance tests to ensure logging doesn't impact system performance
 - Verification that logs contain all required HIPAA information
+- Test compatibility with libSQL/SQLite for log storage and retrieval
 
 ## 4. Enhance Secure Transmission Protocols [pending]
 ### Dependencies: 25.1, 25.2
@@ -147,6 +158,7 @@ Implementation steps:
 4. Add file integrity verification using checksums for uploaded/downloaded files
 5. Implement content validation to ensure only permitted file types are uploaded
 6. Create a transmission monitoring system to detect and block insecure access attempts
+7. Store transmission metadata in libSQL/SQLite database
 
 Testing approach:
 - Security tests attempting to access media via non-HTTPS connections
@@ -154,6 +166,7 @@ Testing approach:
 - Integration tests for file integrity verification
 - Performance tests measuring impact on file transfer speeds
 - Penetration testing to identify potential security vulnerabilities
+- Test compatibility with libSQL/SQLite for metadata storage
 
 ## 5. Update Documentation and Error Handling [pending]
 ### Dependencies: 25.1, 25.2, 25.3, 25.4
@@ -167,6 +180,7 @@ Implementation steps:
 5. Document the encryption standards, key management procedures, and audit logging
 6. Prepare compliance documentation showing how the system meets HIPAA requirements
 7. Create a system status dashboard showing compliance metrics
+8. Document libSQL/SQLite specific considerations for the media handling system
 
 Testing approach:
 - Review of all error messages to ensure they don't leak sensitive information

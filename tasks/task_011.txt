@@ -5,15 +5,15 @@
 # Priority: medium
 # Description: Implement API endpoints for configuring patient notification schedules with HIPAA-compliant data handling.
 # Details:
-Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements.
+Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements. Adapt database models to use libSQL/SQLite data types and constraints. Use JSON1 extension for storing complex notification configuration data.
 
 # Test Strategy:
-Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements.
+Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements. Test compatibility with libSQL/SQLite, particularly for JSON data storage and retrieval.
 
 # Subtasks:
 ## 11.1. Create notification schedule endpoints [pending]
 ### Dependencies: None
-### Description: Implement endpoints for creating and managing notification schedules
+### Description: Implement endpoints for creating and managing notification schedules using libSQL/SQLite for data storage
 ### Details:
 
 
@@ -31,13 +31,13 @@ Test creation of various notification schedules. Verify proper time calculations
 
 ## 11.4. Implement audit logging [pending]
 ### Dependencies: None
-### Description: Add detailed audit trails for all notification configuration operations
+### Description: Add detailed audit trails for all notification configuration operations using libSQL/SQLite
 ### Details:
 
 
 ## 11.5. Add data encryption [pending]
 ### Dependencies: None
-### Description: Implement encryption for notification data at rest and in transit
+### Description: Implement encryption for notification data at rest and in transit, adapting methods for libSQL/SQLite
 ### Details:
 
 

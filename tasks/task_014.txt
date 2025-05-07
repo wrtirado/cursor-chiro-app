@@ -5,10 +5,10 @@
 # Priority: high
 # Description: Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling.
 # Details:
-Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans.
+Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references.
 
 # Test Strategy:
-Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption.
+Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships.
 
 # Subtasks:
 ## 14.1. Create therapy plan editor UI [pending]
@@ -43,7 +43,7 @@ Test creation of plans with various media types. Verify proper saving and retrie
 
 ## 14.6. Add audit logging [pending]
 ### Dependencies: None
-### Description: Implement detailed logging of all therapy plan operations for HIPAA compliance
+### Description: Implement detailed logging of all therapy plan operations for HIPAA compliance using libSQL/SQLite
 ### Details:
 
 

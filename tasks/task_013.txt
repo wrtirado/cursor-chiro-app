@@ -5,10 +5,10 @@
 # Priority: high
 # Description: Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls.
 # Details:
-Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling.
+Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration.
 
 # Test Strategy:
-Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features.
+Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations.
 
 # Subtasks:
 ## 13.1. Create user listing interface with RBAC [pending]
@@ -31,7 +31,7 @@ Test user CRUD operations through the UI with different user roles. Verify prope
 
 ## 13.4. Add search and filtering with audit logging [pending]
 ### Dependencies: None
-### Description: Implement search functionality with detailed logging for HIPAA compliance
+### Description: Implement search functionality with detailed logging for HIPAA compliance, adapting to libSQL/SQLite search capabilities
 ### Details:
 
 

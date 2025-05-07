@@ -32,7 +32,7 @@ This task requires retrofitting HIPAA compliance onto the existing User Manageme
    - Implement proper key management
    - Ensure data is encrypted both at rest and in transit
 
-Refer to docs/healthcare-compliance.md for complete requirements. This implementation must be done without disrupting existing functionality.
+Refer to docs/healthcare-compliance.md for complete requirements. This implementation must be done without disrupting existing functionality. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.
 
 # Test Strategy:
 Testing should verify HIPAA compliance across all aspects of the User Management system:
@@ -67,6 +67,7 @@ Testing should verify HIPAA compliance across all aspects of the User Management
    - Verify all existing functionality continues to work with new compliance features
    - Test performance impact of added security measures
    - Conduct penetration testing to identify potential vulnerabilities
+   - Test compatibility with libSQL/SQLite, particularly for complex queries and transactions
 
 All tests should be documented for compliance auditing purposes.
 
@@ -83,12 +84,14 @@ Implementation steps:
 5. Modify existing user service to incorporate role checks before data access
 6. Update user creation/modification flows to assign appropriate roles
 7. Implement the principle of least privilege by default
+8. Adapt database schema and queries to work with libSQL/SQLite
 
 Testing approach:
 - Unit tests for each role's permission boundaries
 - Integration tests verifying endpoint access control
 - Test cases for permission inheritance and role transitions
 - Verify existing functionality remains intact with new permission checks
+- Test compatibility with libSQL/SQLite database
 
 ## 2. Implement Comprehensive Audit Logging System [pending]
 ### Dependencies: 22.1
@@ -102,6 +105,7 @@ Implementation steps:
 5. Implement log rotation and archiving functionality
 6. Create admin-only interfaces for log review with appropriate filtering
 7. Ensure logs are tamper-evident and cannot be modified by regular users
+8. Adapt logging system to use libSQL/SQLite for storage
 
 Testing approach:
 - Verify all user operations generate appropriate audit entries
@@ -109,6 +113,7 @@ Testing approach:
 - Validate log integrity and tamper protection
 - Performance testing to ensure logging doesn't impact system responsiveness
 - Verify log search and filtering capabilities
+- Test compatibility with libSQL/SQLite for log storage and retrieval
 
 ## 3. Implement Field-Level Encryption for Sensitive Data [pending]
 ### Dependencies: 22.1
@@ -123,6 +128,7 @@ Implementation steps:
 6. Implement key rotation and management policies
 7. Ensure all data is encrypted both at rest and in transit
 8. Add encryption indicators in the database schema
+9. Adapt encryption implementation to work with libSQL/SQLite data types
 
 Testing approach:
 - Unit tests for encryption/decryption operations
@@ -131,6 +137,7 @@ Testing approach:
 - Performance testing for encryption overhead
 - Verify existing functionality with encrypted data
 - Security testing to ensure encryption implementation is sound
+- Test compatibility with libSQL/SQLite for storing and retrieving encrypted data
 
 ## 4. Implement Privacy Rule Compliance Features [pending]
 ### Dependencies: 22.1, 22.2, 22.3
@@ -145,6 +152,7 @@ Implementation steps:
 6. Add functionality to track and honor patient preferences for communications
 7. Create data retention policies and automated enforcement
 8. Implement data export functionality for patient record requests
+9. Adapt consent tracking system to use libSQL/SQLite for storage
 
 Testing approach:
 - Verify consent tracking across user operations
@@ -153,6 +161,7 @@ Testing approach:
 - Test disclosure limitation mechanisms
 - Verify patient communication preferences are honored
 - Test data retention policy enforcement
+- Test compatibility with libSQL/SQLite for consent tracking and data export
 
 ## 5. Integration Testing and HIPAA Compliance Verification [pending]
 ### Dependencies: 22.1, 22.2, 22.3, 22.4
@@ -167,6 +176,7 @@ Implementation steps:
 6. Implement automated compliance checks as part of CI/CD pipeline
 7. Perform user acceptance testing with stakeholders
 8. Create training materials for system users on new HIPAA features
+9. Test compatibility with libSQL/SQLite across all features
 
 Testing approach:
 - End-to-end testing of complete user workflows
@@ -175,4 +185,5 @@ Testing approach:
 - Compliance verification against HIPAA requirements
 - User acceptance testing with different user roles
 - Regression testing of all existing functionality
+- Database compatibility testing with libSQL/SQLite
 

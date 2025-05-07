@@ -1,0 +1,147 @@
+# Task ID: 28
+# Title: Adapt SQLAlchemy Models for libSQL/SQLite Compatibility
+# Status: pending
+# Dependencies: 27
+# Priority: medium
+# Description: Modify SQLAlchemy models in api/models/base.py to ensure compatibility with libSQL/SQLite, focusing on type affinity and storage requirements as outlined in the database migration documentation.
+# Details:
+This task involves reviewing and adapting all SQLAlchemy model field types in `api/models/base.py` to ensure compatibility with libSQL/SQLite's type system. Follow section 3 of `docs/switching-db-to-libsql.md` as a guide.
+
+Specific changes required:
+
+1. **TIMESTAMP fields**: Review all timestamp fields for timezone handling. SQLite doesn't have native timezone support, so ensure timestamps are stored consistently (likely as UTC) and that application code handles timezone conversions appropriately.
+
+2. **JSON fields**: SQLite doesn't have a native JSON type. Either:
+   - Store JSON as TEXT and handle serialization/deserialization in the application code
+   - Implement SQLAlchemy type adapters for automatic JSON conversion
+   - Consider using SQLite JSON1 extension functions for query capabilities if needed
+
+3. **String length constraints**: SQLite doesn't enforce VARCHAR length constraints. Ensure all String fields with length limits rely on application-level validation rather than database constraints.
+
+4. **EncryptedType**: Verify that all EncryptedType fields correctly map to TEXT type in SQLite and that the encryption/decryption process works with SQLite's storage format.
+
+5. **Other field types**: Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system.
+
+Update model definitions as needed, maintaining backward compatibility where possible. Document any changes that might affect application behavior or require data migration.
+
+# Test Strategy:
+1. **Unit Tests**: Create or update unit tests for each model to verify field types are correctly defined and behave as expected with SQLite:
+   - Test serialization/deserialization of JSON fields
+   - Test timezone handling in timestamp fields
+   - Test string fields with various lengths and character sets
+   - Test EncryptedType fields for proper encryption/decryption
+
+2. **Integration Testing**:
+   - Set up a test database using libSQL/SQLite
+   - Run model migrations against this database
+   - Verify all tables and columns are created with correct types
+   - Test CRUD operations on each model with various data types
+
+3. **Validation Testing**:
+   - Test edge cases for each field type (empty strings, NULL values, very large JSON objects)
+   - Verify application-level validation works for string length constraints
+   - Test timezone edge cases (daylight saving transitions, UTC offsets)
+
+4. **Regression Testing**:
+   - Ensure existing functionality works with the updated models
+   - Verify no unexpected behavior changes in query results
+
+Document any SQLite-specific behaviors or limitations discovered during testing.
+
+# Subtasks:
+## 1. Analyze and document current SQLAlchemy model field types [pending]
+### Dependencies: None
+### Description: Create a comprehensive inventory of all field types used in SQLAlchemy models in api/models/base.py, documenting their current configuration and identifying potential compatibility issues with libSQL/SQLite.
+### Details:
+Implementation steps:
+1. Review api/models/base.py and identify all model classes and their field definitions
+2. Create a structured document listing each field type used (TIMESTAMP, JSON, String, EncryptedType, etc.)
+3. For each field type, document:
+   - How it's currently defined
+   - The SQLAlchemy type used
+   - Any constraints or special handling
+   - Potential libSQL/SQLite compatibility issues based on docs/switching-db-to-libsql.md
+4. Identify fields that will need modification
+5. Test by validating the document against the actual codebase to ensure all field types are covered
+
+Testing approach: Perform a code review to ensure all model fields are documented and all potential compatibility issues are identified.
+
+## 2. Implement TIMESTAMP field compatibility adaptations [pending]
+### Dependencies: 28.1
+### Description: Modify all timestamp fields in the SQLAlchemy models to ensure proper handling with libSQL/SQLite, focusing on timezone handling and storage format.
+### Details:
+Implementation steps:
+1. Based on the analysis from subtask 1, identify all TIMESTAMP fields in the models
+2. Modify each timestamp field to ensure it stores data in UTC format
+3. Update field definitions to use appropriate SQLAlchemy types that are compatible with SQLite (likely DateTime without timezone)
+4. Add application-level handling for timezone conversions where needed
+5. Document the changes made to each timestamp field
+6. Create unit tests to verify timestamp storage and retrieval works correctly with both PostgreSQL and SQLite
+
+Testing approach:
+- Write unit tests that create and retrieve objects with timestamp fields
+- Verify correct timezone handling across database backends
+- Test edge cases like DST transitions and timezone conversions
+
+## 3. Adapt JSON field handling for SQLite compatibility [pending]
+### Dependencies: 28.1
+### Description: Modify all JSON fields in the SQLAlchemy models to work with SQLite's lack of native JSON type, implementing proper serialization/deserialization mechanisms.
+### Details:
+Implementation steps:
+1. Based on the analysis from subtask 1, identify all JSON fields in the models
+2. Create a custom SQLAlchemy type adapter that:
+   - Stores JSON as TEXT in SQLite
+   - Handles serialization when writing to the database
+   - Handles deserialization when reading from the database
+3. Replace all existing JSON field definitions with the new custom type
+4. If query capabilities are needed, implement functions that utilize SQLite JSON1 extension
+5. Update any code that directly interacts with these JSON fields
+6. Document the implementation approach and any limitations
+
+Testing approach:
+- Create unit tests that store and retrieve complex JSON structures
+- Test JSON query functionality if implemented
+- Verify compatibility with both PostgreSQL and SQLite backends
+
+## 4. Update String fields and EncryptedType for SQLite compatibility [pending]
+### Dependencies: 28.1
+### Description: Modify String fields with length constraints and EncryptedType fields to ensure they work correctly with SQLite's type system and storage format.
+### Details:
+Implementation steps:
+1. Based on the analysis from subtask 1, identify all String fields with length constraints
+2. Implement application-level validation for string length since SQLite doesn't enforce VARCHAR length
+3. Update String field definitions to work with SQLite while maintaining PostgreSQL compatibility
+4. Identify all EncryptedType fields in the models
+5. Verify and modify EncryptedType implementation to ensure it correctly maps to TEXT in SQLite
+6. Test the encryption/decryption process with SQLite's storage format
+7. Document all changes made to String and EncryptedType fields
+
+Testing approach:
+- Create unit tests for string length validation
+- Test storing and retrieving encrypted data
+- Verify data integrity across database backends
+- Test edge cases like empty strings and maximum length strings
+
+## 5. Review and adapt remaining field types for SQLite compatibility [pending]
+### Dependencies: 28.1, 28.2, 28.3, 28.4
+### Description: Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system and implement any necessary changes.
+### Details:
+Implementation steps:
+1. Based on the analysis from subtask 1, identify all remaining field types not covered in previous subtasks
+2. For each field type, review how it maps to SQLite's type affinity system
+3. Implement necessary changes to ensure correct behavior with SQLite
+4. Pay special attention to:
+   - Boolean fields (stored as integers in SQLite)
+   - Enum types
+   - Any custom field types
+   - Foreign keys and relationships
+5. Create a comprehensive test suite that validates all field types work correctly
+6. Document all changes made and any potential impacts on application behavior
+7. Update the database migration documentation with any new findings or recommendations
+
+Testing approach:
+- Create a test suite that exercises all field types
+- Test with both PostgreSQL and SQLite backends
+- Verify data integrity and type conversion
+- Test application functionality that relies on these fields
+

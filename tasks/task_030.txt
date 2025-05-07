@@ -1,0 +1,138 @@
+# Task ID: 30
+# Title: Rewrite Database Schema and Seed Scripts for SQLite Compatibility
+# Status: pending
+# Dependencies: 29
+# Priority: medium
+# Description: Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.
+# Details:
+This task involves rewriting the `database/init_schema.sql` file to use SQLite syntax and adapting the `scripts/seed_admin.py` script as needed. The changes should follow section 5 of `docs/switching-db-to-libsql.md`.
+
+For `init_schema.sql`:
+1. Replace PostgreSQL-specific data types with SQLite equivalents
+2. Change primary key definitions to use `INTEGER PRIMARY KEY AUTOINCREMENT` syntax
+3. Adjust the `INSERT INTO Roles` statements to match SQLite syntax
+4. Ensure all table creation statements are SQLite-compatible
+5. Verify that any constraints or indexes are properly defined for SQLite
+
+For `scripts/seed_admin.py`:
+1. Review the script to identify any PostgreSQL-specific SQLAlchemy code
+2. Update the script to work with the SQLite dialect if necessary
+3. Ensure it correctly interacts with the updated SQLAlchemy models
+4. Test that it can successfully create an admin user in the SQLite database
+
+The implementation should maintain all existing functionality while ensuring compatibility with SQLite/libSQL. Pay special attention to data type conversions, auto-increment behavior, and any SQL syntax differences between PostgreSQL and SQLite.
+
+# Test Strategy:
+1. Execute the rewritten `init_schema.sql` against a fresh SQLite database and verify it runs without errors
+2. Validate the database schema by inspecting the created tables using SQLite CLI or a GUI tool:
+   - Check that all tables have the correct structure
+   - Verify primary keys are properly set up with autoincrement
+   - Confirm that all indexes and constraints are present
+3. Run the adapted `seed_admin.py` script and verify:
+   - It executes without errors
+   - An admin user is successfully created in the database
+   - The user has the correct role and permissions
+4. Perform basic application operations that interact with the database to ensure the schema changes don't break functionality
+5. Write a simple test script that performs CRUD operations on each table to verify the schema works as expected
+6. Document any SQLite-specific limitations or behavior differences that developers should be aware of
+
+# Subtasks:
+## 1. Analyze PostgreSQL Schema and Identify SQLite Conversion Requirements [pending]
+### Dependencies: None
+### Description: Review the existing PostgreSQL schema in `database/init_schema.sql` and document all elements that need conversion to SQLite syntax
+### Details:
+Implementation steps:
+1. Examine the current `database/init_schema.sql` file and identify all PostgreSQL-specific data types and syntax
+2. Create a mapping document that lists each PostgreSQL data type/feature and its SQLite equivalent
+3. Document specific changes needed for:
+   - Data type conversions (e.g., SERIAL to INTEGER PRIMARY KEY AUTOINCREMENT)
+   - Primary key definitions
+   - Foreign key constraints
+   - Default values
+   - INSERT statements
+   - Any other PostgreSQL-specific features
+4. Review section 5 of `docs/switching-db-to-libsql.md` to ensure all requirements are captured
+5. Create a checklist of all required changes to guide implementation
+
+Testing approach:
+- Verify the completeness of the analysis by cross-checking with SQLite documentation
+- Ensure all tables and fields in the original schema are accounted for in the conversion plan
+
+## 2. Rewrite Table Creation Statements for SQLite Compatibility [pending]
+### Dependencies: 30.1
+### Description: Modify all CREATE TABLE statements in the schema file to use SQLite-compatible syntax
+### Details:
+Implementation steps:
+1. Create a new version of `database/init_schema.sql` based on the analysis from subtask 1
+2. Convert all table creation statements to use SQLite syntax:
+   - Replace PostgreSQL data types with SQLite equivalents (e.g., TEXT instead of VARCHAR, INTEGER instead of INT)
+   - Change SERIAL/BIGSERIAL primary keys to INTEGER PRIMARY KEY AUTOINCREMENT
+   - Adjust foreign key constraint syntax if needed
+   - Modify default value syntax to be SQLite-compatible
+3. Ensure all table relationships and constraints are preserved
+4. Add appropriate comments to document significant changes
+
+Testing approach:
+- Run the modified schema file against a test SQLite database to verify syntax
+- Check that all tables are created without errors
+- Verify primary key and foreign key constraints are properly defined
+
+## 3. Update INSERT Statements and Role Definitions for SQLite [pending]
+### Dependencies: 30.2
+### Description: Modify all INSERT statements and role definitions in the schema file to be compatible with SQLite syntax
+### Details:
+Implementation steps:
+1. Review all INSERT statements in the original schema file, particularly for the Roles table
+2. Adjust the syntax of INSERT statements to be SQLite-compatible:
+   - Modify value formats if necessary
+   - Ensure proper quoting of string values
+   - Adjust any sequence or auto-increment references
+3. If the original schema uses any PostgreSQL-specific INSERT features (like RETURNING), replace with SQLite alternatives
+4. Verify that all predefined data (like role definitions) are properly inserted
+
+Testing approach:
+- Execute the INSERT statements against a test SQLite database
+- Query the database to verify that all predefined data was correctly inserted
+- Check that role IDs and other values match the expected values from the original schema
+
+## 4. Analyze and Update SQLAlchemy Models in seed_admin.py [pending]
+### Dependencies: 30.1
+### Description: Review and modify the SQLAlchemy models and database interaction code in the admin seeding script
+### Details:
+Implementation steps:
+1. Examine `scripts/seed_admin.py` to identify any PostgreSQL-specific SQLAlchemy code
+2. Update SQLAlchemy model definitions if they contain PostgreSQL-specific types or features:
+   - Replace PostgreSQL-specific column types with SQLite-compatible types
+   - Update sequence or auto-increment definitions
+   - Modify any dialect-specific options
+3. Check database connection code to ensure it can connect to SQLite databases
+4. Update any raw SQL queries to use SQLite syntax
+5. Ensure the script correctly references the updated model definitions
+
+Testing approach:
+- Run static code analysis to check for syntax errors
+- Test the script with a mock SQLite database connection
+- Verify that SQLAlchemy models match the updated schema structure
+
+## 5. Test and Finalize SQLite Compatibility [pending]
+### Dependencies: 30.2, 30.3, 30.4
+### Description: Perform comprehensive testing of the updated schema and seeding script with SQLite
+### Details:
+Implementation steps:
+1. Set up a test SQLite database
+2. Execute the updated `init_schema.sql` script against the test database
+3. Run the modified `seed_admin.py` script to create an admin user
+4. Verify that all database operations work as expected:
+   - Tables are created with correct structure
+   - Foreign key constraints work properly
+   - Auto-increment fields generate correct values
+   - Admin user is created successfully
+5. Make any final adjustments to the schema or script based on testing results
+6. Update documentation to reflect the changes made
+
+Testing approach:
+- Run a full end-to-end test of database initialization and admin seeding
+- Verify database structure using SQLite tools (like sqlite3 CLI or DB Browser for SQLite)
+- Test CRUD operations on the admin user to ensure compatibility
+- Compare the behavior with the original PostgreSQL implementation to ensure functional equivalence
+

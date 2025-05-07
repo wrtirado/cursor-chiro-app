@@ -5,10 +5,10 @@
 # Priority: high
 # Description: Implement patient authentication, registration, and chiropractor association with HIPAA-compliant security measures.
 # Details:
-Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail.
+Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail. Store authentication data locally using SQLite with encryption for offline access.
 
 # Test Strategy:
-Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption.
+Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption. Test offline authentication using locally stored SQLite data.
 
 # Subtasks:
 ## 18.1. Create login and registration screens [pending]
@@ -31,7 +31,7 @@ Test registration and login flows with security controls. Verify join code valid
 
 ## 18.4. Implement secure token storage [pending]
 ### Dependencies: None
-### Description: Add encrypted storage for authentication tokens
+### Description: Add encrypted storage for authentication tokens using SQLite
 ### Details:
 
 

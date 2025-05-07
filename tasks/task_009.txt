@@ -5,15 +5,15 @@
 # Priority: medium
 # Description: Implement payment handling functionality for services at company or office level with HIPAA-compliant data handling.
 # Details:
-Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions.
+Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Use libSQL/SQLite JSON1 extension for handling the payment_info JSON field, ensuring compatibility with the new database system.
 
 # Test Strategy:
-Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption.
+Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test JSON1 extension functionality with libSQL/SQLite to ensure proper storage and retrieval of payment configuration.
 
 # Subtasks:
 ## 9.1. Implement secure storage for payment configuration [pending]
 ### Dependencies: None
-### Description: Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field
+### Description: Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field using libSQL/SQLite JSON1 extension
 ### Details:
 
 
@@ -25,7 +25,7 @@ Test payment processing with test credentials. Verify proper recording of paymen
 
 ## 9.3. Implement HIPAA-compliant audit logging [pending]
 ### Dependencies: None
-### Description: Add detailed audit trails for all payment-related operations
+### Description: Add detailed audit trails for all payment-related operations using libSQL/SQLite
 ### Details:
 
 
@@ -43,7 +43,7 @@ Test payment processing with test credentials. Verify proper recording of paymen
 
 ## 9.6. Implement data encryption [pending]
 ### Dependencies: None
-### Description: Add encryption for all payment data at rest and in transit
+### Description: Add encryption for all payment data at rest and in transit, adapting encryption methods for libSQL/SQLite
 ### Details:
 
 

@@ -310,13 +310,13 @@
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions.",
-      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption.",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Use libSQL/SQLite JSON1 extension for handling the payment_info JSON field, ensuring compatibility with the new database system.",
+      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test JSON1 extension functionality with libSQL/SQLite to ensure proper storage and retrieval of payment configuration.",
       "subtasks": [
         {
           "id": 9.1,
           "title": "Implement secure storage for payment configuration",
-          "description": "Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field",
+          "description": "Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field using libSQL/SQLite JSON1 extension",
           "status": "pending"
         },
         {
@@ -328,7 +328,7 @@
         {
           "id": 9.3,
           "title": "Implement HIPAA-compliant audit logging",
-          "description": "Add detailed audit trails for all payment-related operations",
+          "description": "Add detailed audit trails for all payment-related operations using libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -346,7 +346,7 @@
         {
           "id": 9.6,
           "title": "Implement data encryption",
-          "description": "Add encryption for all payment data at rest and in transit",
+          "description": "Add encryption for all payment data at rest and in transit, adapting encryption methods for libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -366,8 +366,8 @@
         5
       ],
       "priority": "low",
-      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure.",
-      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption.",
+      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure. Use libSQL/SQLite JSON1 extension for storing and querying the colors JSON data. Adapt SQLAlchemy models to use appropriate libSQL/SQLite data types and constraints.",
+      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption. Verify JSON1 extension functionality with libSQL/SQLite for proper handling of colors JSON data.",
       "subtasks": [
         {
           "id": 10.1,
@@ -378,7 +378,7 @@
         {
           "id": 10.2,
           "title": "Set up Branding database table",
-          "description": "Create table structure to store branding information with foreign key relationship to Office ID",
+          "description": "Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema",
           "status": "pending"
         },
         {
@@ -396,7 +396,7 @@
         {
           "id": 10.5,
           "title": "Implement audit logging for branding changes",
-          "description": "Add detailed audit trails for all branding-related operations",
+          "description": "Add detailed audit trails for all branding-related operations using libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -408,7 +408,7 @@
         {
           "id": 10.7,
           "title": "Add encryption for branding data",
-          "description": "Implement encryption for branding information at rest",
+          "description": "Implement encryption for branding information at rest using methods compatible with libSQL/SQLite",
           "status": "pending"
         }
       ]
@@ -422,13 +422,13 @@
         6
       ],
       "priority": "medium",
-      "details": "Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements.",
-      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements.",
+      "details": "Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements. Adapt database models to use libSQL/SQLite data types and constraints. Use JSON1 extension for storing complex notification configuration data.",
+      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements. Test compatibility with libSQL/SQLite, particularly for JSON data storage and retrieval.",
       "subtasks": [
         {
           "id": 11.1,
           "title": "Create notification schedule endpoints",
-          "description": "Implement endpoints for creating and managing notification schedules",
+          "description": "Implement endpoints for creating and managing notification schedules using libSQL/SQLite for data storage",
           "status": "pending"
         },
         {
@@ -446,13 +446,13 @@
         {
           "id": 11.4,
           "title": "Implement audit logging",
-          "description": "Add detailed audit trails for all notification configuration operations",
+          "description": "Add detailed audit trails for all notification configuration operations using libSQL/SQLite",
           "status": "pending"
         },
         {
           "id": 11.5,
           "title": "Add data encryption",
-          "description": "Implement encryption for notification data at rest and in transit",
+          "description": "Implement encryption for notification data at rest and in transit, adapting methods for libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -472,8 +472,8 @@
         3
       ],
       "priority": "high",
-      "details": "Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information.",
-      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations.",
+      "details": "Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend.",
+      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend.",
       "subtasks": [
         {
           "id": "12.1",
@@ -498,6 +498,7 @@
         {
           "id": "12.5",
           "title": "Set up API client for backend communication",
+          "description": "Configure API client to handle communication with the libSQL/SQLite backend",
           "status": "pending"
         },
         {
@@ -553,8 +554,8 @@
         4
       ],
       "priority": "high",
-      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling.",
-      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features.",
+      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration.",
+      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations.",
       "subtasks": [
         {
           "id": 13.1,
@@ -577,7 +578,7 @@
         {
           "id": 13.4,
           "title": "Add search and filtering with audit logging",
-          "description": "Implement search functionality with detailed logging for HIPAA compliance",
+          "description": "Implement search functionality with detailed logging for HIPAA compliance, adapting to libSQL/SQLite search capabilities",
           "status": "pending"
         },
         {
@@ -605,8 +606,8 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans.",
-      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption.",
+      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references.",
+      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships.",
       "subtasks": [
         {
           "id": 14.1,
@@ -641,7 +642,7 @@
         {
           "id": 14.6,
           "title": "Add audit logging",
-          "description": "Implement detailed logging of all therapy plan operations for HIPAA compliance",
+          "description": "Implement detailed logging of all therapy plan operations for HIPAA compliance using libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -662,8 +663,8 @@
         8
       ],
       "priority": "medium",
-      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls. Implement charts and visualizations for progress data with de-identification where appropriate. Develop filtering and date range selection tools with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data.",
-      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features.",
+      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls. Implement charts and visualizations for progress data with de-identification where appropriate. Develop filtering and date range selection tools with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data. Adapt analytics queries to use libSQL/SQLite syntax and optimize for its performance characteristics. Use JSON1 extension for complex data aggregation where appropriate.",
+      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features. Verify performance of analytics queries with libSQL/SQLite, especially for large datasets.",
       "subtasks": [
         {
           "id": 15.1,
@@ -674,7 +675,7 @@
         {
           "id": 15.2,
           "title": "Develop filtering and date range tools",
-          "description": "Add controls for filtering data with audit logging",
+          "description": "Add controls for filtering data with audit logging, adapting to libSQL/SQLite query capabilities",
           "status": "pending"
         },
         {
@@ -698,7 +699,7 @@
         {
           "id": 15.6,
           "title": "Add audit logging",
-          "description": "Implement detailed logging of all reporting operations for HIPAA compliance",
+          "description": "Implement detailed logging of all reporting operations for HIPAA compliance using libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -725,8 +726,8 @@
         9
       ],
       "priority": "medium",
-      "details": "Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements.",
-      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements.",
+      "details": "Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data.",
+      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval.",
       "subtasks": [
         {
           "id": 16.1,
@@ -749,7 +750,7 @@
         {
           "id": 16.4,
           "title": "Add payment history reporting",
-          "description": "Implement reporting screens for payment history with audit logging",
+          "description": "Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -767,7 +768,7 @@
         {
           "id": 16.7,
           "title": "Add audit logging",
-          "description": "Implement detailed logging of all payment operations for HIPAA compliance",
+          "description": "Implement detailed logging of all payment operations for HIPAA compliance using libSQL/SQLite",
           "status": "pending"
         },
         {
@@ -787,8 +788,8 @@
         3
       ],
       "priority": "high",
-      "details": "Initialize React Native application with proper project structure. Set up navigation with React Navigation including RBAC for protected screens. Implement state management with Redux or Context API with secure handling of ePHI. Implement offline data storage using AsyncStorage or SQLite for caching plans and progress data with encryption at rest. Create authentication flows with biometric options and automatic session timeouts. Set up API client with offline capabilities and TLS 1.2+ encryption. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders with no ePHI in notification content. Ensure secure local storage with encryption for any ePHI. Implement detailed audit logging for all data access operations.",
-      "testStrategy": "Test application initialization on both iOS and Android. Verify navigation between screens with RBAC controls. Test offline data persistence using AsyncStorage or SQLite with encryption. Verify login functionality, biometric authentication, and session timeout features. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms without exposing ePHI. Validate secure storage implementation with encryption. Test audit logging for all data access operations. Verify that the app handles security appropriately in both online and offline modes.",
+      "details": "Initialize React Native application with proper project structure. Set up navigation with React Navigation including RBAC for protected screens. Implement state management with Redux or Context API with secure handling of ePHI. Implement offline data storage using SQLite for caching plans and progress data with encryption at rest. Create authentication flows with biometric options and automatic session timeouts. Set up API client with offline capabilities and TLS 1.2+ encryption. Implement plan viewing screens for patients to access their treatment plans. Implement local notification scheduling for reminders with no ePHI in notification content. Ensure secure local storage with encryption for any ePHI. Implement detailed audit logging for all data access operations. Configure SQLite to match the schema structure used by the backend libSQL database for better compatibility and synchronization.",
+      "testStrategy": "Test application initialization on both iOS and Android. Verify navigation between screens with RBAC controls. Test offline data persistence using SQLite with encryption. Verify login functionality, biometric authentication, and session timeout features. Test plan viewing functionality with both online and offline data. Ensure local notifications work correctly on both platforms without exposing ePHI. Validate secure storage implementation with encryption. Test audit logging for all data access operations. Verify that the app handles security appropriately in both online and offline modes. Test compatibility between mobile SQLite schema and backend libSQL schema during synchronization.",
       "subtasks": [
         {
           "id": "17.1",
@@ -802,7 +803,8 @@
         },
         {
           "id": "17.3",
-          "title": "Set up AsyncStorage or SQLite for offline data caching",
+          "title": "Set up SQLite for offline data caching",
+          "description": "Configure SQLite database with schema compatible with backend libSQL structure",
           "status": "pending"
         },
         {
@@ -813,6 +815,7 @@
         {
           "id": "17.5",
           "title": "Implement offline synchronization for plan data",
+          "description": "Create sync mechanism compatible with libSQL/SQLite backend",
           "status": "pending"
         },
         {
@@ -856,8 +859,8 @@
         4
       ],
       "priority": "high",
-      "details": "Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail.",
-      "testStrategy": "Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption.",
+      "details": "Create login and registration screens with secure data handling. Implement join code entry and validation. Develop onboarding flow for new patients including consent collection for data handling. Create account management screens with minimal ePHI display. Implement secure token storage and refresh mechanisms with encryption. For SDP Association, patients will associate with their chiropractor using a unique join code or link provided by the chiropractor. This association must be validated through the POST /auth/associate endpoint. Implement biometric authentication options where available. Add automatic session timeouts after periods of inactivity. Ensure all authentication operations are logged in detail. Store authentication data locally using SQLite with encryption for offline access.",
+      "testStrategy": "Test registration and login flows with security controls. Verify join code validation and association with chiropractors using the POST /auth/associate endpoint. Test both join code and link-based association methods. Test token refresh and session management including timeouts. Test biometric authentication on supported devices. Ensure proper error handling and user feedback during the association process. Validate audit logging for all authentication operations. Verify that consent collection is properly implemented and recorded. Test that all communications use TLS 1.2+ encryption. Test offline authentication using locally stored SQLite data.",
       "subtasks": [
         {
           "id": 18.1,
@@ -880,7 +883,7 @@
         {
           "id": 18.4,
           "title": "Implement secure token storage",
-          "description": "Add encrypted storage for authentication tokens",
+          "description": "Add encrypted storage for authentication tokens using SQLite",
           "status": "pending"
         },
         {
@@ -920,20 +923,20 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans.",
-      "testStrategy": "Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest.",
+      "details": "Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans. Design SQLite schema to be compatible with the backend libSQL database structure for seamless synchronization.",
+      "testStrategy": "Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest. Verify compatibility between mobile SQLite and backend libSQL during synchronization.",
       "subtasks": [
         {
           "id": "19.1",
           "title": "Implement SQLite database schema for therapy plans",
           "status": "pending",
-          "description": "Design and implement SQLite database schema to store therapy plans, exercises, and progress tracking information locally."
+          "description": "Design and implement SQLite database schema to store therapy plans, exercises, and progress tracking information locally, ensuring compatibility with backend libSQL structure."
         },
         {
           "id": "19.2",
           "title": "Create API synchronization service",
           "status": "pending",
-          "description": "Develop service to fetch therapy plans from API and store them in local SQLite database. Include logic for determining when to update local data."
+          "description": "Develop service to fetch therapy plans from API and store them in local SQLite database. Include logic for determining when to update local data and handling libSQL/SQLite specific data formats."
         },
         {
           "id": "19.3",
@@ -990,13 +993,13 @@
         11
       ],
       "priority": "medium",
-      "details": "Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server.",
-      "testStrategy": "Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization.",
+      "details": "Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server. Design SQLite schema to match the backend libSQL structure for efficient synchronization.",
+      "testStrategy": "Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization. Test compatibility between mobile SQLite and backend libSQL during synchronization.",
       "subtasks": [
         {
           "id": "20.1",
           "title": "Implement local storage with SQLite",
-          "description": "Set up SQLite database schema for storing progress data locally",
+          "description": "Set up SQLite database schema for storing progress data locally, compatible with backend libSQL structure",
           "status": "pending"
         },
         {
@@ -1055,7 +1058,7 @@
       "description": "Integrate foundational HIPAA compliance measures into the API core structure to ensure secure handling of protected health information (PHI) according to regulatory requirements.",
       "details": "This task requires implementing several key HIPAA compliance components at the API core level:\n\n1. **Security Configuration Review**:\n   - Audit existing API configurations and modify defaults to enforce secure settings\n   - Implement automatic session timeouts after periods of inactivity\n   - Configure proper TLS/SSL settings with modern cipher suites (to be enforced in staging/production)\n   - Disable any insecure defaults that may exist in the framework\n\n2. **Audit Logging Infrastructure**:\n   - Implement comprehensive audit logging for all PHI access, modifications, and transmissions\n   - Log user actions with timestamps, user IDs, actions performed, and affected resources\n   - Ensure logs cannot be modified or deleted by regular users\n   - Create log rotation and retention policies compliant with HIPAA's 6-year retention requirement\n\n3. **Encryption Implementation**:\n   - Apply encryption at rest for all PHI stored in databases or file systems\n   - Configure the application to support TLS 1.2+ for encryption in transit\n   - Support HTTP for local development while ensuring the application is ready for HTTPS in staging/production\n   - Create key management procedures for encryption keys\n   - Document encryption standards used for compliance documentation\n\n4. **Data Handling Controls**:\n   - Implement input validation and sanitization for all API endpoints\n   - Create mechanisms to detect and prevent PHI from appearing in error logs\n   - Establish proper content-type headers and response structures\n   - Implement minimum necessary principle by filtering response data based on user roles\n   - Ensure all data handling code assumes secure transmission in production environments\n\n5. **Documentation Updates**:\n   - Update technical documentation to reflect HIPAA compliance measures\n   - Create developer guidelines for maintaining compliance when modifying the API\n   - Document the environment-specific security configurations (local vs. staging/production)\n\nRefer to docs/healthcare-compliance.md for complete requirements and implementation standards. This implementation should be done at the core/foundation level to ensure all API components inherit these security controls.",
       "testStrategy": "Testing should verify all HIPAA compliance measures are correctly implemented:\n\n1. **Security Configuration Tests**:\n   - Verify the application is properly configured to support TLS when deployed\n   - Confirm the application works correctly over HTTP in local development\n   - Test session timeout functionality by monitoring inactive sessions\n   - Attempt to use deprecated/insecure methods to confirm they're disabled\n   - Document TLS verification tests to be performed in staging/production environments\n\n2. **Audit Logging Tests**:\n   - Perform various API operations and verify appropriate audit logs are generated\n   - Attempt to modify logs directly to confirm immutability\n   - Verify log format contains all required HIPAA elements (who, what, when, where)\n   - Test log rotation and confirm older logs remain accessible\n\n3. **Encryption Tests**:\n   - Use database inspection tools to verify data is encrypted at rest\n   - Verify the application is configured to support TLS 1.2+ for production use\n   - Test key rotation procedures to ensure they work without data loss\n   - Defer actual TLS connection testing (using tools like SSL Labs or testssl.sh) to deployed environments\n\n4. **Data Handling Tests**:\n   - Submit malformed/malicious inputs to verify proper validation\n   - Trigger errors and verify PHI is not exposed in error messages\n   - Test with different user roles to confirm minimum necessary principle\n   - Verify all PHI transmissions are properly structured for secure handling\n   - Confirm the application correctly handles both HTTP (dev) and HTTPS (prod) contexts\n\n5. **Compliance Verification**:\n   - Create a test checklist derived from docs/healthcare-compliance.md\n   - Perform a mock HIPAA audit against the implementation\n   - Document all test results for compliance evidence\n   - Create separate verification procedures for local development vs. production environments\n\nAll tests should be automated where possible and included in the CI/CD pipeline to ensure ongoing compliance. Environment-specific tests (like TLS verification) should be clearly marked for execution only in the appropriate environments.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         3
       ],
@@ -1067,7 +1070,7 @@
           "description": "Create a security configuration framework that enforces HIPAA-compliant settings across different environments (development, staging, production).",
           "dependencies": [],
           "details": "Implementation details:\n1. Create a `SecurityConfigService` class to manage security configurations\n2. Implement environment-specific configuration profiles (dev, staging, prod)\n3. Configure session timeout settings (30 minutes for production, configurable for dev)\n4. Set up TLS/SSL configuration with modern cipher suites\n5. Create middleware to enforce secure headers (Content-Security-Policy, X-XSS-Protection, etc.)\n6. Disable insecure defaults in the framework\n7. Implement configuration validation to ensure security settings meet HIPAA requirements\n\nTesting approach:\n- Unit test each configuration setting\n- Create integration tests that verify security headers are properly applied\n- Test environment switching to ensure production settings cannot be bypassed\n- Validate session timeout functionality works as expected",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1078,7 +1081,7 @@
             1
           ],
           "details": "Implementation details:\n1. Create an `AuditLogger` service that integrates with the security framework\n2. Implement logging middleware to capture API requests and responses\n3. Log critical user events: authentication, PHI access, modifications, and transmissions\n4. Include metadata with each log: timestamp, user ID, IP address, action performed, resources affected\n5. Implement tamper-evident logging (e.g., using sequential IDs or checksums)\n6. Create log rotation and archiving system with 6-year retention capability\n7. Implement log access controls to prevent unauthorized modification\n8. Add configuration for log storage location (file system vs. database)\n\nTesting approach:\n- Unit test logging functions with mock data\n- Create integration tests that verify all required metadata is captured\n- Test log rotation and retention policies\n- Verify logs cannot be modified by regular users\n- Performance test logging system under load",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1089,7 +1092,7 @@
             1
           ],
           "details": "Implementation details:\n1. Develop an `EncryptionService` that provides standardized encryption/decryption methods\n2. Implement database-level encryption for PHI fields using industry-standard algorithms (AES-256)\n3. Create key management utilities for secure key generation, storage, and rotation\n4. Configure the application to enforce TLS 1.2+ for all API communications\n5. Implement environment-aware encryption (relaxed for development, strict for production)\n6. Create utilities to verify encryption status of PHI data\n7. Document all encryption standards and methods used\n\nTesting approach:\n- Unit test encryption/decryption functions\n- Create integration tests that verify PHI is properly encrypted in the database\n- Test key rotation procedures\n- Verify TLS configuration works correctly in different environments\n- Benchmark encryption/decryption performance",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1102,7 +1105,7 @@
             3
           ],
           "details": "Implementation details:\n1. Create a `DataSanitizationService` to handle input validation and sanitization\n2. Implement middleware to detect and redact PHI in error logs and responses\n3. Develop a role-based data filtering system to enforce minimum necessary principle\n4. Create request validators for all API endpoints that handle PHI\n5. Implement proper content-type headers and response structures\n6. Add PHI detection patterns to identify potential data leakage\n7. Create utilities to mask/redact PHI in logs when necessary\n\nTesting approach:\n- Unit test all sanitization and validation functions\n- Create integration tests with various user roles to verify proper data filtering\n- Test error handling to ensure PHI is not leaked in error responses\n- Verify content-type headers are properly set\n- Test with malformed input to ensure robust handling",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1116,7 +1119,7 @@
             4
           ],
           "details": "Implementation details:\n1. Update technical documentation to reflect all implemented HIPAA compliance measures\n2. Create developer guidelines for maintaining compliance when modifying the API\n3. Document environment-specific security configurations\n4. Create a compliance checklist for code reviews\n5. Develop training materials for new developers\n6. Document the encryption standards and key management procedures\n7. Create API usage examples that demonstrate proper handling of PHI\n8. Document audit logging capabilities and retention policies\n\nTesting approach:\n- Review documentation with security team\n- Validate all implemented features are properly documented\n- Have developers follow guidelines to implement a test feature to verify clarity\n- Create automated tests that verify documentation examples work as described\n- Ensure all configuration options are documented with proper defaults",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         }
       ]
@@ -1125,8 +1128,8 @@
       "id": 22,
       "title": "Retrofit HIPAA Compliance to User Management System",
       "description": "Modify the existing User Management features to ensure HIPAA compliance by implementing strict RBAC, audit logging, secure handling of ePHI, and field-level encryption where necessary.",
-      "details": "This task requires retrofitting HIPAA compliance onto the existing User Management system:\n\n1. **Role-Based Access Controls (RBAC)**:\n   - Implement granular permission checks for all user data access endpoints\n   - Create distinct roles (Admin, Provider, Staff, Patient) with appropriate access levels\n   - Modify all user data endpoints to verify role permissions before allowing access/modification\n   - Implement the principle of least privilege across all user operations\n\n2. **Audit Logging**:\n   - Add comprehensive audit logging for all user CRUD operations\n   - Log must include: timestamp, user ID performing action, action type, affected data, IP address\n   - Ensure logs cannot be modified or deleted by regular users\n   - Implement log rotation and secure storage policies\n\n3. **Privacy Rule Compliance**:\n   - Review all user fields to identify potential ePHI\n   - Implement data minimization practices\n   - Add consent tracking mechanisms for data usage\n   - Ensure proper disclosure limitations\n   - Add functionality for patients to request their records\n\n4. **Data Encryption**:\n   - Implement field-level encryption for sensitive user data (SSN, DOB, medical record numbers)\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management\n   - Ensure data is encrypted both at rest and in transit\n\nRefer to docs/healthcare-compliance.md for complete requirements. This implementation must be done without disrupting existing functionality.",
-      "testStrategy": "Testing should verify HIPAA compliance across all aspects of the User Management system:\n\n1. **RBAC Testing**:\n   - Create test users for each role (Admin, Provider, Staff, Patient)\n   - Verify each role can only access permitted data and operations\n   - Test boundary cases where permissions overlap\n   - Attempt unauthorized access and verify proper rejection\n   - Verify role elevation requires proper authentication\n\n2. **Audit Logging Tests**:\n   - Verify all user CRUD operations generate appropriate audit logs\n   - Validate log content includes all required fields\n   - Test log integrity by attempting to modify logs\n   - Verify log retention policies are enforced\n   - Test log search and retrieval functionality\n\n3. **Privacy Compliance Tests**:\n   - Verify patient data access requests work correctly\n   - Test consent management functionality\n   - Verify data minimization in API responses\n   - Test disclosure limitation mechanisms\n\n4. **Encryption Tests**:\n   - Verify sensitive fields are properly encrypted in database\n   - Test that encrypted data can be properly decrypted with appropriate access\n   - Verify encryption in transit using network analysis tools\n   - Test key rotation procedures\n\n5. **Integration Tests**:\n   - Verify all existing functionality continues to work with new compliance features\n   - Test performance impact of added security measures\n   - Conduct penetration testing to identify potential vulnerabilities\n\nAll tests should be documented for compliance auditing purposes.",
+      "details": "This task requires retrofitting HIPAA compliance onto the existing User Management system:\n\n1. **Role-Based Access Controls (RBAC)**:\n   - Implement granular permission checks for all user data access endpoints\n   - Create distinct roles (Admin, Provider, Staff, Patient) with appropriate access levels\n   - Modify all user data endpoints to verify role permissions before allowing access/modification\n   - Implement the principle of least privilege across all user operations\n\n2. **Audit Logging**:\n   - Add comprehensive audit logging for all user CRUD operations\n   - Log must include: timestamp, user ID performing action, action type, affected data, IP address\n   - Ensure logs cannot be modified or deleted by regular users\n   - Implement log rotation and secure storage policies\n\n3. **Privacy Rule Compliance**:\n   - Review all user fields to identify potential ePHI\n   - Implement data minimization practices\n   - Add consent tracking mechanisms for data usage\n   - Ensure proper disclosure limitations\n   - Add functionality for patients to request their records\n\n4. **Data Encryption**:\n   - Implement field-level encryption for sensitive user data (SSN, DOB, medical record numbers)\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management\n   - Ensure data is encrypted both at rest and in transit\n\nRefer to docs/healthcare-compliance.md for complete requirements. This implementation must be done without disrupting existing functionality. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.",
+      "testStrategy": "Testing should verify HIPAA compliance across all aspects of the User Management system:\n\n1. **RBAC Testing**:\n   - Create test users for each role (Admin, Provider, Staff, Patient)\n   - Verify each role can only access permitted data and operations\n   - Test boundary cases where permissions overlap\n   - Attempt unauthorized access and verify proper rejection\n   - Verify role elevation requires proper authentication\n\n2. **Audit Logging Tests**:\n   - Verify all user CRUD operations generate appropriate audit logs\n   - Validate log content includes all required fields\n   - Test log integrity by attempting to modify logs\n   - Verify log retention policies are enforced\n   - Test log search and retrieval functionality\n\n3. **Privacy Compliance Tests**:\n   - Verify patient data access requests work correctly\n   - Test consent management functionality\n   - Verify data minimization in API responses\n   - Test disclosure limitation mechanisms\n\n4. **Encryption Tests**:\n   - Verify sensitive fields are properly encrypted in database\n   - Test that encrypted data can be properly decrypted with appropriate access\n   - Verify encryption in transit using network analysis tools\n   - Test key rotation procedures\n\n5. **Integration Tests**:\n   - Verify all existing functionality continues to work with new compliance features\n   - Test performance impact of added security measures\n   - Conduct penetration testing to identify potential vulnerabilities\n   - Test compatibility with libSQL/SQLite, particularly for complex queries and transactions\n\nAll tests should be documented for compliance auditing purposes.",
       "status": "pending",
       "dependencies": [
         4
@@ -1138,7 +1141,7 @@
           "title": "Implement Role-Based Access Control (RBAC) Framework",
           "description": "Create a comprehensive RBAC system with defined roles, permissions, and access control mechanisms",
           "dependencies": [],
-          "details": "Implementation steps:\n1. Define role entities (Admin, Provider, Staff, Patient) in the database schema\n2. Create a permissions table with granular access controls for different operations\n3. Implement a role-permission mapping system\n4. Create middleware for permission verification on all user data endpoints\n5. Modify existing user service to incorporate role checks before data access\n6. Update user creation/modification flows to assign appropriate roles\n7. Implement the principle of least privilege by default\n\nTesting approach:\n- Unit tests for each role's permission boundaries\n- Integration tests verifying endpoint access control\n- Test cases for permission inheritance and role transitions\n- Verify existing functionality remains intact with new permission checks",
+          "details": "Implementation steps:\n1. Define role entities (Admin, Provider, Staff, Patient) in the database schema\n2. Create a permissions table with granular access controls for different operations\n3. Implement a role-permission mapping system\n4. Create middleware for permission verification on all user data endpoints\n5. Modify existing user service to incorporate role checks before data access\n6. Update user creation/modification flows to assign appropriate roles\n7. Implement the principle of least privilege by default\n8. Adapt database schema and queries to work with libSQL/SQLite\n\nTesting approach:\n- Unit tests for each role's permission boundaries\n- Integration tests verifying endpoint access control\n- Test cases for permission inheritance and role transitions\n- Verify existing functionality remains intact with new permission checks\n- Test compatibility with libSQL/SQLite database",
           "status": "pending",
           "parentTaskId": 22
         },
@@ -1149,7 +1152,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Design audit log schema with required HIPAA fields (timestamp, user ID, action type, affected data, IP address)\n2. Create a centralized logging service that interfaces with all user operations\n3. Implement aspect-oriented programming or middleware to intercept all user CRUD operations\n4. Add secure storage mechanisms for audit logs with appropriate retention policies\n5. Implement log rotation and archiving functionality\n6. Create admin-only interfaces for log review with appropriate filtering\n7. Ensure logs are tamper-evident and cannot be modified by regular users\n\nTesting approach:\n- Verify all user operations generate appropriate audit entries\n- Test log rotation and retention policies\n- Validate log integrity and tamper protection\n- Performance testing to ensure logging doesn't impact system responsiveness\n- Verify log search and filtering capabilities",
+          "details": "Implementation steps:\n1. Design audit log schema with required HIPAA fields (timestamp, user ID, action type, affected data, IP address)\n2. Create a centralized logging service that interfaces with all user operations\n3. Implement aspect-oriented programming or middleware to intercept all user CRUD operations\n4. Add secure storage mechanisms for audit logs with appropriate retention policies\n5. Implement log rotation and archiving functionality\n6. Create admin-only interfaces for log review with appropriate filtering\n7. Ensure logs are tamper-evident and cannot be modified by regular users\n8. Adapt logging system to use libSQL/SQLite for storage\n\nTesting approach:\n- Verify all user operations generate appropriate audit entries\n- Test log rotation and retention policies\n- Validate log integrity and tamper protection\n- Performance testing to ensure logging doesn't impact system responsiveness\n- Verify log search and filtering capabilities\n- Test compatibility with libSQL/SQLite for log storage and retrieval",
           "status": "pending",
           "parentTaskId": 22
         },
@@ -1160,7 +1163,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Identify all fields containing ePHI or sensitive information (SSN, DOB, medical record numbers, etc.)\n2. Design database schema modifications to store encrypted data\n3. Implement AES-256 encryption service with proper key management\n4. Create data access layer that handles transparent encryption/decryption\n5. Modify existing APIs to use the encryption service\n6. Implement key rotation and management policies\n7. Ensure all data is encrypted both at rest and in transit\n8. Add encryption indicators in the database schema\n\nTesting approach:\n- Unit tests for encryption/decryption operations\n- Verify data is properly encrypted in the database\n- Test key rotation procedures\n- Performance testing for encryption overhead\n- Verify existing functionality with encrypted data\n- Security testing to ensure encryption implementation is sound",
+          "details": "Implementation steps:\n1. Identify all fields containing ePHI or sensitive information (SSN, DOB, medical record numbers, etc.)\n2. Design database schema modifications to store encrypted data\n3. Implement AES-256 encryption service with proper key management\n4. Create data access layer that handles transparent encryption/decryption\n5. Modify existing APIs to use the encryption service\n6. Implement key rotation and management policies\n7. Ensure all data is encrypted both at rest and in transit\n8. Add encryption indicators in the database schema\n9. Adapt encryption implementation to work with libSQL/SQLite data types\n\nTesting approach:\n- Unit tests for encryption/decryption operations\n- Verify data is properly encrypted in the database\n- Test key rotation procedures\n- Performance testing for encryption overhead\n- Verify existing functionality with encrypted data\n- Security testing to ensure encryption implementation is sound\n- Test compatibility with libSQL/SQLite for storing and retrieving encrypted data",
           "status": "pending",
           "parentTaskId": 22
         },
@@ -1173,7 +1176,7 @@
             2,
             3
           ],
-          "details": "Implementation steps:\n1. Review all user fields to identify and classify ePHI data\n2. Implement data minimization by modifying schemas and services to only collect necessary information\n3. Create consent tracking system for data usage with versioning\n4. Develop patient portal features for requesting their records\n5. Implement disclosure limitation mechanisms\n6. Add functionality to track and honor patient preferences for communications\n7. Create data retention policies and automated enforcement\n8. Implement data export functionality for patient record requests\n\nTesting approach:\n- Verify consent tracking across user operations\n- Test patient record request workflow\n- Validate data minimization implementation\n- Test disclosure limitation mechanisms\n- Verify patient communication preferences are honored\n- Test data retention policy enforcement",
+          "details": "Implementation steps:\n1. Review all user fields to identify and classify ePHI data\n2. Implement data minimization by modifying schemas and services to only collect necessary information\n3. Create consent tracking system for data usage with versioning\n4. Develop patient portal features for requesting their records\n5. Implement disclosure limitation mechanisms\n6. Add functionality to track and honor patient preferences for communications\n7. Create data retention policies and automated enforcement\n8. Implement data export functionality for patient record requests\n9. Adapt consent tracking system to use libSQL/SQLite for storage\n\nTesting approach:\n- Verify consent tracking across user operations\n- Test patient record request workflow\n- Validate data minimization implementation\n- Test disclosure limitation mechanisms\n- Verify patient communication preferences are honored\n- Test data retention policy enforcement\n- Test compatibility with libSQL/SQLite for consent tracking and data export",
           "status": "pending",
           "parentTaskId": 22
         },
@@ -1187,7 +1190,7 @@
             3,
             4
           ],
-          "details": "Implementation steps:\n1. Create comprehensive test plan covering all HIPAA compliance requirements\n2. Develop integration tests for all modified components\n3. Perform security testing including penetration testing on the modified system\n4. Verify all existing functionality remains intact\n5. Create documentation for HIPAA compliance features\n6. Implement automated compliance checks as part of CI/CD pipeline\n7. Perform user acceptance testing with stakeholders\n8. Create training materials for system users on new HIPAA features\n\nTesting approach:\n- End-to-end testing of complete user workflows\n- Security testing including penetration testing\n- Performance testing under various load conditions\n- Compliance verification against HIPAA requirements\n- User acceptance testing with different user roles\n- Regression testing of all existing functionality",
+          "details": "Implementation steps:\n1. Create comprehensive test plan covering all HIPAA compliance requirements\n2. Develop integration tests for all modified components\n3. Perform security testing including penetration testing on the modified system\n4. Verify all existing functionality remains intact\n5. Create documentation for HIPAA compliance features\n6. Implement automated compliance checks as part of CI/CD pipeline\n7. Perform user acceptance testing with stakeholders\n8. Create training materials for system users on new HIPAA features\n9. Test compatibility with libSQL/SQLite across all features\n\nTesting approach:\n- End-to-end testing of complete user workflows\n- Security testing including penetration testing\n- Performance testing under various load conditions\n- Compliance verification against HIPAA requirements\n- User acceptance testing with different user roles\n- Regression testing of all existing functionality\n- Database compatibility testing with libSQL/SQLite",
           "status": "pending",
           "parentTaskId": 22
         }
@@ -1197,8 +1200,8 @@
       "id": 23,
       "title": "Retrofit HIPAA Compliance to Authentication System",
       "description": "Modify the existing authentication system to ensure HIPAA compliance by implementing secure session management, audit logging, evaluating MFA options, and enhancing credential security throughout the application.",
-      "details": "This task requires updating the authentication system to meet HIPAA security requirements:\n\n1. Secure Session Management:\n   - Implement strict session timeouts (15-30 minutes of inactivity)\n   - Develop secure token handling with proper encryption\n   - Ensure tokens are invalidated on logout and timeout\n   - Add automatic session termination after a defined period (8-12 hours max)\n\n2. Comprehensive Audit Logging:\n   - Create detailed audit logs for all authentication events\n   - Log login attempts (both successful and failed)\n   - Track registration activities\n   - Record password changes and reset requests\n   - Ensure logs include timestamp, user ID, IP address, and action type\n   - Implement tamper-evident logging mechanisms\n\n3. Multi-Factor Authentication:\n   - Evaluate MFA options (SMS, email, authenticator apps, hardware tokens)\n   - Implement the selected MFA solution\n   - Create recovery mechanisms for MFA\n   - Make MFA configurable (required/optional) based on user role\n\n4. Secure Credential Handling:\n   - Review and update password hashing algorithms (use bcrypt or Argon2)\n   - Implement password complexity requirements\n   - Ensure credentials are never logged or stored in plaintext\n   - Add protection against brute force attacks (account lockouts)\n   - Secure the password reset workflow\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. All changes must maintain backward compatibility with existing authentication flows while enhancing security.",
-      "testStrategy": "Testing should verify both security compliance and functionality:\n\n1. Session Management Tests:\n   - Verify sessions expire after the configured inactivity period\n   - Confirm tokens are properly invalidated on logout\n   - Test that expired tokens cannot be reused\n   - Validate that concurrent sessions are handled according to policy\n\n2. Audit Logging Tests:\n   - Verify all required authentication events are logged with correct details\n   - Test log integrity and tamper resistance\n   - Confirm logs contain all required HIPAA fields\n   - Validate log storage and retention meets compliance requirements\n\n3. MFA Testing:\n   - Test each implemented MFA method for proper functionality\n   - Verify MFA bypass attempts are blocked and logged\n   - Test MFA recovery workflows\n   - Confirm MFA enforcement based on user role configuration\n\n4. Security Testing:\n   - Conduct penetration testing focused on authentication\n   - Perform automated security scanning\n   - Test password policies enforcement\n   - Verify protection against common attacks (brute force, credential stuffing)\n   - Ensure no credentials are exposed in logs or error messages\n\n5. Compliance Validation:\n   - Create a compliance checklist based on HIPAA requirements\n   - Perform a formal review against this checklist\n   - Document evidence of compliance for each requirement\n\nAll tests should be automated where possible and included in the CI/CD pipeline.",
+      "details": "This task requires updating the authentication system to meet HIPAA security requirements:\n\n1. Secure Session Management:\n   - Implement strict session timeouts (15-30 minutes of inactivity)\n   - Develop secure token handling with proper encryption\n   - Ensure tokens are invalidated on logout and timeout\n   - Add automatic session termination after a defined period (8-12 hours max)\n\n2. Comprehensive Audit Logging:\n   - Create detailed audit logs for all authentication events\n   - Log login attempts (both successful and failed)\n   - Track registration activities\n   - Record password changes and reset requests\n   - Ensure logs include timestamp, user ID, IP address, and action type\n   - Implement tamper-evident logging mechanisms\n\n3. Multi-Factor Authentication:\n   - Evaluate MFA options (SMS, email, authenticator apps, hardware tokens)\n   - Implement the selected MFA solution\n   - Create recovery mechanisms for MFA\n   - Make MFA configurable (required/optional) based on user role\n\n4. Secure Credential Handling:\n   - Review and update password hashing algorithms (use bcrypt or Argon2)\n   - Implement password complexity requirements\n   - Ensure credentials are never logged or stored in plaintext\n   - Add protection against brute force attacks (account lockouts)\n   - Secure the password reset workflow\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. All changes must maintain backward compatibility with existing authentication flows while enhancing security. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.",
+      "testStrategy": "Testing should verify both security compliance and functionality:\n\n1. Session Management Tests:\n   - Verify sessions expire after the configured inactivity period\n   - Confirm tokens are properly invalidated on logout\n   - Test that expired tokens cannot be reused\n   - Validate that concurrent sessions are handled according to policy\n\n2. Audit Logging Tests:\n   - Verify all required authentication events are logged with correct details\n   - Test log integrity and tamper resistance\n   - Confirm logs contain all required HIPAA fields\n   - Validate log storage and retention meets compliance requirements\n\n3. MFA Testing:\n   - Test each implemented MFA method for proper functionality\n   - Verify MFA bypass attempts are blocked and logged\n   - Test MFA recovery workflows\n   - Confirm MFA enforcement based on user role configuration\n\n4. Security Testing:\n   - Conduct penetration testing focused on authentication\n   - Perform automated security scanning\n   - Test password policies enforcement\n   - Verify protection against common attacks (brute force, credential stuffing)\n   - Ensure no credentials are exposed in logs or error messages\n\n5. Compliance Validation:\n   - Create a compliance checklist based on HIPAA requirements\n   - Perform a formal review against this checklist\n   - Document evidence of compliance for each requirement\n\n6. Database Compatibility Testing:\n   - Verify all authentication operations work correctly with libSQL/SQLite\n   - Test performance of authentication queries with the new database\n   - Ensure transaction integrity for critical authentication operations\n\nAll tests should be automated where possible and included in the CI/CD pipeline.",
       "status": "pending",
       "dependencies": [
         5
@@ -1210,7 +1213,7 @@
           "title": "Implement Secure Session Management",
           "description": "Update the authentication system with HIPAA-compliant session handling including timeouts, secure token management, and automatic session termination.",
           "dependencies": [],
-          "details": "Implementation steps:\n1. Configure session timeout settings to automatically log users out after 15-30 minutes of inactivity\n2. Implement secure token generation using industry-standard encryption (JWT with appropriate algorithms)\n3. Update the token storage mechanism to use HttpOnly and Secure cookies\n4. Add token validation logic to check expiration and integrity on each request\n5. Implement token invalidation on user logout\n6. Add absolute session expiration after 8-12 hours regardless of activity\n7. Create session refresh mechanism that generates new tokens when appropriate\n\nTesting approach:\n- Unit test the token generation, validation, and expiration logic\n- Create integration tests for session timeout scenarios\n- Test logout flows to verify tokens are properly invalidated\n- Verify session expiration works correctly across different browsers",
+          "details": "Implementation steps:\n1. Configure session timeout settings to automatically log users out after 15-30 minutes of inactivity\n2. Implement secure token generation using industry-standard encryption (JWT with appropriate algorithms)\n3. Update the token storage mechanism to use HttpOnly and Secure cookies\n4. Add token validation logic to check expiration and integrity on each request\n5. Implement token invalidation on user logout\n6. Add absolute session expiration after 8-12 hours regardless of activity\n7. Create session refresh mechanism that generates new tokens when appropriate\n8. Adapt token storage and validation to work with libSQL/SQLite\n\nTesting approach:\n- Unit test the token generation, validation, and expiration logic\n- Create integration tests for session timeout scenarios\n- Test logout flows to verify tokens are properly invalidated\n- Verify session expiration works correctly across different browsers\n- Test compatibility with libSQL/SQLite for token storage and validation",
           "status": "pending",
           "parentTaskId": 23
         },
@@ -1221,7 +1224,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Design a structured log format that includes timestamp, user ID, IP address, action type, and result\n2. Implement logging interceptors/middleware to capture authentication events\n3. Add logging for all key events: login attempts, logouts, registration, password changes/resets\n4. Ensure failed authentication attempts are logged with appropriate details\n5. Implement tamper-evident mechanisms (e.g., cryptographic signatures or sequential IDs)\n6. Create a secure storage mechanism for logs with appropriate retention policies\n7. Add log rotation and archiving capabilities\n\nTesting approach:\n- Unit test the logging components to ensure they capture all required fields\n- Create integration tests that verify logs are generated for each authentication event\n- Test log integrity mechanisms to ensure logs cannot be modified\n- Verify log storage and rotation works correctly",
+          "details": "Implementation steps:\n1. Design a structured log format that includes timestamp, user ID, IP address, action type, and result\n2. Implement logging interceptors/middleware to capture authentication events\n3. Add logging for all key events: login attempts, logouts, registration, password changes/resets\n4. Ensure failed authentication attempts are logged with appropriate details\n5. Implement tamper-evident mechanisms (e.g., cryptographic signatures or sequential IDs)\n6. Create a secure storage mechanism for logs with appropriate retention policies\n7. Add log rotation and archiving capabilities\n8. Adapt logging system to use libSQL/SQLite for storage\n\nTesting approach:\n- Unit test the logging components to ensure they capture all required fields\n- Create integration tests that verify logs are generated for each authentication event\n- Test log integrity mechanisms to ensure logs cannot be modified\n- Verify log storage and rotation works correctly\n- Test compatibility with libSQL/SQLite for log storage and retrieval",
           "status": "pending",
           "parentTaskId": 23
         },
@@ -1230,7 +1233,7 @@
           "title": "Enhance Secure Credential Handling",
           "description": "Update password storage, validation, and reset workflows to meet HIPAA security requirements.",
           "dependencies": [],
-          "details": "Implementation steps:\n1. Review and update password hashing algorithm to use bcrypt or Argon2 with appropriate work factors\n2. Implement password complexity requirements (minimum length, character types, etc.)\n3. Create a migration plan for existing password hashes\n4. Add brute force protection with account lockout after multiple failed attempts\n5. Update password reset workflow with secure token generation and expiration\n6. Ensure all credential handling code prevents plaintext storage or logging\n7. Implement secure password change functionality with current password verification\n\nTesting approach:\n- Unit test password hashing and validation logic\n- Test password complexity validation rules\n- Create integration tests for the password reset workflow\n- Verify account lockout functionality works correctly\n- Test migration of existing password hashes",
+          "details": "Implementation steps:\n1. Review and update password hashing algorithm to use bcrypt or Argon2 with appropriate work factors\n2. Implement password complexity requirements (minimum length, character types, etc.)\n3. Create a migration plan for existing password hashes\n4. Add brute force protection with account lockout after multiple failed attempts\n5. Update password reset workflow with secure token generation and expiration\n6. Ensure all credential handling code prevents plaintext storage or logging\n7. Implement secure password change functionality with current password verification\n8. Adapt credential storage to work with libSQL/SQLite data types and constraints\n\nTesting approach:\n- Unit test password hashing and validation logic\n- Test password complexity validation rules\n- Create integration tests for the password reset workflow\n- Verify account lockout functionality works correctly\n- Test migration of existing password hashes\n- Test compatibility with libSQL/SQLite for credential storage and retrieval",
           "status": "pending",
           "parentTaskId": 23
         },
@@ -1242,7 +1245,7 @@
             1,
             3
           ],
-          "details": "Implementation steps:\n1. Research and evaluate MFA options (SMS, email, authenticator apps, hardware tokens)\n2. Document pros/cons of each approach and select the most appropriate solution\n3. Design the MFA enrollment and verification workflows\n4. Implement the selected MFA solution with appropriate libraries/services\n5. Create recovery mechanisms for users who lose MFA access\n6. Make MFA configurable based on user roles (required for admin/clinical, optional for others)\n7. Update login flow to incorporate MFA verification step\n\nTesting approach:\n- Create unit tests for MFA verification logic\n- Develop integration tests for the complete MFA workflow\n- Test recovery mechanisms for various scenarios\n- Verify role-based MFA requirements work correctly\n- Test backward compatibility with existing authentication flows",
+          "details": "Implementation steps:\n1. Research and evaluate MFA options (SMS, email, authenticator apps, hardware tokens)\n2. Document pros/cons of each approach and select the most appropriate solution\n3. Design the MFA enrollment and verification workflows\n4. Implement the selected MFA solution with appropriate libraries/services\n5. Create recovery mechanisms for users who lose MFA access\n6. Make MFA configurable based on user roles (required for admin/clinical, optional for others)\n7. Update login flow to incorporate MFA verification step\n8. Adapt MFA configuration storage to work with libSQL/SQLite\n\nTesting approach:\n- Create unit tests for MFA verification logic\n- Develop integration tests for the complete MFA workflow\n- Test recovery mechanisms for various scenarios\n- Verify role-based MFA requirements work correctly\n- Test backward compatibility with existing authentication flows\n- Test compatibility with libSQL/SQLite for MFA configuration storage",
           "status": "pending",
           "parentTaskId": 23
         },
@@ -1256,7 +1259,7 @@
             3,
             4
           ],
-          "details": "Implementation steps:\n1. Integrate all authentication components (session management, audit logging, credential handling, MFA)\n2. Create comprehensive documentation for the updated authentication system\n3. Develop a HIPAA compliance checklist and verify all requirements are met\n4. Perform security review of the complete authentication system\n5. Update user-facing documentation and help resources\n6. Create a rollout plan with fallback options\n7. Implement monitoring for authentication-related security events\n\nTesting approach:\n- Conduct end-to-end testing of all authentication flows\n- Perform security testing (penetration testing) on the authentication system\n- Test all error handling and edge cases\n- Verify audit logs capture all required information across the system\n- Conduct user acceptance testing with different user roles\n- Verify backward compatibility with existing integrations",
+          "details": "Implementation steps:\n1. Integrate all authentication components (session management, audit logging, credential handling, MFA)\n2. Create comprehensive documentation for the updated authentication system\n3. Develop a HIPAA compliance checklist and verify all requirements are met\n4. Perform security review of the complete authentication system\n5. Update user-facing documentation and help resources\n6. Create a rollout plan with fallback options\n7. Implement monitoring for authentication-related security events\n8. Test complete system compatibility with libSQL/SQLite\n\nTesting approach:\n- Conduct end-to-end testing of all authentication flows\n- Perform security testing (penetration testing) on the authentication system\n- Test all error handling and edge cases\n- Verify audit logs capture all required information across the system\n- Conduct user acceptance testing with different user roles\n- Verify backward compatibility with existing integrations\n- Test database performance and reliability with libSQL/SQLite",
           "status": "pending",
           "parentTaskId": 23
         }
@@ -1266,8 +1269,8 @@
       "id": 24,
       "title": "Retrofit HIPAA Compliance to Company and Office Management Features",
       "description": "Implement HIPAA compliance measures for existing Company and Office Management functionality by adding Role-Based Access Controls (RBAC) and comprehensive audit logging for all data operations.",
-      "details": "This task requires modifying the existing Company and Office Management features to ensure HIPAA compliance by:\n\n1. Implementing strict Role-Based Access Controls (RBAC):\n   - Restrict company/office management capabilities to users with Admin role only\n   - Modify all controller endpoints to verify user permissions before allowing operations\n   - Update UI components to hide management options from unauthorized users\n   - Create permission constants in a central location for consistency\n\n2. Adding comprehensive audit logging:\n   - Implement detailed audit trails for all company/office CRUD operations\n   - Log must include: timestamp, user ID, action type, affected entity, before/after states\n   - Ensure logs are tamper-evident and cannot be modified\n   - Store logs in a separate, secure database table with appropriate retention policies\n\n3. Data access patterns:\n   - Implement data access filters at the repository/service layer to enforce permissions\n   - Add middleware to verify permissions for all API routes related to companies/offices\n\n4. Documentation updates:\n   - Update API documentation to reflect new permission requirements\n   - Document the audit logging format and retention policies\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6.",
-      "testStrategy": "Testing should verify both the RBAC implementation and audit logging functionality:\n\n1. RBAC Testing:\n   - Unit tests for each permission check in services and controllers\n   - Integration tests that verify users with Admin role can perform all operations\n   - Integration tests that verify users without Admin role receive 403 Forbidden responses\n   - UI tests to confirm management options are only visible to authorized users\n\n2. Audit Logging Tests:\n   - Unit tests to verify log entries are created for each CRUD operation\n   - Tests to verify log entries contain all required fields (timestamp, user, action, etc.)\n   - Integration tests that perform operations and verify corresponding log entries\n   - Tests to verify logs cannot be modified or deleted through normal application interfaces\n\n3. Security Testing:\n   - Attempt to bypass RBAC by directly calling APIs with unauthorized credentials\n   - Verify that all routes are protected, including any that might have been overlooked\n   - Test for SQL injection and other security vulnerabilities in the logging system\n\n4. Compliance Verification:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Verify each requirement is met through manual testing\n   - Document evidence of compliance for each requirement",
+      "details": "This task requires modifying the existing Company and Office Management features to ensure HIPAA compliance by:\n\n1. Implementing strict Role-Based Access Controls (RBAC):\n   - Restrict company/office management capabilities to users with Admin role only\n   - Modify all controller endpoints to verify user permissions before allowing operations\n   - Update UI components to hide management options from unauthorized users\n   - Create permission constants in a central location for consistency\n\n2. Adding comprehensive audit logging:\n   - Implement detailed audit trails for all company/office CRUD operations\n   - Log must include: timestamp, user ID, action type, affected entity, before/after states\n   - Ensure logs are tamper-evident and cannot be modified\n   - Store logs in a separate, secure database table with appropriate retention policies\n\n3. Data access patterns:\n   - Implement data access filters at the repository/service layer to enforce permissions\n   - Add middleware to verify permissions for all API routes related to companies/offices\n\n4. Documentation updates:\n   - Update API documentation to reflect new permission requirements\n   - Document the audit logging format and retention policies\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. This work builds upon the existing Company and Office Management features from Task 6. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.",
+      "testStrategy": "Testing should verify both the RBAC implementation and audit logging functionality:\n\n1. RBAC Testing:\n   - Unit tests for each permission check in services and controllers\n   - Integration tests that verify users with Admin role can perform all operations\n   - Integration tests that verify users without Admin role receive 403 Forbidden responses\n   - UI tests to confirm management options are only visible to authorized users\n\n2. Audit Logging Tests:\n   - Unit tests to verify log entries are created for each CRUD operation\n   - Tests to verify log entries contain all required fields (timestamp, user, action, etc.)\n   - Integration tests that perform operations and verify corresponding log entries\n   - Tests to verify logs cannot be modified or deleted through normal application interfaces\n\n3. Security Testing:\n   - Attempt to bypass RBAC by directly calling APIs with unauthorized credentials\n   - Verify that all routes are protected, including any that might have been overlooked\n   - Test for SQL injection and other security vulnerabilities in the logging system\n\n4. Compliance Verification:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Verify each requirement is met through manual testing\n   - Document evidence of compliance for each requirement\n\n5. Database Compatibility Testing:\n   - Verify all operations work correctly with libSQL/SQLite\n   - Test performance of queries with the new database\n   - Ensure transaction integrity for critical operations",
       "status": "pending",
       "dependencies": [
         6
@@ -1279,7 +1282,7 @@
           "title": "Create RBAC Permission Constants and Core Infrastructure",
           "description": "Establish the foundation for HIPAA compliance by creating permission constants and the core infrastructure needed for role-based access controls.",
           "dependencies": [],
-          "details": "Implementation steps:\n1. Create a new `permissions.js` file in a central location to define all permission constants related to company and office management (e.g., `VIEW_COMPANY`, `EDIT_COMPANY`, `DELETE_COMPANY`, etc.)\n2. Create a `RolePermissionService` that maps roles to permissions (Admin role should have all company/office management permissions)\n3. Implement a `PermissionChecker` utility that can verify if a user has a specific permission based on their role\n4. Create middleware function `verifyPermission(requiredPermission)` that can be applied to routes to check permissions\n5. Set up the database schema for the audit logging table with fields: id, timestamp, userId, action, entityType, entityId, previousState, newState\n\nTesting approach:\n- Unit test the permission mapping to ensure Admin role has all required permissions\n- Test the PermissionChecker with various role/permission combinations\n- Verify the middleware correctly blocks/allows requests based on permissions",
+          "details": "Implementation steps:\n1. Create a new `permissions.js` file in a central location to define all permission constants related to company and office management (e.g., `VIEW_COMPANY`, `EDIT_COMPANY`, `DELETE_COMPANY`, etc.)\n2. Create a `RolePermissionService` that maps roles to permissions (Admin role should have all company/office management permissions)\n3. Implement a `PermissionChecker` utility that can verify if a user has a specific permission based on their role\n4. Create middleware function `verifyPermission(requiredPermission)` that can be applied to routes to check permissions\n5. Set up the database schema for the audit logging table with fields: id, timestamp, userId, action, entityType, entityId, previousState, newState\n6. Adapt database schema to use libSQL/SQLite data types and constraints\n\nTesting approach:\n- Unit test the permission mapping to ensure Admin role has all required permissions\n- Test the PermissionChecker with various role/permission combinations\n- Verify the middleware correctly blocks/allows requests based on permissions\n- Test compatibility with libSQL/SQLite database",
           "status": "pending",
           "parentTaskId": 24
         },
@@ -1290,7 +1293,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Create an `AuditLogService` with methods to log different types of operations (create, read, update, delete)\n2. Implement functions to capture and format the before/after states of entities for change tracking\n3. Add encryption for sensitive data in the logs to ensure they're tamper-evident\n4. Implement log retention policies according to HIPAA requirements (minimum 6 years)\n5. Create database access methods for storing and retrieving audit logs\n6. Add a method to verify log integrity to detect any tampering attempts\n\nTesting approach:\n- Unit test the logging service with mock data for all CRUD operations\n- Verify that before/after states are correctly captured and stored\n- Test the encryption and tamper detection mechanisms\n- Ensure log retention policies are correctly applied",
+          "details": "Implementation steps:\n1. Create an `AuditLogService` with methods to log different types of operations (create, read, update, delete)\n2. Implement functions to capture and format the before/after states of entities for change tracking\n3. Add encryption for sensitive data in the logs to ensure they're tamper-evident\n4. Implement log retention policies according to HIPAA requirements (minimum 6 years)\n5. Create database access methods for storing and retrieving audit logs\n6. Add a method to verify log integrity to detect any tampering attempts\n7. Adapt logging service to use libSQL/SQLite for storage\n\nTesting approach:\n- Unit test the logging service with mock data for all CRUD operations\n- Verify that before/after states are correctly captured and stored\n- Test the encryption and tamper detection mechanisms\n- Ensure log retention policies are correctly applied\n- Test compatibility with libSQL/SQLite for log storage and retrieval",
           "status": "pending",
           "parentTaskId": 24
         },
@@ -1302,7 +1305,7 @@
             1,
             2
           ],
-          "details": "Implementation steps:\n1. Apply the `verifyPermission` middleware to all company management routes with appropriate permission requirements\n2. Modify the CompanyService to check permissions at the service layer before performing operations\n3. Integrate the AuditLogService into all company CRUD operations to log actions with required details\n4. Update repository methods to capture before/after states for audit logging\n5. Implement data access filters at the repository layer to enforce permissions\n6. Update error handling to provide appropriate responses for permission denied scenarios\n\nTesting approach:\n- Integration tests for each endpoint with different user roles to verify permission enforcement\n- Verify audit logs are created for all operations with correct details\n- Test error scenarios and permission denied cases\n- Ensure data access filters correctly restrict data based on permissions",
+          "details": "Implementation steps:\n1. Apply the `verifyPermission` middleware to all company management routes with appropriate permission requirements\n2. Modify the CompanyService to check permissions at the service layer before performing operations\n3. Integrate the AuditLogService into all company CRUD operations to log actions with required details\n4. Update repository methods to capture before/after states for audit logging\n5. Implement data access filters at the repository layer to enforce permissions\n6. Update error handling to provide appropriate responses for permission denied scenarios\n7. Adapt database queries to use libSQL/SQLite syntax\n\nTesting approach:\n- Integration tests for each endpoint with different user roles to verify permission enforcement\n- Verify audit logs are created for all operations with correct details\n- Test error scenarios and permission denied cases\n- Ensure data access filters correctly restrict data based on permissions\n- Test compatibility with libSQL/SQLite for all database operations",
           "status": "pending",
           "parentTaskId": 24
         },
@@ -1314,7 +1317,7 @@
             1,
             2
           ],
-          "details": "Implementation steps:\n1. Apply the `verifyPermission` middleware to all office management routes with appropriate permission requirements\n2. Modify the OfficeService to check permissions at the service layer before performing operations\n3. Integrate the AuditLogService into all office CRUD operations to log actions with required details\n4. Update repository methods to capture before/after states for audit logging\n5. Implement data access filters at the repository layer to enforce permissions\n6. Update error handling to provide appropriate responses for permission denied scenarios\n\nTesting approach:\n- Integration tests for each endpoint with different user roles to verify permission enforcement\n- Verify audit logs are created for all operations with correct details\n- Test error scenarios and permission denied cases\n- Ensure data access filters correctly restrict data based on permissions",
+          "details": "Implementation steps:\n1. Apply the `verifyPermission` middleware to all office management routes with appropriate permission requirements\n2. Modify the OfficeService to check permissions at the service layer before performing operations\n3. Integrate the AuditLogService into all office CRUD operations to log actions with required details\n4. Update repository methods to capture before/after states for audit logging\n5. Implement data access filters at the repository layer to enforce permissions\n6. Update error handling to provide appropriate responses for permission denied scenarios\n7. Adapt database queries to use libSQL/SQLite syntax\n\nTesting approach:\n- Integration tests for each endpoint with different user roles to verify permission enforcement\n- Verify audit logs are created for all operations with correct details\n- Test error scenarios and permission denied cases\n- Ensure data access filters correctly restrict data based on permissions\n- Test compatibility with libSQL/SQLite for all database operations",
           "status": "pending",
           "parentTaskId": 24
         },
@@ -1326,7 +1329,7 @@
             3,
             4
           ],
-          "details": "Implementation steps:\n1. Modify company and office management UI components to check user permissions before rendering management options\n2. Add client-side permission checking utility that mirrors the server-side permission structure\n3. Update API documentation to reflect new permission requirements for all endpoints\n4. Document the audit logging format, fields, and retention policies\n5. Create developer documentation explaining the RBAC implementation and how to properly use it for new features\n6. Update the healthcare-compliance.md document with details on how the implementation satisfies HIPAA requirements\n\nTesting approach:\n- UI tests to verify management options are only visible to authorized users\n- Manual testing of UI with different user roles\n- Review documentation for completeness and accuracy\n- Verify that all HIPAA compliance requirements from the original task are addressed in the documentation",
+          "details": "Implementation steps:\n1. Modify company and office management UI components to check user permissions before rendering management options\n2. Add client-side permission checking utility that mirrors the server-side permission structure\n3. Update API documentation to reflect new permission requirements for all endpoints\n4. Document the audit logging format, fields, and retention policies\n5. Create developer documentation explaining the RBAC implementation and how to properly use it for new features\n6. Update the healthcare-compliance.md document with details on how the implementation satisfies HIPAA requirements\n7. Document any libSQL/SQLite specific considerations for developers\n\nTesting approach:\n- UI tests to verify management options are only visible to authorized users\n- Manual testing of UI with different user roles\n- Review documentation for completeness and accuracy\n- Verify that all HIPAA compliance requirements from the original task are addressed in the documentation",
           "status": "pending",
           "parentTaskId": 24
         }
@@ -1336,8 +1339,8 @@
       "id": 25,
       "title": "Retrofit HIPAA Compliance for Media Handling System",
       "description": "Modify the existing S3/MinIO media handling features to ensure HIPAA compliance by implementing secure access controls, encryption, audit logging, and secure transmission protocols for media files that may contain or be linked to ePHI.",
-      "details": "This task requires updating the existing media handling system to meet HIPAA compliance requirements as outlined in docs/healthcare-compliance.md. Specific implementation details include:\n\n1. Access Controls:\n   - Implement role-based access control (RBAC) for all media files\n   - Create permission checks before any media access, ensuring only authorized users can view/download files\n   - Add patient-provider relationship validation before granting access to therapy-related media\n   - Implement time-limited access tokens for temporary file access\n\n2. Encryption:\n   - Configure server-side encryption (SSE) for all files stored in S3/MinIO\n   - Implement AES-256 encryption standard\n   - Establish secure key management procedures\n   - Ensure encryption at rest for all stored media\n\n3. Audit Logging:\n   - Create comprehensive audit logs capturing all media interactions:\n     - File uploads (who, when, file metadata)\n     - File access/downloads (who, when, access context)\n     - File modifications or deletions\n   - Ensure logs contain sufficient detail for compliance reporting\n   - Make logs tamper-evident and immutable\n   - Implement log retention policies per HIPAA requirements\n\n4. Secure Transmission:\n   - Enforce HTTPS/TLS 1.2+ for all media transfers\n   - Implement secure URL generation with appropriate expiration\n   - Add integrity verification for uploaded/downloaded files\n\n5. Additional Requirements:\n   - Update privacy notices and terms of service\n   - Create documentation for the security measures implemented\n   - Ensure proper error handling that doesn't expose sensitive information\n\nReview the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible.",
-      "testStrategy": "Testing should verify all HIPAA compliance aspects of the media handling system:\n\n1. Access Control Testing:\n   - Verify unauthorized users cannot access protected media files\n   - Test that users can only access files they have permissions for\n   - Verify access tokens expire correctly and cannot be reused\n   - Test edge cases like terminated staff accounts and transferred patients\n\n2. Encryption Testing:\n   - Verify server-side encryption is properly configured\n   - Confirm encryption headers in S3/MinIO responses\n   - Attempt to access raw storage to confirm files are encrypted\n   - Validate key rotation procedures work correctly\n\n3. Audit Log Testing:\n   - Verify all media operations generate appropriate audit logs\n   - Confirm logs contain required fields (user ID, timestamp, action, resource ID)\n   - Test log integrity and immutability\n   - Verify log retention policies are enforced\n\n4. Secure Transmission Testing:\n   - Use tools like OWASP ZAP to verify secure connections\n   - Test for TLS configuration issues\n   - Verify secure URL generation and expiration\n   - Attempt to intercept traffic to confirm encryption\n\n5. Compliance Testing:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Perform a security review with the compliance team\n   - Document all security measures for potential audit\n\n6. Regression Testing:\n   - Verify all existing media functionality still works\n   - Test performance impact of new security measures\n\nCreate automated tests where possible and document manual test procedures for aspects that cannot be automated.",
+      "details": "This task requires updating the existing media handling system to meet HIPAA compliance requirements as outlined in docs/healthcare-compliance.md. Specific implementation details include:\n\n1. Access Controls:\n   - Implement role-based access control (RBAC) for all media files\n   - Create permission checks before any media access, ensuring only authorized users can view/download files\n   - Add patient-provider relationship validation before granting access to therapy-related media\n   - Implement time-limited access tokens for temporary file access\n\n2. Encryption:\n   - Configure server-side encryption (SSE) for all files stored in S3/MinIO\n   - Implement AES-256 encryption standard\n   - Establish secure key management procedures\n   - Ensure encryption at rest for all stored media\n\n3. Audit Logging:\n   - Create comprehensive audit logs capturing all media interactions:\n     - File uploads (who, when, file metadata)\n     - File access/downloads (who, when, access context)\n     - File modifications or deletions\n   - Ensure logs contain sufficient detail for compliance reporting\n   - Make logs tamper-evident and immutable\n   - Implement log retention policies per HIPAA requirements\n\n4. Secure Transmission:\n   - Enforce HTTPS/TLS 1.2+ for all media transfers\n   - Implement secure URL generation with appropriate expiration\n   - Add integrity verification for uploaded/downloaded files\n\n5. Additional Requirements:\n   - Update privacy notices and terms of service\n   - Create documentation for the security measures implemented\n   - Ensure proper error handling that doesn't expose sensitive information\n\nReview the existing implementation from Task 7 and ensure all modifications maintain backward compatibility where possible. Adapt metadata storage and audit logging to use libSQL/SQLite instead of PostgreSQL, ensuring compatibility with the new database system.",
+      "testStrategy": "Testing should verify all HIPAA compliance aspects of the media handling system:\n\n1. Access Control Testing:\n   - Verify unauthorized users cannot access protected media files\n   - Test that users can only access files they have permissions for\n   - Verify access tokens expire correctly and cannot be reused\n   - Test edge cases like terminated staff accounts and transferred patients\n\n2. Encryption Testing:\n   - Verify server-side encryption is properly configured\n   - Confirm encryption headers in S3/MinIO responses\n   - Attempt to access raw storage to confirm files are encrypted\n   - Validate key rotation procedures work correctly\n\n3. Audit Log Testing:\n   - Verify all media operations generate appropriate audit logs\n   - Confirm logs contain required fields (user ID, timestamp, action, resource ID)\n   - Test log integrity and immutability\n   - Verify log retention policies are enforced\n\n4. Secure Transmission Testing:\n   - Use tools like OWASP ZAP to verify secure connections\n   - Test for TLS configuration issues\n   - Verify secure URL generation and expiration\n   - Attempt to intercept traffic to confirm encryption\n\n5. Compliance Testing:\n   - Create a compliance checklist based on docs/healthcare-compliance.md\n   - Perform a security review with the compliance team\n   - Document all security measures for potential audit\n\n6. Regression Testing:\n   - Verify all existing media functionality still works\n   - Test performance impact of new security measures\n\n7. Database Compatibility Testing:\n   - Verify metadata storage works correctly with libSQL/SQLite\n   - Test audit logging with the new database system\n   - Ensure transaction integrity for critical operations\n\nCreate automated tests where possible and document manual test procedures for aspects that cannot be automated.",
       "status": "pending",
       "dependencies": [
         7
@@ -1349,7 +1352,7 @@
           "title": "Implement Role-Based Access Control (RBAC) for Media Files",
           "description": "Modify the existing media handling system to implement RBAC and permission validation before any media access.",
           "dependencies": [],
-          "details": "Implementation steps:\n1. Create a MediaPermission model to define access levels (read, write, delete) for user roles\n2. Implement a MediaAccessService that validates user permissions before any file operation\n3. Add patient-provider relationship validation by querying the existing relationship database\n4. Create middleware that intercepts all media requests to perform permission checks\n5. Implement time-limited access tokens for temporary file access using JWT with expiration\n6. Update existing media retrieval endpoints to use the new permission system\n\nTesting approach:\n- Unit tests for the MediaAccessService with various permission scenarios\n- Integration tests verifying access control across the application\n- Security tests attempting unauthorized access to media files\n- Performance tests to ensure minimal overhead from permission checks",
+          "details": "Implementation steps:\n1. Create a MediaPermission model to define access levels (read, write, delete) for user roles\n2. Implement a MediaAccessService that validates user permissions before any file operation\n3. Add patient-provider relationship validation by querying the existing relationship database\n4. Create middleware that intercepts all media requests to perform permission checks\n5. Implement time-limited access tokens for temporary file access using JWT with expiration\n6. Update existing media retrieval endpoints to use the new permission system\n7. Adapt database schema and queries to use libSQL/SQLite\n\nTesting approach:\n- Unit tests for the MediaAccessService with various permission scenarios\n- Integration tests verifying access control across the application\n- Security tests attempting unauthorized access to media files\n- Performance tests to ensure minimal overhead from permission checks\n- Test compatibility with libSQL/SQLite database",
           "status": "pending",
           "parentTaskId": 25
         },
@@ -1360,7 +1363,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Configure server-side encryption (SSE) settings in the S3/MinIO client\n2. Implement a secure key management service that handles encryption keys\n3. Create a key rotation mechanism that periodically updates encryption keys\n4. Modify the file upload process to ensure encryption headers are properly set\n5. Implement a system to re-encrypt existing files to meet the new standards\n6. Create a verification process that confirms files are properly encrypted\n\nTesting approach:\n- Unit tests for the encryption configuration\n- Integration tests verifying files are properly encrypted when stored\n- Tests for key rotation functionality\n- Verification tests to confirm existing files are properly re-encrypted\n- Performance testing to measure impact of encryption on upload/download speeds",
+          "details": "Implementation steps:\n1. Configure server-side encryption (SSE) settings in the S3/MinIO client\n2. Implement a secure key management service that handles encryption keys\n3. Create a key rotation mechanism that periodically updates encryption keys\n4. Modify the file upload process to ensure encryption headers are properly set\n5. Implement a system to re-encrypt existing files to meet the new standards\n6. Create a verification process that confirms files are properly encrypted\n7. Store encryption metadata in libSQL/SQLite database\n\nTesting approach:\n- Unit tests for the encryption configuration\n- Integration tests verifying files are properly encrypted when stored\n- Tests for key rotation functionality\n- Verification tests to confirm existing files are properly re-encrypted\n- Performance testing to measure impact of encryption on upload/download speeds\n- Test compatibility with libSQL/SQLite for metadata storage",
           "status": "pending",
           "parentTaskId": 25
         },
@@ -1371,7 +1374,7 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Design and implement a MediaAuditLog model to store detailed audit information\n2. Create an AuditLogService that captures all media operations (upload, access, modification, deletion)\n3. Implement hooks in the media handling system to trigger audit logging\n4. Ensure logs contain user ID, timestamp, action type, file metadata, and access context\n5. Make logs tamper-evident by implementing digital signatures or blockchain techniques\n6. Create a log retention policy manager that archives/deletes logs according to HIPAA requirements\n7. Implement a secure log viewing interface for administrators and compliance officers\n\nTesting approach:\n- Unit tests for the AuditLogService\n- Integration tests verifying all media operations are properly logged\n- Tests for log immutability and tamper detection\n- Performance tests to ensure logging doesn't impact system performance\n- Verification that logs contain all required HIPAA information",
+          "details": "Implementation steps:\n1. Design and implement a MediaAuditLog model to store detailed audit information\n2. Create an AuditLogService that captures all media operations (upload, access, modification, deletion)\n3. Implement hooks in the media handling system to trigger audit logging\n4. Ensure logs contain user ID, timestamp, action type, file metadata, and access context\n5. Make logs tamper-evident by implementing digital signatures or blockchain techniques\n6. Create a log retention policy manager that archives/deletes logs according to HIPAA requirements\n7. Implement a secure log viewing interface for administrators and compliance officers\n8. Adapt logging system to use libSQL/SQLite for storage\n\nTesting approach:\n- Unit tests for the AuditLogService\n- Integration tests verifying all media operations are properly logged\n- Tests for log immutability and tamper detection\n- Performance tests to ensure logging doesn't impact system performance\n- Verification that logs contain all required HIPAA information\n- Test compatibility with libSQL/SQLite for log storage and retrieval",
           "status": "pending",
           "parentTaskId": 25
         },
@@ -1383,7 +1386,7 @@
             1,
             2
           ],
-          "details": "Implementation steps:\n1. Enforce HTTPS/TLS 1.2+ for all media transfers by updating server configurations\n2. Implement secure URL generation with appropriate expiration times for media access\n3. Create a signed URL service that generates time-limited, authenticated access URLs\n4. Add file integrity verification using checksums for uploaded/downloaded files\n5. Implement content validation to ensure only permitted file types are uploaded\n6. Create a transmission monitoring system to detect and block insecure access attempts\n\nTesting approach:\n- Security tests attempting to access media via non-HTTPS connections\n- Tests for URL expiration functionality\n- Integration tests for file integrity verification\n- Performance tests measuring impact on file transfer speeds\n- Penetration testing to identify potential security vulnerabilities",
+          "details": "Implementation steps:\n1. Enforce HTTPS/TLS 1.2+ for all media transfers by updating server configurations\n2. Implement secure URL generation with appropriate expiration times for media access\n3. Create a signed URL service that generates time-limited, authenticated access URLs\n4. Add file integrity verification using checksums for uploaded/downloaded files\n5. Implement content validation to ensure only permitted file types are uploaded\n6. Create a transmission monitoring system to detect and block insecure access attempts\n7. Store transmission metadata in libSQL/SQLite database\n\nTesting approach:\n- Security tests attempting to access media via non-HTTPS connections\n- Tests for URL expiration functionality\n- Integration tests for file integrity verification\n- Performance tests measuring impact on file transfer speeds\n- Penetration testing to identify potential security vulnerabilities\n- Test compatibility with libSQL/SQLite for metadata storage",
           "status": "pending",
           "parentTaskId": 25
         },
@@ -1397,7 +1400,7 @@
             3,
             4
           ],
-          "details": "Implementation steps:\n1. Update privacy notices and terms of service to reflect new security measures\n2. Create technical documentation detailing all implemented security features\n3. Implement HIPAA-compliant error handling that doesn't expose sensitive information\n4. Create user guides for the secure media handling system\n5. Document the encryption standards, key management procedures, and audit logging\n6. Prepare compliance documentation showing how the system meets HIPAA requirements\n7. Create a system status dashboard showing compliance metrics\n\nTesting approach:\n- Review of all error messages to ensure they don't leak sensitive information\n- Validation of documentation against HIPAA requirements\n- User testing of documentation clarity\n- Verification that all implemented features are properly documented\n- Compliance officer review of the final documentation package",
+          "details": "Implementation steps:\n1. Update privacy notices and terms of service to reflect new security measures\n2. Create technical documentation detailing all implemented security features\n3. Implement HIPAA-compliant error handling that doesn't expose sensitive information\n4. Create user guides for the secure media handling system\n5. Document the encryption standards, key management procedures, and audit logging\n6. Prepare compliance documentation showing how the system meets HIPAA requirements\n7. Create a system status dashboard showing compliance metrics\n8. Document libSQL/SQLite specific considerations for the media handling system\n\nTesting approach:\n- Review of all error messages to ensure they don't leak sensitive information\n- Validation of documentation against HIPAA requirements\n- User testing of documentation clarity\n- Verification that all implemented features are properly documented\n- Compliance officer review of the final documentation package",
           "status": "pending",
           "parentTaskId": 25
         }
@@ -1407,13 +1410,295 @@
       "id": 26,
       "title": "Retrofit HIPAA Compliance for Therapy Plan Management",
       "description": "Modify the existing Therapy Plan Management features to ensure HIPAA compliance through implementing strict RBAC, comprehensive audit logging, data encryption at rest, and secure transmission protocols.",
-      "details": "This task requires retrofitting HIPAA compliance onto the existing Therapy Plan Management system (from Task 8) with the following specific requirements:\n\n1. Role-Based Access Control (RBAC):\n   - Implement granular permission system for therapy plans with distinct roles (Chiropractor/Creator, Patient, Assistant, Administrator)\n   - Enforce ownership model where plan creators have full access rights\n   - Limit patient access to view-only for assigned plans\n   - Create middleware to validate access permissions before any plan operation\n   - Implement access control checks in all plan-related API endpoints\n\n2. Audit Logging:\n   - Create comprehensive logging system capturing all plan interactions\n   - Log must include: user ID, action type, timestamp, IP address, affected resource ID, and before/after states\n   - Implement logs for plan creation, viewing, modification, assignment, and deletion\n   - Ensure exercise addition/modification/removal is logged\n   - Create admin interface for log review with filtering capabilities\n   - Ensure logs are tamper-proof and cannot be modified\n\n3. Data Encryption:\n   - Implement field-level encryption for sensitive plan data including titles, descriptions, instructions, and patient-specific notes\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management system with rotation capabilities\n   - Ensure database backups are also encrypted\n\n4. Secure Transmission:\n   - Enforce HTTPS for all API communications\n   - Implement proper Content Security Policy headers\n   - Add API rate limiting to prevent abuse\n   - Ensure all therapy plan data is encrypted during transmission\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols.",
-      "testStrategy": "Testing should verify all HIPAA compliance aspects:\n\n1. RBAC Testing:\n   - Unit tests for each permission level (create, read, update, delete) across all roles\n   - Integration tests simulating different user roles attempting various operations\n   - Negative testing to verify unauthorized access is properly rejected\n   - Test boundary cases (e.g., transferred ownership, deactivated accounts)\n\n2. Audit Logging Verification:\n   - Verify all required events generate appropriate log entries with complete information\n   - Test log integrity by attempting to modify logs directly\n   - Validate log retention policies are enforced\n   - Test log search and filtering functionality\n   - Verify logs capture before/after states for modifications\n\n3. Encryption Testing:\n   - Verify sensitive fields are encrypted in database using direct DB inspection\n   - Test encryption/decryption performance under load\n   - Verify key rotation procedures work correctly\n   - Ensure encrypted backups can be properly restored\n\n4. Security Testing:\n   - Perform penetration testing on API endpoints\n   - Verify all communications use HTTPS with proper certificate validation\n   - Test API rate limiting functionality\n   - Conduct man-in-the-middle attack simulations to verify data cannot be intercepted\n\n5. Compliance Validation:\n   - Create comprehensive test documentation mapping each test to specific HIPAA requirements\n   - Conduct end-to-end scenario testing with realistic patient data\n   - Perform security code review focused on the implemented changes\n   - Validate against HIPAA compliance checklist from docs/healthcare-compliance.md",
+      "details": "This task requires retrofitting HIPAA compliance onto the existing Therapy Plan Management system (from Task 8) with the following specific requirements:\n\n1. Role-Based Access Control (RBAC):\n   - Implement granular permission system for therapy plans with distinct roles (Chiropractor/Creator, Patient, Assistant, Administrator)\n   - Enforce ownership model where plan creators have full access rights\n   - Limit patient access to view-only for assigned plans\n   - Create middleware to validate access permissions before any plan operation\n   - Implement access control checks in all plan-related API endpoints\n\n2. Audit Logging:\n   - Create comprehensive logging system capturing all plan interactions\n   - Log must include: user ID, action type, timestamp, IP address, affected resource ID, and before/after states\n   - Implement logs for plan creation, viewing, modification, assignment, and deletion\n   - Ensure exercise addition/modification/removal is logged\n   - Create admin interface for log review with filtering capabilities\n   - Ensure logs are tamper-proof and cannot be modified\n\n3. Data Encryption:\n   - Implement field-level encryption for sensitive plan data including titles, descriptions, instructions, and patient-specific notes\n   - Use industry-standard encryption algorithms (AES-256)\n   - Implement proper key management system with rotation capabilities\n   - Ensure database backups are also encrypted\n\n4. Secure Transmission:\n   - Enforce HTTPS for all API communications\n   - Implement proper Content Security Policy headers\n   - Add API rate limiting to prevent abuse\n   - Ensure all therapy plan data is encrypted during transmission\n\nRefer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.",
+      "testStrategy": "Testing should verify all HIPAA compliance aspects:\n\n1. RBAC Testing:\n   - Unit tests for each permission level (create, read, update, delete) across all roles\n   - Integration tests simulating different user roles attempting various operations\n   - Negative testing to verify unauthorized access is properly rejected\n   - Test boundary cases (e.g., transferred ownership, deactivated accounts)\n\n2. Audit Logging Verification:\n   - Verify all required events generate appropriate log entries with complete information\n   - Test log integrity by attempting to modify logs directly\n   - Validate log retention policies are enforced\n   - Test log search and filtering functionality\n   - Verify logs capture before/after states for modifications\n\n3. Encryption Testing:\n   - Verify sensitive fields are encrypted in database using direct DB inspection\n   - Test encryption/decryption performance under load\n   - Verify key rotation procedures work correctly\n   - Ensure encrypted backups can be properly restored\n\n4. Security Testing:\n   - Perform penetration testing on API endpoints\n   - Verify all communications use HTTPS with proper certificate validation\n   - Test API rate limiting functionality\n   - Conduct man-in-the-middle attack simulations to verify data cannot be intercepted\n\n5. Compliance Validation:\n   - Create comprehensive test documentation mapping each test to specific HIPAA requirements\n   - Conduct end-to-end scenario testing with realistic patient data\n   - Perform security code review focused on the implemented changes\n   - Validate against HIPAA compliance checklist from docs/healthcare-compliance.md\n\n6. Database Compatibility Testing:\n   - Verify all operations work correctly with libSQL/SQLite\n   - Test performance of complex queries with the new database\n   - Ensure transaction integrity for critical operations\n   - Test encryption compatibility with libSQL/SQLite",
       "status": "pending",
       "dependencies": [
         8
       ],
-      "priority": "high"
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Role-Based Access Control (RBAC) System",
+          "description": "Design and implement a granular RBAC system for the Therapy Plan Management features with distinct roles and permissions.",
+          "dependencies": [],
+          "details": "Implementation details:\n1. Create a permission model with defined roles (Chiropractor/Creator, Patient, Assistant, Administrator)\n2. Define granular permissions for each role (create, read, update, delete, assign)\n3. Implement ownership model where plan creators have full access rights\n4. Create middleware to validate access permissions before any plan operation\n5. Modify existing API endpoints to include permission checks\n6. Update database schema to track ownership and permissions\n7. Create role assignment functionality for administrators\n8. Adapt database schema and queries to use libSQL/SQLite\n\nTesting approach:\n- Unit tests for permission validation logic\n- Integration tests for middleware functionality\n- End-to-end tests simulating different user roles accessing protected resources\n- Security penetration testing to verify unauthorized access is prevented\n- Test compatibility with libSQL/SQLite database",
+          "status": "pending",
+          "parentTaskId": 26
+        },
+        {
+          "id": 2,
+          "title": "Develop Comprehensive Audit Logging System",
+          "description": "Create a tamper-proof audit logging system that captures all interactions with therapy plans.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation details:\n1. Design database schema for audit logs with fields for user ID, action type, timestamp, IP address, resource ID, and before/after states\n2. Implement logging service to capture all plan interactions\n3. Add logging hooks to all plan-related operations (creation, viewing, modification, assignment, deletion)\n4. Ensure exercise addition/modification/removal is logged\n5. Implement tamper-proof mechanisms (e.g., cryptographic signatures, sequential IDs)\n6. Create admin interface for log review with filtering and search capabilities\n7. Implement log retention policies according to HIPAA requirements\n8. Adapt logging system to use libSQL/SQLite for storage\n\nTesting approach:\n- Unit tests for logging service\n- Integration tests to verify logs are created for all operations\n- Verification tests for tamper-proof mechanisms\n- UI tests for admin interface functionality\n- Performance tests to ensure logging doesn't impact system performance\n- Test compatibility with libSQL/SQLite for log storage and retrieval",
+          "status": "pending",
+          "parentTaskId": 26
+        },
+        {
+          "id": 3,
+          "title": "Implement Data Encryption at Rest",
+          "description": "Add field-level encryption for sensitive therapy plan data using industry-standard encryption algorithms.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation details:\n1. Identify all sensitive fields requiring encryption (plan titles, descriptions, instructions, patient notes)\n2. Implement encryption/decryption service using AES-256 algorithm\n3. Create key management system with secure storage and rotation capabilities\n4. Modify database access layer to transparently encrypt/decrypt data\n5. Update database schema to store encrypted data\n6. Ensure database backups are also encrypted\n7. Implement key rotation procedures\n8. Document encryption implementation for compliance audits\n9. Adapt encryption implementation to work with libSQL/SQLite data types\n\nTesting approach:\n- Unit tests for encryption/decryption functions\n- Integration tests verifying data is properly encrypted in database\n- Performance tests to measure impact of encryption/decryption operations\n- Security tests to verify encrypted data cannot be accessed without proper keys\n- Backup and restore tests with encrypted data\n- Test compatibility with libSQL/SQLite for storing and retrieving encrypted data",
+          "status": "pending",
+          "parentTaskId": 26
+        },
+        {
+          "id": 4,
+          "title": "Enhance Secure Data Transmission",
+          "description": "Implement secure transmission protocols for all therapy plan data communications.",
+          "dependencies": [
+            1,
+            3
+          ],
+          "details": "Implementation details:\n1. Configure and enforce HTTPS for all API communications\n2. Implement proper Content Security Policy headers\n3. Add API rate limiting to prevent abuse\n4. Implement transport layer encryption for all therapy plan data\n5. Update API endpoints to validate secure connections\n6. Configure secure cookie attributes (Secure, HttpOnly, SameSite)\n7. Implement HSTS headers\n8. Add protection against common web vulnerabilities (XSS, CSRF)\n\nTesting approach:\n- Security scans to verify HTTPS implementation\n- API tests to verify rate limiting functionality\n- Penetration testing to identify potential security vulnerabilities\n- Performance testing under rate limiting conditions\n- Compatibility testing across different browsers and clients",
+          "status": "pending",
+          "parentTaskId": 26
+        },
+        {
+          "id": 5,
+          "title": "Create HIPAA Compliance Documentation and Verification",
+          "description": "Develop comprehensive documentation and verification procedures to ensure HIPAA compliance of the therapy plan management system.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Implementation details:\n1. Create detailed documentation of all implemented HIPAA compliance measures\n2. Develop verification procedures to test compliance features\n3. Implement automated compliance checks as part of CI/CD pipeline\n4. Create user training materials for HIPAA-compliant system usage\n5. Develop incident response procedures for potential data breaches\n6. Create compliance reports for auditing purposes\n7. Implement regular compliance scanning and reporting\n8. Document all security measures for regulatory review\n9. Document libSQL/SQLite specific considerations for the therapy plan management system\n\nTesting approach:\n- Comprehensive system audit against HIPAA requirements\n- Simulated breach scenarios to test incident response\n- User acceptance testing with compliance-focused scenarios\n- Documentation review by legal/compliance team\n- Verification that all requirements from healthcare-compliance.md are satisfied\n- Test database compatibility with libSQL/SQLite across all features",
+          "status": "pending",
+          "parentTaskId": 26
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Migrate Database Configuration from PostgreSQL to libSQL/SQLite",
+      "description": "Update the docker-compose.yml and environment variables to replace PostgreSQL with libSQL/SQLite as the database backend, following the guidelines in docs/switching-db-to-libsql.md.",
+      "details": "This task involves modifying the project's database configuration to use libSQL/SQLite instead of PostgreSQL:\n\n1. Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container\n\n2. Update the DATABASE_URL environment variable in the 'api' service to use the libSQL format:\n   - For file-based SQLite: `DATABASE_URL=sqlite:///path/to/db.sqlite`\n   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`\n\n3. Adjust volumes configuration in the 'api' service to ensure persistence of the SQLite database file if using file-based approach:\n   - Add a volume mapping like `- ./data:/app/data` if storing the SQLite file in a /data directory\n\n4. Remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed\n\n5. Update any database initialization scripts or commands in the docker-compose.yml to align with libSQL/SQLite requirements\n\n6. Ensure the libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file\n\n7. Document the changes made in a comment at the top of the docker-compose.yml file",
+      "testStrategy": "To verify the successful migration to libSQL/SQLite:\n\n1. Run `docker-compose up -d` to start the services with the new configuration\n\n2. Check that the application starts without database connection errors in the logs: `docker-compose logs api`\n\n3. Verify the API can perform basic database operations by:\n   - Creating a test record through an API endpoint\n   - Retrieving the created record\n   - Updating the record\n   - Deleting the record\n\n4. Confirm data persistence by:\n   - Creating data through the API\n   - Stopping all containers with `docker-compose down`\n   - Starting containers again with `docker-compose up -d`\n   - Verifying the previously created data is still accessible\n\n5. If using file-based SQLite, check that the database file exists in the expected location\n\n6. Verify the application works correctly when scaled (if applicable) to ensure there are no file locking issues with SQLite\n\n7. Run the application's existing test suite to ensure all database interactions continue to function correctly",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Remove PostgreSQL service from docker-compose.yml",
+          "description": "Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container and document the change.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'db' service section that defines the PostgreSQL container\n3. Either remove the entire section or comment it out using YAML comment syntax (# at the beginning of each line)\n4. Add a comment at the top of the file documenting the migration from PostgreSQL to libSQL/SQLite\n5. Verify the file still has valid YAML syntax after changes\n\nTesting approach:\n- Run 'docker-compose config' to validate the YAML syntax is still correct\n- Ensure the PostgreSQL container no longer starts when running 'docker-compose up'",
+          "status": "pending",
+          "parentTaskId": 27
+        },
+        {
+          "id": 2,
+          "title": "Update DATABASE_URL environment variable for libSQL/SQLite",
+          "description": "Modify the DATABASE_URL environment variable in the 'api' service to use the appropriate libSQL/SQLite connection string format.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Find the DATABASE_URL environment variable\n4. Replace the PostgreSQL connection string with the appropriate libSQL format:\n   - For file-based SQLite: `DATABASE_URL=sqlite:///app/data/db.sqlite`\n   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`\n5. If using a remote libSQL instance, ensure any tokens or credentials are properly handled (e.g., using .env files)\n\nTesting approach:\n- Verify the connection string format matches the documentation in docs/switching-db-to-libsql.md\n- Test the connection string format with a simple database connection test",
+          "status": "pending",
+          "parentTaskId": 27
+        },
+        {
+          "id": 3,
+          "title": "Configure volume mapping for SQLite persistence",
+          "description": "Add or update volume configuration in the 'api' service to ensure SQLite database file persistence if using file-based approach.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Find or add the 'volumes' section under the 'api' service\n4. Add a volume mapping to ensure persistence of the SQLite database file:\n   - Add `- ./data:/app/data` if storing the SQLite file in a /data directory\n5. Create the local data directory if it doesn't exist\n6. Ensure proper permissions are set on the data directory\n\nTesting approach:\n- Run 'docker-compose up' and verify the volume is correctly mounted\n- Create a test file in the mounted directory and verify it persists between container restarts\n- Check that database changes persist after container restarts",
+          "status": "pending",
+          "parentTaskId": 27
+        },
+        {
+          "id": 4,
+          "title": "Remove PostgreSQL-specific environment variables",
+          "description": "Identify and remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed with libSQL/SQLite.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Review all environment variables and identify PostgreSQL-specific ones such as:\n   - POSTGRES_USER\n   - POSTGRES_PASSWORD\n   - POSTGRES_DB\n   - POSTGRES_HOST\n   - Any other PostgreSQL-specific configuration variables\n4. Remove or comment out these variables as they're no longer needed\n5. If there are any database initialization scripts or commands specific to PostgreSQL, update or remove them\n\nTesting approach:\n- Run 'docker-compose up' and verify the application starts without errors related to missing environment variables\n- Check application logs to ensure no PostgreSQL connection attempts are being made",
+          "status": "pending",
+          "parentTaskId": 27
+        },
+        {
+          "id": 5,
+          "title": "Update Dockerfile to include libSQL/SQLite dependencies",
+          "description": "Ensure the necessary libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Review docs/switching-db-to-libsql.md to identify required libraries\n2. Open the application's Dockerfile\n3. Add necessary system packages if required (e.g., sqlite3-dev)\n4. Update the application's requirements file (e.g., requirements.txt) to include:\n   - sqlalchemy with appropriate drivers\n   - libsql-client or pysqlite3 as needed\n5. If using a specific ORM, ensure compatible versions are specified\n6. Remove any PostgreSQL-specific libraries that are no longer needed\n\nTesting approach:\n- Build the Docker image with 'docker-compose build'\n- Run the application with 'docker-compose up'\n- Verify the application can connect to the libSQL/SQLite database\n- Run a simple database query to confirm functionality\n- Check application logs for any dependency or import errors",
+          "status": "pending",
+          "parentTaskId": 27
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "title": "Adapt SQLAlchemy Models for libSQL/SQLite Compatibility",
+      "description": "Modify SQLAlchemy models in api/models/base.py to ensure compatibility with libSQL/SQLite, focusing on type affinity and storage requirements as outlined in the database migration documentation.",
+      "details": "This task involves reviewing and adapting all SQLAlchemy model field types in `api/models/base.py` to ensure compatibility with libSQL/SQLite's type system. Follow section 3 of `docs/switching-db-to-libsql.md` as a guide.\n\nSpecific changes required:\n\n1. **TIMESTAMP fields**: Review all timestamp fields for timezone handling. SQLite doesn't have native timezone support, so ensure timestamps are stored consistently (likely as UTC) and that application code handles timezone conversions appropriately.\n\n2. **JSON fields**: SQLite doesn't have a native JSON type. Either:\n   - Store JSON as TEXT and handle serialization/deserialization in the application code\n   - Implement SQLAlchemy type adapters for automatic JSON conversion\n   - Consider using SQLite JSON1 extension functions for query capabilities if needed\n\n3. **String length constraints**: SQLite doesn't enforce VARCHAR length constraints. Ensure all String fields with length limits rely on application-level validation rather than database constraints.\n\n4. **EncryptedType**: Verify that all EncryptedType fields correctly map to TEXT type in SQLite and that the encryption/decryption process works with SQLite's storage format.\n\n5. **Other field types**: Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system.\n\nUpdate model definitions as needed, maintaining backward compatibility where possible. Document any changes that might affect application behavior or require data migration.",
+      "testStrategy": "1. **Unit Tests**: Create or update unit tests for each model to verify field types are correctly defined and behave as expected with SQLite:\n   - Test serialization/deserialization of JSON fields\n   - Test timezone handling in timestamp fields\n   - Test string fields with various lengths and character sets\n   - Test EncryptedType fields for proper encryption/decryption\n\n2. **Integration Testing**:\n   - Set up a test database using libSQL/SQLite\n   - Run model migrations against this database\n   - Verify all tables and columns are created with correct types\n   - Test CRUD operations on each model with various data types\n\n3. **Validation Testing**:\n   - Test edge cases for each field type (empty strings, NULL values, very large JSON objects)\n   - Verify application-level validation works for string length constraints\n   - Test timezone edge cases (daylight saving transitions, UTC offsets)\n\n4. **Regression Testing**:\n   - Ensure existing functionality works with the updated models\n   - Verify no unexpected behavior changes in query results\n\nDocument any SQLite-specific behaviors or limitations discovered during testing.",
+      "status": "pending",
+      "dependencies": [
+        27
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze and document current SQLAlchemy model field types",
+          "description": "Create a comprehensive inventory of all field types used in SQLAlchemy models in api/models/base.py, documenting their current configuration and identifying potential compatibility issues with libSQL/SQLite.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Review api/models/base.py and identify all model classes and their field definitions\n2. Create a structured document listing each field type used (TIMESTAMP, JSON, String, EncryptedType, etc.)\n3. For each field type, document:\n   - How it's currently defined\n   - The SQLAlchemy type used\n   - Any constraints or special handling\n   - Potential libSQL/SQLite compatibility issues based on docs/switching-db-to-libsql.md\n4. Identify fields that will need modification\n5. Test by validating the document against the actual codebase to ensure all field types are covered\n\nTesting approach: Perform a code review to ensure all model fields are documented and all potential compatibility issues are identified.",
+          "status": "pending",
+          "parentTaskId": 28
+        },
+        {
+          "id": 2,
+          "title": "Implement TIMESTAMP field compatibility adaptations",
+          "description": "Modify all timestamp fields in the SQLAlchemy models to ensure proper handling with libSQL/SQLite, focusing on timezone handling and storage format.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all TIMESTAMP fields in the models\n2. Modify each timestamp field to ensure it stores data in UTC format\n3. Update field definitions to use appropriate SQLAlchemy types that are compatible with SQLite (likely DateTime without timezone)\n4. Add application-level handling for timezone conversions where needed\n5. Document the changes made to each timestamp field\n6. Create unit tests to verify timestamp storage and retrieval works correctly with both PostgreSQL and SQLite\n\nTesting approach:\n- Write unit tests that create and retrieve objects with timestamp fields\n- Verify correct timezone handling across database backends\n- Test edge cases like DST transitions and timezone conversions",
+          "status": "pending",
+          "parentTaskId": 28
+        },
+        {
+          "id": 3,
+          "title": "Adapt JSON field handling for SQLite compatibility",
+          "description": "Modify all JSON fields in the SQLAlchemy models to work with SQLite's lack of native JSON type, implementing proper serialization/deserialization mechanisms.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all JSON fields in the models\n2. Create a custom SQLAlchemy type adapter that:\n   - Stores JSON as TEXT in SQLite\n   - Handles serialization when writing to the database\n   - Handles deserialization when reading from the database\n3. Replace all existing JSON field definitions with the new custom type\n4. If query capabilities are needed, implement functions that utilize SQLite JSON1 extension\n5. Update any code that directly interacts with these JSON fields\n6. Document the implementation approach and any limitations\n\nTesting approach:\n- Create unit tests that store and retrieve complex JSON structures\n- Test JSON query functionality if implemented\n- Verify compatibility with both PostgreSQL and SQLite backends",
+          "status": "pending",
+          "parentTaskId": 28
+        },
+        {
+          "id": 4,
+          "title": "Update String fields and EncryptedType for SQLite compatibility",
+          "description": "Modify String fields with length constraints and EncryptedType fields to ensure they work correctly with SQLite's type system and storage format.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all String fields with length constraints\n2. Implement application-level validation for string length since SQLite doesn't enforce VARCHAR length\n3. Update String field definitions to work with SQLite while maintaining PostgreSQL compatibility\n4. Identify all EncryptedType fields in the models\n5. Verify and modify EncryptedType implementation to ensure it correctly maps to TEXT in SQLite\n6. Test the encryption/decryption process with SQLite's storage format\n7. Document all changes made to String and EncryptedType fields\n\nTesting approach:\n- Create unit tests for string length validation\n- Test storing and retrieving encrypted data\n- Verify data integrity across database backends\n- Test edge cases like empty strings and maximum length strings",
+          "status": "pending",
+          "parentTaskId": 28
+        },
+        {
+          "id": 5,
+          "title": "Review and adapt remaining field types for SQLite compatibility",
+          "description": "Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system and implement any necessary changes.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all remaining field types not covered in previous subtasks\n2. For each field type, review how it maps to SQLite's type affinity system\n3. Implement necessary changes to ensure correct behavior with SQLite\n4. Pay special attention to:\n   - Boolean fields (stored as integers in SQLite)\n   - Enum types\n   - Any custom field types\n   - Foreign keys and relationships\n5. Create a comprehensive test suite that validates all field types work correctly\n6. Document all changes made and any potential impacts on application behavior\n7. Update the database migration documentation with any new findings or recommendations\n\nTesting approach:\n- Create a test suite that exercises all field types\n- Test with both PostgreSQL and SQLite backends\n- Verify data integrity and type conversion\n- Test application functionality that relies on these fields",
+          "status": "pending",
+          "parentTaskId": 28
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "title": "Overhaul Alembic Migrations for libSQL/SQLite Compatibility",
+      "description": "Reset the Alembic migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models.",
+      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Modify the `env.py` file in the Alembic directory if necessary to ensure proper configuration for libSQL\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using Alembic's standard upgrade path. A separate data migration strategy may be needed for production environments.",
+      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run `alembic upgrade head` to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test downgrade functionality with `alembic downgrade base`\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
+      "status": "pending",
+      "dependencies": [
+        28
+      ],
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Back up and clean existing Alembic migration files",
+          "description": "Create a backup of all existing migration files in the alembic/versions/ directory and then remove them from the active project directory.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Create a backup directory outside the project structure (e.g., 'alembic_backup/')\n2. Copy all files from 'alembic/versions/' to the backup directory with their original filenames and timestamps preserved\n3. Document the backup location in a README file within the backup directory\n4. Remove all migration script files from the 'alembic/versions/' directory\n5. Verify the directory is empty except for any necessary __init__.py file\n\nTesting approach:\n- Confirm all files were properly backed up by comparing file counts and checksums\n- Verify the alembic/versions/ directory is properly cleaned",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 2,
+          "title": "Update Alembic environment configuration for libSQL",
+          "description": "Modify the Alembic environment configuration in env.py to ensure proper compatibility with libSQL/SQLite.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Review the current env.py file in the Alembic directory\n2. Update the database URL handling to properly connect to libSQL/SQLite\n3. Modify any SQLAlchemy configuration options that need adjustment for libSQL compatibility\n4. Ensure proper handling of SQLite-specific constraints and types\n5. Add comments explaining the libSQL-specific configurations\n6. Update any render_item or include_object functions to handle SQLite-specific schema elements\n\nTesting approach:\n- Run a basic Alembic command like 'alembic current' to verify the configuration works\n- Check logs for any SQLite-specific warnings or errors",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 3,
+          "title": "Generate new initial migration for libSQL schema",
+          "description": "Create a new initial migration that captures the complete database schema compatible with libSQL/SQLite.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility\n2. Run the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n3. Capture the new migration version ID for documentation\n4. Verify the migration file was created in the alembic/versions/ directory\n5. Check that the migration includes all expected tables, indices, and constraints\n\nTesting approach:\n- Review the generated migration file to ensure it correctly captures all model definitions\n- Verify no SQLite-incompatible operations are included\n- Check for any unexpected schema differences",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 4,
+          "title": "Review and optimize the generated migration",
+          "description": "Carefully review the auto-generated migration file and make any necessary adjustments for optimal libSQL compatibility.",
+          "dependencies": [
+            3
+          ],
+          "details": "Implementation steps:\n1. Open the newly generated migration file\n2. Review all create_table, create_index, and other schema operations\n3. Check for and fix any SQLite-incompatible operations (like certain constraint types)\n4. Optimize index definitions for libSQL performance characteristics\n5. Add comments explaining any manual adjustments made\n6. Ensure proper handling of TEXT vs VARCHAR types and other SQLite-specific type mappings\n7. Verify foreign key constraints are properly defined\n\nTesting approach:\n- Manually review the SQL that would be generated using 'alembic upgrade --sql head'\n- Verify the SQL is valid for libSQL/SQLite\n- Check for any potential performance issues with the schema design",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 5,
+          "title": "Test migration and update documentation",
+          "description": "Apply the migration to a test database and update all documentation that references Alembic migrations.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
+          "status": "pending",
+          "parentTaskId": 29
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "title": "Rewrite Database Schema and Seed Scripts for SQLite Compatibility",
+      "description": "Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.",
+      "details": "This task involves rewriting the `database/init_schema.sql` file to use SQLite syntax and adapting the `scripts/seed_admin.py` script as needed. The changes should follow section 5 of `docs/switching-db-to-libsql.md`.\n\nFor `init_schema.sql`:\n1. Replace PostgreSQL-specific data types with SQLite equivalents\n2. Change primary key definitions to use `INTEGER PRIMARY KEY AUTOINCREMENT` syntax\n3. Adjust the `INSERT INTO Roles` statements to match SQLite syntax\n4. Ensure all table creation statements are SQLite-compatible\n5. Verify that any constraints or indexes are properly defined for SQLite\n\nFor `scripts/seed_admin.py`:\n1. Review the script to identify any PostgreSQL-specific SQLAlchemy code\n2. Update the script to work with the SQLite dialect if necessary\n3. Ensure it correctly interacts with the updated SQLAlchemy models\n4. Test that it can successfully create an admin user in the SQLite database\n\nThe implementation should maintain all existing functionality while ensuring compatibility with SQLite/libSQL. Pay special attention to data type conversions, auto-increment behavior, and any SQL syntax differences between PostgreSQL and SQLite.",
+      "testStrategy": "1. Execute the rewritten `init_schema.sql` against a fresh SQLite database and verify it runs without errors\n2. Validate the database schema by inspecting the created tables using SQLite CLI or a GUI tool:\n   - Check that all tables have the correct structure\n   - Verify primary keys are properly set up with autoincrement\n   - Confirm that all indexes and constraints are present\n3. Run the adapted `seed_admin.py` script and verify:\n   - It executes without errors\n   - An admin user is successfully created in the database\n   - The user has the correct role and permissions\n4. Perform basic application operations that interact with the database to ensure the schema changes don't break functionality\n5. Write a simple test script that performs CRUD operations on each table to verify the schema works as expected\n6. Document any SQLite-specific limitations or behavior differences that developers should be aware of",
+      "status": "pending",
+      "dependencies": [
+        29
+      ],
+      "priority": "medium"
     }
   ],
   "metadata": {

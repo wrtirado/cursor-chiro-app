@@ -34,7 +34,7 @@ This task requires retrofitting HIPAA compliance onto the existing Therapy Plan 
    - Add API rate limiting to prevent abuse
    - Ensure all therapy plan data is encrypted during transmission
 
-Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols.
+Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.
 
 # Test Strategy:
 Testing should verify all HIPAA compliance aspects:
@@ -70,6 +70,12 @@ Testing should verify all HIPAA compliance aspects:
    - Perform security code review focused on the implemented changes
    - Validate against HIPAA compliance checklist from docs/healthcare-compliance.md
 
+6. Database Compatibility Testing:
+   - Verify all operations work correctly with libSQL/SQLite
+   - Test performance of complex queries with the new database
+   - Ensure transaction integrity for critical operations
+   - Test encryption compatibility with libSQL/SQLite
+
 # Subtasks:
 ## 1. Implement Role-Based Access Control (RBAC) System [pending]
 ### Dependencies: None
@@ -83,12 +89,14 @@ Implementation details:
 5. Modify existing API endpoints to include permission checks
 6. Update database schema to track ownership and permissions
 7. Create role assignment functionality for administrators
+8. Adapt database schema and queries to use libSQL/SQLite
 
 Testing approach:
 - Unit tests for permission validation logic
 - Integration tests for middleware functionality
 - End-to-end tests simulating different user roles accessing protected resources
 - Security penetration testing to verify unauthorized access is prevented
+- Test compatibility with libSQL/SQLite database
 
 ## 2. Develop Comprehensive Audit Logging System [pending]
 ### Dependencies: 26.1
@@ -102,6 +110,7 @@ Implementation details:
 5. Implement tamper-proof mechanisms (e.g., cryptographic signatures, sequential IDs)
 6. Create admin interface for log review with filtering and search capabilities
 7. Implement log retention policies according to HIPAA requirements
+8. Adapt logging system to use libSQL/SQLite for storage
 
 Testing approach:
 - Unit tests for logging service
@@ -109,6 +118,7 @@ Testing approach:
 - Verification tests for tamper-proof mechanisms
 - UI tests for admin interface functionality
 - Performance tests to ensure logging doesn't impact system performance
+- Test compatibility with libSQL/SQLite for log storage and retrieval
 
 ## 3. Implement Data Encryption at Rest [pending]
 ### Dependencies: 26.1
@@ -123,6 +133,7 @@ Implementation details:
 6. Ensure database backups are also encrypted
 7. Implement key rotation procedures
 8. Document encryption implementation for compliance audits
+9. Adapt encryption implementation to work with libSQL/SQLite data types
 
 Testing approach:
 - Unit tests for encryption/decryption functions
@@ -130,6 +141,7 @@ Testing approach:
 - Performance tests to measure impact of encryption/decryption operations
 - Security tests to verify encrypted data cannot be accessed without proper keys
 - Backup and restore tests with encrypted data
+- Test compatibility with libSQL/SQLite for storing and retrieving encrypted data
 
 ## 4. Enhance Secure Data Transmission [pending]
 ### Dependencies: 26.1, 26.3
@@ -165,6 +177,7 @@ Implementation details:
 6. Create compliance reports for auditing purposes
 7. Implement regular compliance scanning and reporting
 8. Document all security measures for regulatory review
+9. Document libSQL/SQLite specific considerations for the therapy plan management system
 
 Testing approach:
 - Comprehensive system audit against HIPAA requirements
@@ -172,4 +185,5 @@ Testing approach:
 - User acceptance testing with compliance-focused scenarios
 - Documentation review by legal/compliance team
 - Verification that all requirements from healthcare-compliance.md are satisfied
+- Test database compatibility with libSQL/SQLite across all features
 

@@ -5,21 +5,21 @@
 # Priority: high
 # Description: Implement the therapy plan viewer with offline capabilities using SQLite for local storage, ensuring HIPAA-compliant data handling.
 # Details:
-Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans.
+Create therapy plan listing screen with minimal ePHI display. Implement detailed plan view with exercise instructions. Develop media viewing capabilities for images and videos. Create progress tracking with checkboxes for completed exercises. Implement offline functionality using SQLite database for structured data storage with encryption at rest. Set up API synchronization to retrieve plans and store them locally. Implement offline media caching system for videos and images to ensure they're available without network connection. Ensure all data access is logged for audit purposes. Implement secure data wiping functionality for when consent is withdrawn. Add access controls to ensure patients can only view their own plans. Design SQLite schema to be compatible with the backend libSQL database structure for seamless synchronization.
 
 # Test Strategy:
-Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest.
+Test plan viewing with various media types. Verify offline functionality by disabling network access after initial sync. Test database operations for storing and retrieving therapy plans with encryption. Verify media caching works correctly for different file sizes and types. Test progress tracking and synchronization when returning online. Ensure proper handling of large media files and storage constraints. Validate audit logging for all data access operations. Test secure data wiping functionality. Verify that access controls prevent unauthorized access to plans. Test that all stored data is properly encrypted at rest. Verify compatibility between mobile SQLite and backend libSQL during synchronization.
 
 # Subtasks:
 ## 19.1. Implement SQLite database schema for therapy plans [pending]
 ### Dependencies: None
-### Description: Design and implement SQLite database schema to store therapy plans, exercises, and progress tracking information locally.
+### Description: Design and implement SQLite database schema to store therapy plans, exercises, and progress tracking information locally, ensuring compatibility with backend libSQL structure.
 ### Details:
 
 
 ## 19.2. Create API synchronization service [pending]
 ### Dependencies: None
-### Description: Develop service to fetch therapy plans from API and store them in local SQLite database. Include logic for determining when to update local data.
+### Description: Develop service to fetch therapy plans from API and store them in local SQLite database. Include logic for determining when to update local data and handling libSQL/SQLite specific data formats.
 ### Details:
 
 

@@ -5,10 +5,10 @@
 # Priority: high
 # Description: Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance.
 # Details:
-Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information.
+Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend.
 
 # Test Strategy:
-Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations.
+Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend.
 
 # Subtasks:
 ## 12.1. Set up basic React application structure [pending]
@@ -37,7 +37,7 @@ Test application initialization and routing. Verify protected routes redirect un
 
 ## 12.5. Set up API client for backend communication [pending]
 ### Dependencies: None
-### Description: 
+### Description: Configure API client to handle communication with the libSQL/SQLite backend
 ### Details:
 
 

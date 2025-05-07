@@ -5,15 +5,15 @@
 # Priority: medium
 # Description: Implement local notifications and progress synchronization with HIPAA-compliant data handling.
 # Details:
-Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server.
+Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server. Design SQLite schema to match the backend libSQL structure for efficient synchronization.
 
 # Test Strategy:
-Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization.
+Test notification triggering at scheduled times without exposing ePHI. Verify progress synchronization after offline usage with encryption. Test conflict resolution with simultaneous updates. Ensure battery-efficient background operations. Validate interactive checklist UI functionality and state persistence. Test audit logging for all data synchronization operations. Verify that all stored data is properly encrypted at rest. Test that all communications use TLS 1.2+ encryption. Validate consent verification before data synchronization. Test compatibility between mobile SQLite and backend libSQL during synchronization.
 
 # Subtasks:
 ## 20.1. Implement local storage with SQLite [pending]
 ### Dependencies: None
-### Description: Set up SQLite database schema for storing progress data locally
+### Description: Set up SQLite database schema for storing progress data locally, compatible with backend libSQL structure
 ### Details:
 
 
