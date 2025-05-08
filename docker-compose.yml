@@ -1,18 +1,19 @@
+# Migrated from PostgreSQL to libSQL server configuration.
 version: "3.8"
 
 services:
-  db:
-    image: postgres:15-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changethis}
-      POSTGRES_DB: ${POSTGRES_DB:-app_db}
-    ports:
-      - "5432:5432"
-    networks:
-      - app-network
+#  db:
+#    image: postgres:15-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
+#    environment:
+#      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changethis}
+#      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - app-network
 
   minio:
     image: minio/minio:latest
@@ -37,14 +38,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-changethis}@db:5432/${POSTGRES_DB:-app_db}
+      DATABASE_URL: ${DATABASE_URL} # Pulled directly from .env file
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_BUCKET: ${MINIO_BUCKET:-therapy-media}
       MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
     depends_on:
-      - db
+      # - db # Removed as PostgreSQL is no longer used
       - minio
     networks:
       - app-network
@@ -53,7 +54,7 @@ services:
     # tty: true
 
 volumes:
-  postgres_data:
+  # postgres_data: # Removed as PostgreSQL is no longer used
   minio_data:
 
 networks:

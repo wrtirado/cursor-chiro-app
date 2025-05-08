@@ -2,8 +2,10 @@ fastapi
 uvicorn[standard]
 python-jose[cryptography]
 passlib[bcrypt]
-psycopg2-binary
+# psycopg2-binary # Removed for libSQL
 SQLAlchemy
+libsql-client # Added for libSQL
+sqlalchemy-libsql # Correct package for SQLAlchemy libSQL dialect
 python-dotenv
 pydantic-settings 
 pydantic[email]

@@ -1,6 +1,6 @@
 # Task ID: 27
 # Title: Migrate Database Configuration from PostgreSQL to libSQL/SQLite
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: medium
 # Description: Update the docker-compose.yml and environment variables to replace PostgreSQL with libSQL/SQLite as the database backend, following the guidelines in docs/switching-db-to-libsql.md.
@@ -50,7 +50,7 @@ To verify the successful migration to libSQL/SQLite:
 7. Run the application's existing test suite to ensure all database interactions continue to function correctly
 
 # Subtasks:
-## 1. Remove PostgreSQL service from docker-compose.yml [pending]
+## 1. Remove PostgreSQL service from docker-compose.yml [done]
 ### Dependencies: None
 ### Description: Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container and document the change.
 ### Details:
@@ -65,7 +65,7 @@ Testing approach:
 - Run 'docker-compose config' to validate the YAML syntax is still correct
 - Ensure the PostgreSQL container no longer starts when running 'docker-compose up'
 
-## 2. Update DATABASE_URL environment variable for libSQL/SQLite [pending]
+## 2. Update DATABASE_URL environment variable for libSQL/SQLite [done]
 ### Dependencies: 27.1
 ### Description: Modify the DATABASE_URL environment variable in the 'api' service to use the appropriate libSQL/SQLite connection string format.
 ### Details:
@@ -82,7 +82,7 @@ Testing approach:
 - Verify the connection string format matches the documentation in docs/switching-db-to-libsql.md
 - Test the connection string format with a simple database connection test
 
-## 3. Configure volume mapping for SQLite persistence [pending]
+## 3. Configure volume mapping for SQLite persistence [done]
 ### Dependencies: 27.1, 27.2
 ### Description: Add or update volume configuration in the 'api' service to ensure SQLite database file persistence if using file-based approach.
 ### Details:
@@ -100,7 +100,7 @@ Testing approach:
 - Create a test file in the mounted directory and verify it persists between container restarts
 - Check that database changes persist after container restarts
 
-## 4. Remove PostgreSQL-specific environment variables [pending]
+## 4. Remove PostgreSQL-specific environment variables [done]
 ### Dependencies: 27.1, 27.2
 ### Description: Identify and remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed with libSQL/SQLite.
 ### Details:
@@ -120,7 +120,7 @@ Testing approach:
 - Run 'docker-compose up' and verify the application starts without errors related to missing environment variables
 - Check application logs to ensure no PostgreSQL connection attempts are being made
 
-## 5. Update Dockerfile to include libSQL/SQLite dependencies [pending]
+## 5. Update Dockerfile to include libSQL/SQLite dependencies [done]
 ### Dependencies: 27.1, 27.2, 27.3, 27.4
 ### Description: Ensure the necessary libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file.
 ### Details:
