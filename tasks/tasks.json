@@ -1555,7 +1555,7 @@
       "description": "Modify SQLAlchemy models in api/models/base.py to ensure compatibility with libSQL/SQLite, focusing on type affinity and storage requirements as outlined in the database migration documentation.",
       "details": "This task involves reviewing and adapting all SQLAlchemy model field types in `api/models/base.py` to ensure compatibility with libSQL/SQLite's type system. Follow section 3 of `docs/switching-db-to-libsql.md` as a guide.\n\nSpecific changes required:\n\n1. **TIMESTAMP fields**: Review all timestamp fields for timezone handling. SQLite doesn't have native timezone support, so ensure timestamps are stored consistently (likely as UTC) and that application code handles timezone conversions appropriately.\n\n2. **JSON fields**: SQLite doesn't have a native JSON type. Either:\n   - Store JSON as TEXT and handle serialization/deserialization in the application code\n   - Implement SQLAlchemy type adapters for automatic JSON conversion\n   - Consider using SQLite JSON1 extension functions for query capabilities if needed\n\n3. **String length constraints**: SQLite doesn't enforce VARCHAR length constraints. Ensure all String fields with length limits rely on application-level validation rather than database constraints.\n\n4. **EncryptedType**: Verify that all EncryptedType fields correctly map to TEXT type in SQLite and that the encryption/decryption process works with SQLite's storage format.\n\n5. **Other field types**: Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system.\n\nUpdate model definitions as needed, maintaining backward compatibility where possible. Document any changes that might affect application behavior or require data migration.",
       "testStrategy": "1. **Unit Tests**: Create or update unit tests for each model to verify field types are correctly defined and behave as expected with SQLite:\n   - Test serialization/deserialization of JSON fields\n   - Test timezone handling in timestamp fields\n   - Test string fields with various lengths and character sets\n   - Test EncryptedType fields for proper encryption/decryption\n\n2. **Integration Testing**:\n   - Set up a test database using libSQL/SQLite\n   - Run model migrations against this database\n   - Verify all tables and columns are created with correct types\n   - Test CRUD operations on each model with various data types\n\n3. **Validation Testing**:\n   - Test edge cases for each field type (empty strings, NULL values, very large JSON objects)\n   - Verify application-level validation works for string length constraints\n   - Test timezone edge cases (daylight saving transitions, UTC offsets)\n\n4. **Regression Testing**:\n   - Ensure existing functionality works with the updated models\n   - Verify no unexpected behavior changes in query results\n\nDocument any SQLite-specific behaviors or limitations discovered during testing.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         27
       ],
@@ -1567,7 +1567,7 @@
           "description": "Create a comprehensive inventory of all field types used in SQLAlchemy models in api/models/base.py, documenting their current configuration and identifying potential compatibility issues with libSQL/SQLite.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Review api/models/base.py and identify all model classes and their field definitions\n2. Create a structured document listing each field type used (TIMESTAMP, JSON, String, EncryptedType, etc.)\n3. For each field type, document:\n   - How it's currently defined\n   - The SQLAlchemy type used\n   - Any constraints or special handling\n   - Potential libSQL/SQLite compatibility issues based on docs/switching-db-to-libsql.md\n4. Identify fields that will need modification\n5. Test by validating the document against the actual codebase to ensure all field types are covered\n\nTesting approach: Perform a code review to ensure all model fields are documented and all potential compatibility issues are identified.",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1578,7 +1578,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all TIMESTAMP fields in the models\n2. Modify each timestamp field to ensure it stores data in UTC format\n3. Update field definitions to use appropriate SQLAlchemy types that are compatible with SQLite (likely DateTime without timezone)\n4. Add application-level handling for timezone conversions where needed\n5. Document the changes made to each timestamp field\n6. Create unit tests to verify timestamp storage and retrieval works correctly with both PostgreSQL and SQLite\n\nTesting approach:\n- Write unit tests that create and retrieve objects with timestamp fields\n- Verify correct timezone handling across database backends\n- Test edge cases like DST transitions and timezone conversions",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1589,7 +1589,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all JSON fields in the models\n2. Create a custom SQLAlchemy type adapter that:\n   - Stores JSON as TEXT in SQLite\n   - Handles serialization when writing to the database\n   - Handles deserialization when reading from the database\n3. Replace all existing JSON field definitions with the new custom type\n4. If query capabilities are needed, implement functions that utilize SQLite JSON1 extension\n5. Update any code that directly interacts with these JSON fields\n6. Document the implementation approach and any limitations\n\nTesting approach:\n- Create unit tests that store and retrieve complex JSON structures\n- Test JSON query functionality if implemented\n- Verify compatibility with both PostgreSQL and SQLite backends",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1600,7 +1600,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all String fields with length constraints\n2. Implement application-level validation for string length since SQLite doesn't enforce VARCHAR length\n3. Update String field definitions to work with SQLite while maintaining PostgreSQL compatibility\n4. Identify all EncryptedType fields in the models\n5. Verify and modify EncryptedType implementation to ensure it correctly maps to TEXT in SQLite\n6. Test the encryption/decryption process with SQLite's storage format\n7. Document all changes made to String and EncryptedType fields\n\nTesting approach:\n- Create unit tests for string length validation\n- Test storing and retrieving encrypted data\n- Verify data integrity across database backends\n- Test edge cases like empty strings and maximum length strings",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1614,7 +1614,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all remaining field types not covered in previous subtasks\n2. For each field type, review how it maps to SQLite's type affinity system\n3. Implement necessary changes to ensure correct behavior with SQLite\n4. Pay special attention to:\n   - Boolean fields (stored as integers in SQLite)\n   - Enum types\n   - Any custom field types\n   - Foreign keys and relationships\n5. Create a comprehensive test suite that validates all field types work correctly\n6. Document all changes made and any potential impacts on application behavior\n7. Update the database migration documentation with any new findings or recommendations\n\nTesting approach:\n- Create a test suite that exercises all field types\n- Test with both PostgreSQL and SQLite backends\n- Verify data integrity and type conversion\n- Test application functionality that relies on these fields",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         }
       ]

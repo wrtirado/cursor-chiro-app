@@ -3,7 +3,7 @@ from sqlalchemy import (
     Integer,
     String,
     ForeignKey,
-    TIMESTAMP,
+    DateTime,
     Boolean,
     JSON,
     Text,
@@ -20,10 +20,8 @@ class Company(Base):
     __tablename__ = "companies"
     company_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     # payment_info = Column(JSONB) # Add later
     offices = relationship("Office", back_populates="company")
 
@@ -36,10 +34,8 @@ class Office(Base):
     )
     name = Column(String(255), nullable=False)
     address = Column(Text)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     company = relationship("Company", back_populates="offices")
     users = relationship("User", back_populates="office")
     branding = relationship("Branding", back_populates="office", uselist=False)
@@ -63,6 +59,11 @@ class User(Base):
     # If email lookup needed, maybe store a hash of the email for lookup and encrypt the actual email.
     # For now, encrypting it. -> REVERTING: Removing encryption for login lookup
     # email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False) # Encrypted
+    # If email lookup needed, maybe store a hash of the email for lookup and encrypt the actual email.
+    # For now, encrypting it. -> REVERTING: Removing encryption for login lookup
+    # email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False) # Encrypted
+    # For now, encrypting it. -> REVERTING: Removing encryption for login lookup
+    # email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False) # Encrypted
     email = Column(
         String(255), unique=True, index=True, nullable=False
     )  # Plaintext for lookup
@@ -70,10 +71,8 @@ class User(Base):
         String(255), nullable=False
     )  # Password hashes are already secure
     join_code = Column(String(10), unique=True, index=True)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     office = relationship("Office", back_populates="users")
     role = relationship("Role", back_populates="users")
     # Relationships for TherapyPlans, PlanAssignments, Progress if needed
@@ -99,10 +98,8 @@ class TherapyPlan(Base):
     title = Column(EncryptedType(String(255)), nullable=False)
     description = Column(EncryptedType(Text))
     version = Column(Integer, default=1)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     creator = relationship("User", back_populates="therapy_plans_created")
     exercises = relationship("PlanExercise", back_populates="plan")
     assignments = relationship("PlanAssignment", back_populates="plan")
@@ -119,10 +116,8 @@ class PlanExercise(Base):
     sequence_order = Column(Integer, nullable=False)
     image_url = Column(String(1024))
     video_url = Column(String(1024))
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     plan = relationship("TherapyPlan", back_populates="exercises")
     progress_entries = relationship("Progress", back_populates="exercise")
 
@@ -137,9 +132,9 @@ class PlanAssignment(Base):
         Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
     assigned_by_id = Column(Integer, ForeignKey("users.user_id", ondelete="SET NULL"))
-    assigned_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    start_date = Column(TIMESTAMP(timezone=True))
-    end_date = Column(TIMESTAMP(timezone=True))
+    assigned_at = Column(DateTime, server_default=func.now())
+    start_date = Column(DateTime)
+    end_date = Column(DateTime)
     plan = relationship("TherapyPlan", back_populates="assignments")
     patient = relationship(
         "User", foreign_keys=[patient_id], back_populates="assignments_received"
@@ -163,7 +158,7 @@ class Progress(Base):
         ForeignKey("planexercises.plan_exercise_id", ondelete="CASCADE"),
         nullable=False,
     )
-    completed_at = Column(TIMESTAMP(timezone=True))
+    completed_at = Column(DateTime)
     notes = Column(EncryptedType(Text))
     assignment = relationship("PlanAssignment", back_populates="progress")
     exercise = relationship("PlanExercise", back_populates="progress_entries")
@@ -180,8 +175,6 @@ class Branding(Base):
     )
     logo_url = Column(String(1024))
     colors = Column(JSON)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     office = relationship("Office", back_populates="branding")
