@@ -26,4 +26,8 @@ build/
 *.egg-info/
 
 # Docker
-.dockerignore 
+.dockerignore
+
+# Ignore all files in logs/ but keep the directory itself
+logs/*
+!logs/.gitkeep 
