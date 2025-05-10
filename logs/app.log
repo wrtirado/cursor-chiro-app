@@ -417,3 +417,64 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) 505, message='Invali
 2025-05-09 04:23:38,440 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' stopped>: created
 2025-05-09 04:23:38,441 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
 2025-05-09 04:23:38,652 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-10 12:14:19,549 - app - ERROR - FATAL: Invalid ENCRYPTION_KEY configured. Application cannot start securely. Error: Invalid ENCRYPTION_KEY length or format. Must be 32 url-safe base64-encoded bytes.
+2025-05-10 12:16:08,171 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb22b0b90 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:16:08,172 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb22b0b90 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:16:08,173 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb22b0b90 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-10 12:16:08,176 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473652517328>: database='ws://db:8080' destroyed
+2025-05-10 12:16:08,176 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb22b0b90 name='Thread-1 (_thread_main)' stopped>: destroyed
+2025-05-10 12:17:18,200 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff930a3660 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:17:18,201 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff930a3660 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:17:18,208 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473207281360>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff9323c910>
+2025-05-10 12:21:33,797 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9627eee0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:21:33,797 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9627eee0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:21:33,800 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473259329552>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff962a1410>
+2025-05-10 12:22:21,023 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff949d30c0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:22:21,023 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff949d30c0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:22:21,026 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473158845584>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff9343d0d0>
+2025-05-10 12:23:56,819 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9bd62da0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:23:56,820 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9bd62da0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:23:56,822 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473312544784>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff99c32050>
+2025-05-10 12:24:08,003 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa68bada0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:24:08,003 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa68bada0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:24:08,006 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473514104336>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffffa5559210>
+2025-05-10 12:24:34,487 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa48668a0 name='Thread-2 (_thread_main)' stopped>: created
+2025-05-10 12:24:34,488 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa48668a0 name='Thread-2 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:24:34,491 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473443348112>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffffa49a8510>
+2025-05-10 12:24:34,497 - app - WARNING - HTTPException during request to /api/v1/auth/login: Status=401, Detail='Incorrect email or password'
+2025-05-10 12:26:41,817 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8261d130 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:26:41,818 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8261d130 name='Thread-1 (_thread_main)' started loop=<_UnixSelectorEventLoop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:26:41,821 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472856182352>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff819c1750>
+2025-05-10 12:26:41,855 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472856182352>: database='ws://db:8080' destroyed
+2025-05-10 12:31:24,125 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7eef8910 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:31:24,125 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7eef8910 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:31:24,129 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472849219088>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff7db6ce50>
+2025-05-10 12:31:48,408 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff87138460 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:31:48,408 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff87138460 name='Thread-1 (_thread_main)' started loop=<_UnixSelectorEventLoop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:31:48,412 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472948319248>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff871ad110>
+2025-05-10 12:31:48,454 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472948319248>: database='ws://db:8080' destroyed
+2025-05-10 12:31:54,220 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff86659180 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:31:54,221 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff86659180 name='Thread-1 (_thread_main)' started loop=<_UnixSelectorEventLoop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:31:54,225 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472937070352>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff866e54d0>
+2025-05-10 12:31:54,231 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-10 12:31:54,520 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472937070352>: database='ws://db:8080' destroyed
+2025-05-10 12:32:08,196 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7cfa19a0 name='Thread-2 (_thread_main)' stopped>: created
+2025-05-10 12:32:08,197 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7cfa19a0 name='Thread-2 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:32:08,199 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472767656336>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff7c54a010>
+2025-05-10 12:32:08,205 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-10 12:35:54,997 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7b36b1b0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:35:54,998 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff7b36b1b0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:35:55,001 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281472807576080>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff7ba2fa10>
+2025-05-10 12:35:56,259 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff901272a0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-10 12:35:56,260 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff901272a0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-10 12:35:56,263 - libsql_client.dbapi2.types - INFO - ConnectionHrana<281473157326544>: database='ws://db:8080' created stream: <libsql_client.hrana.conn.HranaStream object at 0xffff9014cf90>

@@ -19,7 +19,7 @@ from api.core.encryption import EncryptedType
 class Company(Base):
     __tablename__ = "companies"
     company_id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), nullable=False)
+    name = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     # payment_info = Column(JSONB) # Add later
@@ -32,7 +32,7 @@ class Office(Base):
     company_id = Column(
         Integer, ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False
     )
-    name = Column(String(255), nullable=False)
+    name = Column(Text, nullable=False)
     address = Column(Text)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -44,7 +44,7 @@ class Office(Base):
 class Role(Base):
     __tablename__ = "roles"
     role_id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True, nullable=False, index=True)
+    name = Column(Text, unique=True, nullable=False, index=True)
     users = relationship("User", back_populates="role")
 
 
@@ -53,7 +53,7 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, index=True)
     office_id = Column(Integer, ForeignKey("offices.office_id", ondelete="SET NULL"))
     role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
-    name = Column(EncryptedType(String(255)), nullable=False)
+    name = Column(EncryptedType(), nullable=False)
     # Encrypting email: Makes direct lookup via email complex.
     # Consider if lookup is essential or if user_id is primary lookup key.
     # If email lookup needed, maybe store a hash of the email for lookup and encrypt the actual email.
@@ -65,12 +65,12 @@ class User(Base):
     # For now, encrypting it. -> REVERTING: Removing encryption for login lookup
     # email = Column(EncryptedType(String(255)), unique=True, index=True, nullable=False) # Encrypted
     email = Column(
-        String(255), unique=True, index=True, nullable=False
+        Text, unique=True, index=True, nullable=False
     )  # Plaintext for lookup
     password_hash = Column(
-        String(255), nullable=False
+        Text, nullable=False
     )  # Password hashes are already secure
-    join_code = Column(String(10), unique=True, index=True)
+    join_code = Column(Text, unique=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     office = relationship("Office", back_populates="users")
@@ -95,8 +95,8 @@ class TherapyPlan(Base):
     chiropractor_id = Column(
         Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
-    title = Column(EncryptedType(String(255)), nullable=False)
-    description = Column(EncryptedType(Text))
+    title = Column(EncryptedType(), nullable=False)
+    description = Column(EncryptedType())
     version = Column(Integer, default=1)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -111,11 +111,11 @@ class PlanExercise(Base):
     plan_id = Column(
         Integer, ForeignKey("therapyplans.plan_id", ondelete="CASCADE"), nullable=False
     )
-    title = Column(EncryptedType(String(255)), nullable=False)
-    instructions = Column(EncryptedType(Text))
+    title = Column(EncryptedType(), nullable=False)
+    instructions = Column(EncryptedType())
     sequence_order = Column(Integer, nullable=False)
-    image_url = Column(String(1024))
-    video_url = Column(String(1024))
+    image_url = Column(Text)
+    video_url = Column(Text)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     plan = relationship("TherapyPlan", back_populates="exercises")
@@ -159,7 +159,7 @@ class Progress(Base):
         nullable=False,
     )
     completed_at = Column(DateTime)
-    notes = Column(EncryptedType(Text))
+    notes = Column(EncryptedType())
     assignment = relationship("PlanAssignment", back_populates="progress")
     exercise = relationship("PlanExercise", back_populates="progress_entries")
 
@@ -173,7 +173,7 @@ class Branding(Base):
         unique=True,
         nullable=False,
     )
-    logo_url = Column(String(1024))
+    logo_url = Column(Text)
     colors = Column(JSON)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

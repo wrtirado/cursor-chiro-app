@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "sqlite+libsql://chiro-app-wrtirado.aws-us-west-2.turso.io?authToken=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NDY2NzY1NjQsImlkIjoiMDNhZGVmMWYtMmZiYS00NWVmLWJiNjItZDVmMTdjMTdkYzU2IiwicmlkIjoiNjg2OGUwYWUtODMzMi00YWY1LThkZTktNDc3NmZkNzljNTRmIn0.DacxrIagYIGqqn7tphZYM5V_jdvLB3ygMRg2bcU1I-8wBwMRgu6cZ0R8Js1Nq7yyFR69N9tiZ63I4K06k29uDg&secure=true",
+        "sqlite+libsql://db:8080?mode=rw"
     )
 
     # JWT settings
