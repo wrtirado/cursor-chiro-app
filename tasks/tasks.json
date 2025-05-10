@@ -1660,7 +1660,7 @@
             2
           ],
           "details": "Implementation steps:\n1. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility\n2. Run the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n3. Capture the new migration version ID for documentation\n4. Verify the migration file was created in the alembic/versions/ directory\n5. Check that the migration includes all expected tables, indices, and constraints\n\nTesting approach:\n- Review the generated migration file to ensure it correctly captures all model definitions\n- Verify no SQLite-incompatible operations are included\n- Check for any unexpected schema differences",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1671,7 +1671,7 @@
             3
           ],
           "details": "Implementation steps:\n1. Open the newly generated migration file\n2. Review all create_table, create_index, and other schema operations\n3. Check for and fix any SQLite-incompatible operations (like certain constraint types)\n4. Optimize index definitions for libSQL performance characteristics\n5. Add comments explaining any manual adjustments made\n6. Ensure proper handling of TEXT vs VARCHAR types and other SQLite-specific type mappings\n7. Verify foreign key constraints are properly defined\n\nTesting approach:\n- Manually review the SQL that would be generated using 'alembic upgrade --sql head'\n- Verify the SQL is valid for libSQL/SQLite\n- Check for any potential performance issues with the schema design",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1683,7 +1683,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         }
       ]
@@ -1694,7 +1694,7 @@
       "description": "Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.",
       "details": "This task involves rewriting the `database/init_schema.sql` file to use SQLite syntax and adapting the `scripts/seed_admin.py` script as needed. The changes should follow section 5 of `docs/switching-db-to-libsql.md`.\n\nFor `init_schema.sql`:\n1. Replace PostgreSQL-specific data types with SQLite equivalents\n2. Change primary key definitions to use `INTEGER PRIMARY KEY AUTOINCREMENT` syntax\n3. Adjust the `INSERT INTO Roles` statements to match SQLite syntax\n4. Ensure all table creation statements are SQLite-compatible\n5. Verify that any constraints or indexes are properly defined for SQLite\n\nFor `scripts/seed_admin.py`:\n1. Review the script to identify any PostgreSQL-specific SQLAlchemy code\n2. Update the script to work with the SQLite dialect if necessary\n3. Ensure it correctly interacts with the updated SQLAlchemy models\n4. Test that it can successfully create an admin user in the SQLite database\n\nThe implementation should maintain all existing functionality while ensuring compatibility with SQLite/libSQL. Pay special attention to data type conversions, auto-increment behavior, and any SQL syntax differences between PostgreSQL and SQLite.",
       "testStrategy": "1. Execute the rewritten `init_schema.sql` against a fresh SQLite database and verify it runs without errors\n2. Validate the database schema by inspecting the created tables using SQLite CLI or a GUI tool:\n   - Check that all tables have the correct structure\n   - Verify primary keys are properly set up with autoincrement\n   - Confirm that all indexes and constraints are present\n3. Run the adapted `seed_admin.py` script and verify:\n   - It executes without errors\n   - An admin user is successfully created in the database\n   - The user has the correct role and permissions\n4. Perform basic application operations that interact with the database to ensure the schema changes don't break functionality\n5. Write a simple test script that performs CRUD operations on each table to verify the schema works as expected\n6. Document any SQLite-specific limitations or behavior differences that developers should be aware of",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         29
       ],
@@ -1706,7 +1706,7 @@
           "description": "Review the existing PostgreSQL schema in `database/init_schema.sql` and document all elements that need conversion to SQLite syntax",
           "dependencies": [],
           "details": "Implementation steps:\n1. Examine the current `database/init_schema.sql` file and identify all PostgreSQL-specific data types and syntax\n2. Create a mapping document that lists each PostgreSQL data type/feature and its SQLite equivalent\n3. Document specific changes needed for:\n   - Data type conversions (e.g., SERIAL to INTEGER PRIMARY KEY AUTOINCREMENT)\n   - Primary key definitions\n   - Foreign key constraints\n   - Default values\n   - INSERT statements\n   - Any other PostgreSQL-specific features\n4. Review section 5 of `docs/switching-db-to-libsql.md` to ensure all requirements are captured\n5. Create a checklist of all required changes to guide implementation\n\nTesting approach:\n- Verify the completeness of the analysis by cross-checking with SQLite documentation\n- Ensure all tables and fields in the original schema are accounted for in the conversion plan",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 30
         },
         {
@@ -1717,7 +1717,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Create a new version of `database/init_schema.sql` based on the analysis from subtask 1\n2. Convert all table creation statements to use SQLite syntax:\n   - Replace PostgreSQL data types with SQLite equivalents (e.g., TEXT instead of VARCHAR, INTEGER instead of INT)\n   - Change SERIAL/BIGSERIAL primary keys to INTEGER PRIMARY KEY AUTOINCREMENT\n   - Adjust foreign key constraint syntax if needed\n   - Modify default value syntax to be SQLite-compatible\n3. Ensure all table relationships and constraints are preserved\n4. Add appropriate comments to document significant changes\n\nTesting approach:\n- Run the modified schema file against a test SQLite database to verify syntax\n- Check that all tables are created without errors\n- Verify primary key and foreign key constraints are properly defined",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 30
         },
         {
@@ -1728,7 +1728,7 @@
             2
           ],
           "details": "Implementation steps:\n1. Review all INSERT statements in the original schema file, particularly for the Roles table\n2. Adjust the syntax of INSERT statements to be SQLite-compatible:\n   - Modify value formats if necessary\n   - Ensure proper quoting of string values\n   - Adjust any sequence or auto-increment references\n3. If the original schema uses any PostgreSQL-specific INSERT features (like RETURNING), replace with SQLite alternatives\n4. Verify that all predefined data (like role definitions) are properly inserted\n\nTesting approach:\n- Execute the INSERT statements against a test SQLite database\n- Query the database to verify that all predefined data was correctly inserted\n- Check that role IDs and other values match the expected values from the original schema",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 30
         },
         {
@@ -1739,7 +1739,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Examine `scripts/seed_admin.py` to identify any PostgreSQL-specific SQLAlchemy code\n2. Update SQLAlchemy model definitions if they contain PostgreSQL-specific types or features:\n   - Replace PostgreSQL-specific column types with SQLite-compatible types\n   - Update sequence or auto-increment definitions\n   - Modify any dialect-specific options\n3. Check database connection code to ensure it can connect to SQLite databases\n4. Update any raw SQL queries to use SQLite syntax\n5. Ensure the script correctly references the updated model definitions\n\nTesting approach:\n- Run static code analysis to check for syntax errors\n- Test the script with a mock SQLite database connection\n- Verify that SQLAlchemy models match the updated schema structure",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 30
         },
         {
@@ -1752,8 +1752,90 @@
             4
           ],
           "details": "Implementation steps:\n1. Set up a test SQLite database\n2. Execute the updated `init_schema.sql` script against the test database\n3. Run the modified `seed_admin.py` script to create an admin user\n4. Verify that all database operations work as expected:\n   - Tables are created with correct structure\n   - Foreign key constraints work properly\n   - Auto-increment fields generate correct values\n   - Admin user is created successfully\n5. Make any final adjustments to the schema or script based on testing results\n6. Update documentation to reflect the changes made\n\nTesting approach:\n- Run a full end-to-end test of database initialization and admin seeding\n- Verify database structure using SQLite tools (like sqlite3 CLI or DB Browser for SQLite)\n- Test CRUD operations on the admin user to ensure compatibility\n- Compare the behavior with the original PostgreSQL implementation to ensure functional equivalence",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 30
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "Remove Fernet/EncryptedType Field Encryption from Codebase",
+      "description": "Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.",
+      "details": "This task involves removing all application-level field encryption that's no longer needed due to database-level encryption:\n\n1. Identify all SQLAlchemy models using EncryptedType fields\n2. Convert these fields to their base types (String, Integer, etc.)\n3. Remove all imports and usage of Fernet and EncryptedType throughout the codebase\n4. Update database migration scripts to convert encrypted columns to plain data types\n5. Remove encryption-related utility functions and helper methods\n6. Update any API endpoints or services that handle encryption/decryption logic\n7. Remove encryption-related environment variables (ENCRYPTION_KEY, etc.) from:\n   - .env files\n   - Docker configurations\n   - CI/CD pipelines\n   - Deployment templates\n8. Update documentation to reflect that field-level encryption has been removed and security is now handled at the database level\n9. Ensure any data serialization/deserialization logic that handled encrypted fields is updated\n10. Check for any custom validation logic that might have been specific to encrypted fields\n\nBefore making changes, create a backup of the database to ensure data can be recovered if needed.",
+      "testStrategy": "1. Create a comprehensive test plan covering all affected models and functionality:\n   - Unit tests: Verify models function correctly with plain field types\n   - Integration tests: Ensure API endpoints correctly handle the non-encrypted data\n   - Migration tests: Verify data integrity after migration from encrypted to non-encrypted fields\n\n2. Specific test cases:\n   - Test CRUD operations on all previously encrypted fields\n   - Verify data consistency by comparing pre-migration and post-migration data samples\n   - Test boundary conditions (empty values, max length values, special characters)\n   - Ensure search functionality works on previously encrypted fields\n   - Verify that removing encryption doesn't break any filtering or sorting operations\n\n3. Security validation:\n   - Confirm TLS connections are properly configured\n   - Verify libSQL TDE is correctly protecting the database\n   - Run security scans to ensure no sensitive data is exposed\n\n4. Performance testing:\n   - Measure and document any performance improvements from removing encryption overhead\n\n5. Regression testing:\n   - Run the full test suite to ensure no functionality is broken by these changes",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Audit and inventory all encrypted fields in models",
+          "description": "Create a comprehensive inventory of all SQLAlchemy models using EncryptedType fields, documenting their current types, encryption methods, and where they're used in the codebase.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Search the codebase for all imports of 'EncryptedType' and 'Fernet'\n2. Identify all model classes using these imports\n3. For each model, document:\n   - Model name\n   - Encrypted field names\n   - Base data types (String, Integer, etc.)\n   - Any special handling or validation logic\n4. Create a mapping document showing current encrypted fields and their target plain types\n5. Identify any custom encryption/decryption utility functions\n\nTesting approach:\n- This is an audit task, so verify completeness by using grep/search tools\n- Cross-reference findings with database schema to ensure all encrypted columns are identified",
+          "status": "pending",
+          "parentTaskId": 31
+        },
+        {
+          "id": 2,
+          "title": "Create database migration script for decryption",
+          "description": "Develop a database migration script that will safely convert encrypted column data to plaintext while preserving the original information.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create a new Alembic migration script\n2. For each encrypted field identified in subtask 1:\n   - Add migration code to decrypt the data in-place\n   - Modify column types to remove encryption\n   - Ensure proper data type conversion\n3. Include transaction handling for safety\n4. Add rollback capability in case of failure\n5. Test the migration on a copy of production data\n6. Document the migration process\n\nTesting approach:\n- Test migration on a copy of the database\n- Verify data integrity by comparing decrypted values with expected values\n- Test rollback functionality\n- Ensure all data types are correctly preserved",
+          "status": "pending",
+          "parentTaskId": 31
+        },
+        {
+          "id": 3,
+          "title": "Update SQLAlchemy models to remove EncryptedType",
+          "description": "Modify all SQLAlchemy model definitions to replace EncryptedType fields with their base types (String, Integer, etc.).",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. For each model identified in subtask 1:\n   - Replace EncryptedType fields with their base types\n   - Remove Fernet and EncryptedType imports\n   - Update any type hints or annotations\n2. Update model validation methods that might reference encryption\n3. Update any model methods that handle encryption/decryption\n4. Remove any special handling for encrypted fields in model methods\n5. Update model tests to reflect the changes\n\nTesting approach:\n- Run unit tests for all modified models\n- Test CRUD operations with the updated models\n- Verify serialization/deserialization still works correctly\n- Ensure model validation still functions properly",
+          "status": "pending",
+          "parentTaskId": 31
+        },
+        {
+          "id": 4,
+          "title": "Update service layer and API endpoints",
+          "description": "Modify service layer code and API endpoints to remove any encryption/decryption logic and handle plaintext data directly.",
+          "dependencies": [
+            3
+          ],
+          "details": "Implementation steps:\n1. Identify all services and API endpoints that interact with previously encrypted fields\n2. Remove any encryption/decryption operations in these components\n3. Update data validation logic that might have been specific to encrypted fields\n4. Update serialization/deserialization logic for API responses\n5. Remove any special handling for encrypted fields in business logic\n6. Update error handling related to encryption/decryption\n\nTesting approach:\n- Run unit tests for all modified services\n- Test API endpoints with various inputs\n- Verify correct data handling without encryption\n- Test edge cases that might have been handled differently with encryption",
+          "status": "pending",
+          "parentTaskId": 31
+        },
+        {
+          "id": 5,
+          "title": "Remove encryption utilities and environment variables",
+          "description": "Clean up all encryption-related utility functions, helper methods, and environment variables from the codebase and configuration files.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Remove all encryption utility functions and helper methods\n2. Delete encryption-related environment variables from:\n   - .env files and templates\n   - Docker configurations\n   - CI/CD pipeline configurations\n   - Deployment templates\n   - Kubernetes/infrastructure configs\n3. Update configuration loading code to remove references to encryption keys\n4. Remove any encryption-related test fixtures or mocks\n5. Clean up imports of removed utilities throughout the codebase\n\nTesting approach:\n- Verify application starts without encryption environment variables\n- Run the test suite to ensure no references to removed utilities\n- Check deployment processes work without encryption configuration\n- Verify no runtime errors occur due to missing encryption utilities",
+          "status": "pending",
+          "parentTaskId": 31
+        },
+        {
+          "id": 6,
+          "title": "Update documentation and finalize removal",
+          "description": "Update all documentation to reflect the removal of field-level encryption and perform final verification that all encryption code has been removed.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "details": "Implementation steps:\n1. Update documentation to reflect that field-level encryption has been removed\n2. Document that security is now handled at the database level (libSQL TDE and TLS)\n3. Update developer guides, API documentation, and security documentation\n4. Perform a final codebase search for any remaining references to:\n   - Fernet\n   - EncryptedType\n   - Encryption keys\n   - Encryption/decryption functions\n5. Run a full test suite to verify application functionality\n6. Update any data seeding scripts or fixtures that might have used encrypted data\n\nTesting approach:\n- Comprehensive end-to-end testing of the application\n- Verify all documentation accurately reflects the new security approach\n- Run security scans to ensure no sensitive data is exposed\n- Verify all tests pass with the updated codebase",
+          "status": "pending",
+          "parentTaskId": 31
         }
       ]
     }

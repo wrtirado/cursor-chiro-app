@@ -1483,7 +1483,7 @@
       "description": "Update the docker-compose.yml and environment variables to replace PostgreSQL with libSQL/SQLite as the database backend, following the guidelines in docs/switching-db-to-libsql.md.",
       "details": "This task involves modifying the project's database configuration to use libSQL/SQLite instead of PostgreSQL:\n\n1. Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container\n\n2. Update the DATABASE_URL environment variable in the 'api' service to use the libSQL format:\n   - For file-based SQLite: `DATABASE_URL=sqlite:///path/to/db.sqlite`\n   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`\n\n3. Adjust volumes configuration in the 'api' service to ensure persistence of the SQLite database file if using file-based approach:\n   - Add a volume mapping like `- ./data:/app/data` if storing the SQLite file in a /data directory\n\n4. Remove any PostgreSQL-specific environment variables from the 'api' service that are no longer needed\n\n5. Update any database initialization scripts or commands in the docker-compose.yml to align with libSQL/SQLite requirements\n\n6. Ensure the libSQL/SQLite client libraries are properly installed in the application's Dockerfile or requirements file\n\n7. Document the changes made in a comment at the top of the docker-compose.yml file",
       "testStrategy": "To verify the successful migration to libSQL/SQLite:\n\n1. Run `docker-compose up -d` to start the services with the new configuration\n\n2. Check that the application starts without database connection errors in the logs: `docker-compose logs api`\n\n3. Verify the API can perform basic database operations by:\n   - Creating a test record through an API endpoint\n   - Retrieving the created record\n   - Updating the record\n   - Deleting the record\n\n4. Confirm data persistence by:\n   - Creating data through the API\n   - Stopping all containers with `docker-compose down`\n   - Starting containers again with `docker-compose up -d`\n   - Verifying the previously created data is still accessible\n\n5. If using file-based SQLite, check that the database file exists in the expected location\n\n6. Verify the application works correctly when scaled (if applicable) to ensure there are no file locking issues with SQLite\n\n7. Run the application's existing test suite to ensure all database interactions continue to function correctly",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         1
       ],
@@ -1495,7 +1495,7 @@
           "description": "Remove or comment out the 'db' service in docker-compose.yml that currently defines the PostgreSQL container and document the change.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'db' service section that defines the PostgreSQL container\n3. Either remove the entire section or comment it out using YAML comment syntax (# at the beginning of each line)\n4. Add a comment at the top of the file documenting the migration from PostgreSQL to libSQL/SQLite\n5. Verify the file still has valid YAML syntax after changes\n\nTesting approach:\n- Run 'docker-compose config' to validate the YAML syntax is still correct\n- Ensure the PostgreSQL container no longer starts when running 'docker-compose up'",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 27
         },
         {
@@ -1506,7 +1506,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Find the DATABASE_URL environment variable\n4. Replace the PostgreSQL connection string with the appropriate libSQL format:\n   - For file-based SQLite: `DATABASE_URL=sqlite:///app/data/db.sqlite`\n   - For libSQL server: `DATABASE_URL=libsql://[token]@[hostname].turso.io/[db-name]`\n5. If using a remote libSQL instance, ensure any tokens or credentials are properly handled (e.g., using .env files)\n\nTesting approach:\n- Verify the connection string format matches the documentation in docs/switching-db-to-libsql.md\n- Test the connection string format with a simple database connection test",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 27
         },
         {
@@ -1518,7 +1518,7 @@
             2
           ],
           "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Find or add the 'volumes' section under the 'api' service\n4. Add a volume mapping to ensure persistence of the SQLite database file:\n   - Add `- ./data:/app/data` if storing the SQLite file in a /data directory\n5. Create the local data directory if it doesn't exist\n6. Ensure proper permissions are set on the data directory\n\nTesting approach:\n- Run 'docker-compose up' and verify the volume is correctly mounted\n- Create a test file in the mounted directory and verify it persists between container restarts\n- Check that database changes persist after container restarts",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 27
         },
         {
@@ -1530,7 +1530,7 @@
             2
           ],
           "details": "Implementation steps:\n1. Open docker-compose.yml\n2. Locate the 'api' service section\n3. Review all environment variables and identify PostgreSQL-specific ones such as:\n   - POSTGRES_USER\n   - POSTGRES_PASSWORD\n   - POSTGRES_DB\n   - POSTGRES_HOST\n   - Any other PostgreSQL-specific configuration variables\n4. Remove or comment out these variables as they're no longer needed\n5. If there are any database initialization scripts or commands specific to PostgreSQL, update or remove them\n\nTesting approach:\n- Run 'docker-compose up' and verify the application starts without errors related to missing environment variables\n- Check application logs to ensure no PostgreSQL connection attempts are being made",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 27
         },
         {
@@ -1544,7 +1544,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Review docs/switching-db-to-libsql.md to identify required libraries\n2. Open the application's Dockerfile\n3. Add necessary system packages if required (e.g., sqlite3-dev)\n4. Update the application's requirements file (e.g., requirements.txt) to include:\n   - sqlalchemy with appropriate drivers\n   - libsql-client or pysqlite3 as needed\n5. If using a specific ORM, ensure compatible versions are specified\n6. Remove any PostgreSQL-specific libraries that are no longer needed\n\nTesting approach:\n- Build the Docker image with 'docker-compose build'\n- Run the application with 'docker-compose up'\n- Verify the application can connect to the libSQL/SQLite database\n- Run a simple database query to confirm functionality\n- Check application logs for any dependency or import errors",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 27
         }
       ]
@@ -1555,7 +1555,7 @@
       "description": "Modify SQLAlchemy models in api/models/base.py to ensure compatibility with libSQL/SQLite, focusing on type affinity and storage requirements as outlined in the database migration documentation.",
       "details": "This task involves reviewing and adapting all SQLAlchemy model field types in `api/models/base.py` to ensure compatibility with libSQL/SQLite's type system. Follow section 3 of `docs/switching-db-to-libsql.md` as a guide.\n\nSpecific changes required:\n\n1. **TIMESTAMP fields**: Review all timestamp fields for timezone handling. SQLite doesn't have native timezone support, so ensure timestamps are stored consistently (likely as UTC) and that application code handles timezone conversions appropriately.\n\n2. **JSON fields**: SQLite doesn't have a native JSON type. Either:\n   - Store JSON as TEXT and handle serialization/deserialization in the application code\n   - Implement SQLAlchemy type adapters for automatic JSON conversion\n   - Consider using SQLite JSON1 extension functions for query capabilities if needed\n\n3. **String length constraints**: SQLite doesn't enforce VARCHAR length constraints. Ensure all String fields with length limits rely on application-level validation rather than database constraints.\n\n4. **EncryptedType**: Verify that all EncryptedType fields correctly map to TEXT type in SQLite and that the encryption/decryption process works with SQLite's storage format.\n\n5. **Other field types**: Review all other field types (Integer, Boolean, etc.) to ensure they map correctly to SQLite's type affinity system.\n\nUpdate model definitions as needed, maintaining backward compatibility where possible. Document any changes that might affect application behavior or require data migration.",
       "testStrategy": "1. **Unit Tests**: Create or update unit tests for each model to verify field types are correctly defined and behave as expected with SQLite:\n   - Test serialization/deserialization of JSON fields\n   - Test timezone handling in timestamp fields\n   - Test string fields with various lengths and character sets\n   - Test EncryptedType fields for proper encryption/decryption\n\n2. **Integration Testing**:\n   - Set up a test database using libSQL/SQLite\n   - Run model migrations against this database\n   - Verify all tables and columns are created with correct types\n   - Test CRUD operations on each model with various data types\n\n3. **Validation Testing**:\n   - Test edge cases for each field type (empty strings, NULL values, very large JSON objects)\n   - Verify application-level validation works for string length constraints\n   - Test timezone edge cases (daylight saving transitions, UTC offsets)\n\n4. **Regression Testing**:\n   - Ensure existing functionality works with the updated models\n   - Verify no unexpected behavior changes in query results\n\nDocument any SQLite-specific behaviors or limitations discovered during testing.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         27
       ],
@@ -1567,7 +1567,7 @@
           "description": "Create a comprehensive inventory of all field types used in SQLAlchemy models in api/models/base.py, documenting their current configuration and identifying potential compatibility issues with libSQL/SQLite.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Review api/models/base.py and identify all model classes and their field definitions\n2. Create a structured document listing each field type used (TIMESTAMP, JSON, String, EncryptedType, etc.)\n3. For each field type, document:\n   - How it's currently defined\n   - The SQLAlchemy type used\n   - Any constraints or special handling\n   - Potential libSQL/SQLite compatibility issues based on docs/switching-db-to-libsql.md\n4. Identify fields that will need modification\n5. Test by validating the document against the actual codebase to ensure all field types are covered\n\nTesting approach: Perform a code review to ensure all model fields are documented and all potential compatibility issues are identified.",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1578,7 +1578,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all TIMESTAMP fields in the models\n2. Modify each timestamp field to ensure it stores data in UTC format\n3. Update field definitions to use appropriate SQLAlchemy types that are compatible with SQLite (likely DateTime without timezone)\n4. Add application-level handling for timezone conversions where needed\n5. Document the changes made to each timestamp field\n6. Create unit tests to verify timestamp storage and retrieval works correctly with both PostgreSQL and SQLite\n\nTesting approach:\n- Write unit tests that create and retrieve objects with timestamp fields\n- Verify correct timezone handling across database backends\n- Test edge cases like DST transitions and timezone conversions",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1589,7 +1589,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all JSON fields in the models\n2. Create a custom SQLAlchemy type adapter that:\n   - Stores JSON as TEXT in SQLite\n   - Handles serialization when writing to the database\n   - Handles deserialization when reading from the database\n3. Replace all existing JSON field definitions with the new custom type\n4. If query capabilities are needed, implement functions that utilize SQLite JSON1 extension\n5. Update any code that directly interacts with these JSON fields\n6. Document the implementation approach and any limitations\n\nTesting approach:\n- Create unit tests that store and retrieve complex JSON structures\n- Test JSON query functionality if implemented\n- Verify compatibility with both PostgreSQL and SQLite backends",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1600,7 +1600,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all String fields with length constraints\n2. Implement application-level validation for string length since SQLite doesn't enforce VARCHAR length\n3. Update String field definitions to work with SQLite while maintaining PostgreSQL compatibility\n4. Identify all EncryptedType fields in the models\n5. Verify and modify EncryptedType implementation to ensure it correctly maps to TEXT in SQLite\n6. Test the encryption/decryption process with SQLite's storage format\n7. Document all changes made to String and EncryptedType fields\n\nTesting approach:\n- Create unit tests for string length validation\n- Test storing and retrieving encrypted data\n- Verify data integrity across database backends\n- Test edge cases like empty strings and maximum length strings",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         },
         {
@@ -1614,7 +1614,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Based on the analysis from subtask 1, identify all remaining field types not covered in previous subtasks\n2. For each field type, review how it maps to SQLite's type affinity system\n3. Implement necessary changes to ensure correct behavior with SQLite\n4. Pay special attention to:\n   - Boolean fields (stored as integers in SQLite)\n   - Enum types\n   - Any custom field types\n   - Foreign keys and relationships\n5. Create a comprehensive test suite that validates all field types work correctly\n6. Document all changes made and any potential impacts on application behavior\n7. Update the database migration documentation with any new findings or recommendations\n\nTesting approach:\n- Create a test suite that exercises all field types\n- Test with both PostgreSQL and SQLite backends\n- Verify data integrity and type conversion\n- Test application functionality that relies on these fields",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 28
         }
       ]
@@ -1637,7 +1637,7 @@
           "description": "Create a backup of all existing migration files in the alembic/versions/ directory and then remove them from the active project directory.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Create a backup directory outside the project structure (e.g., 'alembic_backup/')\n2. Copy all files from 'alembic/versions/' to the backup directory with their original filenames and timestamps preserved\n3. Document the backup location in a README file within the backup directory\n4. Remove all migration script files from the 'alembic/versions/' directory\n5. Verify the directory is empty except for any necessary __init__.py file\n\nTesting approach:\n- Confirm all files were properly backed up by comparing file counts and checksums\n- Verify the alembic/versions/ directory is properly cleaned",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1648,7 +1648,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Review the current env.py file in the Alembic directory\n2. Update the database URL handling to properly connect to libSQL/SQLite\n3. Modify any SQLAlchemy configuration options that need adjustment for libSQL compatibility\n4. Ensure proper handling of SQLite-specific constraints and types\n5. Add comments explaining the libSQL-specific configurations\n6. Update any render_item or include_object functions to handle SQLite-specific schema elements\n\nTesting approach:\n- Run a basic Alembic command like 'alembic current' to verify the configuration works\n- Check logs for any SQLite-specific warnings or errors",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1660,7 +1660,7 @@
             2
           ],
           "details": "Implementation steps:\n1. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility\n2. Run the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n3. Capture the new migration version ID for documentation\n4. Verify the migration file was created in the alembic/versions/ directory\n5. Check that the migration includes all expected tables, indices, and constraints\n\nTesting approach:\n- Review the generated migration file to ensure it correctly captures all model definitions\n- Verify no SQLite-incompatible operations are included\n- Check for any unexpected schema differences",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1671,7 +1671,7 @@
             3
           ],
           "details": "Implementation steps:\n1. Open the newly generated migration file\n2. Review all create_table, create_index, and other schema operations\n3. Check for and fix any SQLite-incompatible operations (like certain constraint types)\n4. Optimize index definitions for libSQL performance characteristics\n5. Add comments explaining any manual adjustments made\n6. Ensure proper handling of TEXT vs VARCHAR types and other SQLite-specific type mappings\n7. Verify foreign key constraints are properly defined\n\nTesting approach:\n- Manually review the SQL that would be generated using 'alembic upgrade --sql head'\n- Verify the SQL is valid for libSQL/SQLite\n- Check for any potential performance issues with the schema design",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1683,7 +1683,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         }
       ]
@@ -1694,10 +1694,77 @@
       "description": "Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.",
       "details": "This task involves rewriting the `database/init_schema.sql` file to use SQLite syntax and adapting the `scripts/seed_admin.py` script as needed. The changes should follow section 5 of `docs/switching-db-to-libsql.md`.\n\nFor `init_schema.sql`:\n1. Replace PostgreSQL-specific data types with SQLite equivalents\n2. Change primary key definitions to use `INTEGER PRIMARY KEY AUTOINCREMENT` syntax\n3. Adjust the `INSERT INTO Roles` statements to match SQLite syntax\n4. Ensure all table creation statements are SQLite-compatible\n5. Verify that any constraints or indexes are properly defined for SQLite\n\nFor `scripts/seed_admin.py`:\n1. Review the script to identify any PostgreSQL-specific SQLAlchemy code\n2. Update the script to work with the SQLite dialect if necessary\n3. Ensure it correctly interacts with the updated SQLAlchemy models\n4. Test that it can successfully create an admin user in the SQLite database\n\nThe implementation should maintain all existing functionality while ensuring compatibility with SQLite/libSQL. Pay special attention to data type conversions, auto-increment behavior, and any SQL syntax differences between PostgreSQL and SQLite.",
       "testStrategy": "1. Execute the rewritten `init_schema.sql` against a fresh SQLite database and verify it runs without errors\n2. Validate the database schema by inspecting the created tables using SQLite CLI or a GUI tool:\n   - Check that all tables have the correct structure\n   - Verify primary keys are properly set up with autoincrement\n   - Confirm that all indexes and constraints are present\n3. Run the adapted `seed_admin.py` script and verify:\n   - It executes without errors\n   - An admin user is successfully created in the database\n   - The user has the correct role and permissions\n4. Perform basic application operations that interact with the database to ensure the schema changes don't break functionality\n5. Write a simple test script that performs CRUD operations on each table to verify the schema works as expected\n6. Document any SQLite-specific limitations or behavior differences that developers should be aware of",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         29
       ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze PostgreSQL Schema and Identify SQLite Conversion Requirements",
+          "description": "Review the existing PostgreSQL schema in `database/init_schema.sql` and document all elements that need conversion to SQLite syntax",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Examine the current `database/init_schema.sql` file and identify all PostgreSQL-specific data types and syntax\n2. Create a mapping document that lists each PostgreSQL data type/feature and its SQLite equivalent\n3. Document specific changes needed for:\n   - Data type conversions (e.g., SERIAL to INTEGER PRIMARY KEY AUTOINCREMENT)\n   - Primary key definitions\n   - Foreign key constraints\n   - Default values\n   - INSERT statements\n   - Any other PostgreSQL-specific features\n4. Review section 5 of `docs/switching-db-to-libsql.md` to ensure all requirements are captured\n5. Create a checklist of all required changes to guide implementation\n\nTesting approach:\n- Verify the completeness of the analysis by cross-checking with SQLite documentation\n- Ensure all tables and fields in the original schema are accounted for in the conversion plan",
+          "status": "done",
+          "parentTaskId": 30
+        },
+        {
+          "id": 2,
+          "title": "Rewrite Table Creation Statements for SQLite Compatibility",
+          "description": "Modify all CREATE TABLE statements in the schema file to use SQLite-compatible syntax",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create a new version of `database/init_schema.sql` based on the analysis from subtask 1\n2. Convert all table creation statements to use SQLite syntax:\n   - Replace PostgreSQL data types with SQLite equivalents (e.g., TEXT instead of VARCHAR, INTEGER instead of INT)\n   - Change SERIAL/BIGSERIAL primary keys to INTEGER PRIMARY KEY AUTOINCREMENT\n   - Adjust foreign key constraint syntax if needed\n   - Modify default value syntax to be SQLite-compatible\n3. Ensure all table relationships and constraints are preserved\n4. Add appropriate comments to document significant changes\n\nTesting approach:\n- Run the modified schema file against a test SQLite database to verify syntax\n- Check that all tables are created without errors\n- Verify primary key and foreign key constraints are properly defined",
+          "status": "done",
+          "parentTaskId": 30
+        },
+        {
+          "id": 3,
+          "title": "Update INSERT Statements and Role Definitions for SQLite",
+          "description": "Modify all INSERT statements and role definitions in the schema file to be compatible with SQLite syntax",
+          "dependencies": [
+            2
+          ],
+          "details": "Implementation steps:\n1. Review all INSERT statements in the original schema file, particularly for the Roles table\n2. Adjust the syntax of INSERT statements to be SQLite-compatible:\n   - Modify value formats if necessary\n   - Ensure proper quoting of string values\n   - Adjust any sequence or auto-increment references\n3. If the original schema uses any PostgreSQL-specific INSERT features (like RETURNING), replace with SQLite alternatives\n4. Verify that all predefined data (like role definitions) are properly inserted\n\nTesting approach:\n- Execute the INSERT statements against a test SQLite database\n- Query the database to verify that all predefined data was correctly inserted\n- Check that role IDs and other values match the expected values from the original schema",
+          "status": "done",
+          "parentTaskId": 30
+        },
+        {
+          "id": 4,
+          "title": "Analyze and Update SQLAlchemy Models in seed_admin.py",
+          "description": "Review and modify the SQLAlchemy models and database interaction code in the admin seeding script",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Examine `scripts/seed_admin.py` to identify any PostgreSQL-specific SQLAlchemy code\n2. Update SQLAlchemy model definitions if they contain PostgreSQL-specific types or features:\n   - Replace PostgreSQL-specific column types with SQLite-compatible types\n   - Update sequence or auto-increment definitions\n   - Modify any dialect-specific options\n3. Check database connection code to ensure it can connect to SQLite databases\n4. Update any raw SQL queries to use SQLite syntax\n5. Ensure the script correctly references the updated model definitions\n\nTesting approach:\n- Run static code analysis to check for syntax errors\n- Test the script with a mock SQLite database connection\n- Verify that SQLAlchemy models match the updated schema structure",
+          "status": "done",
+          "parentTaskId": 30
+        },
+        {
+          "id": 5,
+          "title": "Test and Finalize SQLite Compatibility",
+          "description": "Perform comprehensive testing of the updated schema and seeding script with SQLite",
+          "dependencies": [
+            2,
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Set up a test SQLite database\n2. Execute the updated `init_schema.sql` script against the test database\n3. Run the modified `seed_admin.py` script to create an admin user\n4. Verify that all database operations work as expected:\n   - Tables are created with correct structure\n   - Foreign key constraints work properly\n   - Auto-increment fields generate correct values\n   - Admin user is created successfully\n5. Make any final adjustments to the schema or script based on testing results\n6. Update documentation to reflect the changes made\n\nTesting approach:\n- Run a full end-to-end test of database initialization and admin seeding\n- Verify database structure using SQLite tools (like sqlite3 CLI or DB Browser for SQLite)\n- Test CRUD operations on the admin user to ensure compatibility\n- Compare the behavior with the original PostgreSQL implementation to ensure functional equivalence",
+          "status": "done",
+          "parentTaskId": 30
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "Remove Fernet/EncryptedType Field Encryption from Codebase",
+      "description": "Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.",
+      "details": "This task involves removing all application-level field encryption that's no longer needed due to database-level encryption:\n\n1. Identify all SQLAlchemy models using EncryptedType fields\n2. Convert these fields to their base types (String, Integer, etc.)\n3. Remove all imports and usage of Fernet and EncryptedType throughout the codebase\n4. Update database migration scripts to convert encrypted columns to plain data types\n5. Remove encryption-related utility functions and helper methods\n6. Update any API endpoints or services that handle encryption/decryption logic\n7. Remove encryption-related environment variables (ENCRYPTION_KEY, etc.) from:\n   - .env files\n   - Docker configurations\n   - CI/CD pipelines\n   - Deployment templates\n8. Update documentation to reflect that field-level encryption has been removed and security is now handled at the database level\n9. Ensure any data serialization/deserialization logic that handled encrypted fields is updated\n10. Check for any custom validation logic that might have been specific to encrypted fields\n\nBefore making changes, create a backup of the database to ensure data can be recovered if needed.",
+      "testStrategy": "1. Create a comprehensive test plan covering all affected models and functionality:\n   - Unit tests: Verify models function correctly with plain field types\n   - Integration tests: Ensure API endpoints correctly handle the non-encrypted data\n   - Migration tests: Verify data integrity after migration from encrypted to non-encrypted fields\n\n2. Specific test cases:\n   - Test CRUD operations on all previously encrypted fields\n   - Verify data consistency by comparing pre-migration and post-migration data samples\n   - Test boundary conditions (empty values, max length values, special characters)\n   - Ensure search functionality works on previously encrypted fields\n   - Verify that removing encryption doesn't break any filtering or sorting operations\n\n3. Security validation:\n   - Confirm TLS connections are properly configured\n   - Verify libSQL TDE is correctly protecting the database\n   - Run security scans to ensure no sensitive data is exposed\n\n4. Performance testing:\n   - Measure and document any performance improvements from removing encryption overhead\n\n5. Regression testing:\n   - Run the full test suite to ensure no functionality is broken by these changes",
+      "status": "pending",
+      "dependencies": [],
       "priority": "medium"
     }
   ],

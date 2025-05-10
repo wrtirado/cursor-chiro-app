@@ -1,0 +1,173 @@
+# Task ID: 31
+# Title: Remove Fernet/EncryptedType Field Encryption from Codebase
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.
+# Details:
+This task involves removing all application-level field encryption that's no longer needed due to database-level encryption:
+
+1. Identify all SQLAlchemy models using EncryptedType fields
+2. Convert these fields to their base types (String, Integer, etc.)
+3. Remove all imports and usage of Fernet and EncryptedType throughout the codebase
+4. Update database migration scripts to convert encrypted columns to plain data types
+5. Remove encryption-related utility functions and helper methods
+6. Update any API endpoints or services that handle encryption/decryption logic
+7. Remove encryption-related environment variables (ENCRYPTION_KEY, etc.) from:
+   - .env files
+   - Docker configurations
+   - CI/CD pipelines
+   - Deployment templates
+8. Update documentation to reflect that field-level encryption has been removed and security is now handled at the database level
+9. Ensure any data serialization/deserialization logic that handled encrypted fields is updated
+10. Check for any custom validation logic that might have been specific to encrypted fields
+
+Before making changes, create a backup of the database to ensure data can be recovered if needed.
+
+# Test Strategy:
+1. Create a comprehensive test plan covering all affected models and functionality:
+   - Unit tests: Verify models function correctly with plain field types
+   - Integration tests: Ensure API endpoints correctly handle the non-encrypted data
+   - Migration tests: Verify data integrity after migration from encrypted to non-encrypted fields
+
+2. Specific test cases:
+   - Test CRUD operations on all previously encrypted fields
+   - Verify data consistency by comparing pre-migration and post-migration data samples
+   - Test boundary conditions (empty values, max length values, special characters)
+   - Ensure search functionality works on previously encrypted fields
+   - Verify that removing encryption doesn't break any filtering or sorting operations
+
+3. Security validation:
+   - Confirm TLS connections are properly configured
+   - Verify libSQL TDE is correctly protecting the database
+   - Run security scans to ensure no sensitive data is exposed
+
+4. Performance testing:
+   - Measure and document any performance improvements from removing encryption overhead
+
+5. Regression testing:
+   - Run the full test suite to ensure no functionality is broken by these changes
+
+# Subtasks:
+## 1. Audit and inventory all encrypted fields in models [pending]
+### Dependencies: None
+### Description: Create a comprehensive inventory of all SQLAlchemy models using EncryptedType fields, documenting their current types, encryption methods, and where they're used in the codebase.
+### Details:
+Implementation steps:
+1. Search the codebase for all imports of 'EncryptedType' and 'Fernet'
+2. Identify all model classes using these imports
+3. For each model, document:
+   - Model name
+   - Encrypted field names
+   - Base data types (String, Integer, etc.)
+   - Any special handling or validation logic
+4. Create a mapping document showing current encrypted fields and their target plain types
+5. Identify any custom encryption/decryption utility functions
+
+Testing approach:
+- This is an audit task, so verify completeness by using grep/search tools
+- Cross-reference findings with database schema to ensure all encrypted columns are identified
+
+## 2. Create database migration script for decryption [pending]
+### Dependencies: 31.1
+### Description: Develop a database migration script that will safely convert encrypted column data to plaintext while preserving the original information.
+### Details:
+Implementation steps:
+1. Create a new Alembic migration script
+2. For each encrypted field identified in subtask 1:
+   - Add migration code to decrypt the data in-place
+   - Modify column types to remove encryption
+   - Ensure proper data type conversion
+3. Include transaction handling for safety
+4. Add rollback capability in case of failure
+5. Test the migration on a copy of production data
+6. Document the migration process
+
+Testing approach:
+- Test migration on a copy of the database
+- Verify data integrity by comparing decrypted values with expected values
+- Test rollback functionality
+- Ensure all data types are correctly preserved
+
+## 3. Update SQLAlchemy models to remove EncryptedType [pending]
+### Dependencies: 31.1, 31.2
+### Description: Modify all SQLAlchemy model definitions to replace EncryptedType fields with their base types (String, Integer, etc.).
+### Details:
+Implementation steps:
+1. For each model identified in subtask 1:
+   - Replace EncryptedType fields with their base types
+   - Remove Fernet and EncryptedType imports
+   - Update any type hints or annotations
+2. Update model validation methods that might reference encryption
+3. Update any model methods that handle encryption/decryption
+4. Remove any special handling for encrypted fields in model methods
+5. Update model tests to reflect the changes
+
+Testing approach:
+- Run unit tests for all modified models
+- Test CRUD operations with the updated models
+- Verify serialization/deserialization still works correctly
+- Ensure model validation still functions properly
+
+## 4. Update service layer and API endpoints [pending]
+### Dependencies: 31.3
+### Description: Modify service layer code and API endpoints to remove any encryption/decryption logic and handle plaintext data directly.
+### Details:
+Implementation steps:
+1. Identify all services and API endpoints that interact with previously encrypted fields
+2. Remove any encryption/decryption operations in these components
+3. Update data validation logic that might have been specific to encrypted fields
+4. Update serialization/deserialization logic for API responses
+5. Remove any special handling for encrypted fields in business logic
+6. Update error handling related to encryption/decryption
+
+Testing approach:
+- Run unit tests for all modified services
+- Test API endpoints with various inputs
+- Verify correct data handling without encryption
+- Test edge cases that might have been handled differently with encryption
+
+## 5. Remove encryption utilities and environment variables [pending]
+### Dependencies: 31.3, 31.4
+### Description: Clean up all encryption-related utility functions, helper methods, and environment variables from the codebase and configuration files.
+### Details:
+Implementation steps:
+1. Remove all encryption utility functions and helper methods
+2. Delete encryption-related environment variables from:
+   - .env files and templates
+   - Docker configurations
+   - CI/CD pipeline configurations
+   - Deployment templates
+   - Kubernetes/infrastructure configs
+3. Update configuration loading code to remove references to encryption keys
+4. Remove any encryption-related test fixtures or mocks
+5. Clean up imports of removed utilities throughout the codebase
+
+Testing approach:
+- Verify application starts without encryption environment variables
+- Run the test suite to ensure no references to removed utilities
+- Check deployment processes work without encryption configuration
+- Verify no runtime errors occur due to missing encryption utilities
+
+## 6. Update documentation and finalize removal [pending]
+### Dependencies: 31.1, 31.2, 31.3, 31.4, 31.5
+### Description: Update all documentation to reflect the removal of field-level encryption and perform final verification that all encryption code has been removed.
+### Details:
+Implementation steps:
+1. Update documentation to reflect that field-level encryption has been removed
+2. Document that security is now handled at the database level (libSQL TDE and TLS)
+3. Update developer guides, API documentation, and security documentation
+4. Perform a final codebase search for any remaining references to:
+   - Fernet
+   - EncryptedType
+   - Encryption keys
+   - Encryption/decryption functions
+5. Run a full test suite to verify application functionality
+6. Update any data seeding scripts or fixtures that might have used encrypted data
+
+Testing approach:
+- Comprehensive end-to-end testing of the application
+- Verify all documentation accurately reflects the new security approach
+- Run security scans to ensure no sensitive data is exposed
+- Verify all tests pass with the updated codebase
+

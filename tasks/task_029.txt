@@ -64,7 +64,7 @@ Testing approach:
 - Run a basic Alembic command like 'alembic current' to verify the configuration works
 - Check logs for any SQLite-specific warnings or errors
 
-## 3. Generate new initial migration for libSQL schema [pending]
+## 3. Generate new initial migration for libSQL schema [done]
 ### Dependencies: 29.1, 29.2
 ### Description: Create a new initial migration that captures the complete database schema compatible with libSQL/SQLite.
 ### Details:
@@ -80,7 +80,7 @@ Testing approach:
 - Verify no SQLite-incompatible operations are included
 - Check for any unexpected schema differences
 
-## 4. Review and optimize the generated migration [pending]
+## 4. Review and optimize the generated migration [done]
 ### Dependencies: 29.3
 ### Description: Carefully review the auto-generated migration file and make any necessary adjustments for optimal libSQL compatibility.
 ### Details:
@@ -98,7 +98,7 @@ Testing approach:
 - Verify the SQL is valid for libSQL/SQLite
 - Check for any potential performance issues with the schema design
 
-## 5. Test migration and update documentation [pending]
+## 5. Test migration and update documentation [done]
 ### Dependencies: 29.3, 29.4
 ### Description: Apply the migration to a test database and update all documentation that references Alembic migrations.
 ### Details:
