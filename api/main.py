@@ -16,6 +16,46 @@ from api.plans.router import router as plans_router  # Import plans router
 from api.media.router import router as media_router  # Import media router
 from api.progress.router import router as progress_router  # Import progress router
 
+# --- Temporary for DB connection testing: Create tables ---
+from api.database.session import engine, Base  # ADD THIS LINE
+import api.models.base
+import traceback  # Add this import for more detailed error printing
+
+# WARNING: This is for initial setup/testing ...
+print("Attempting to create database tables directly (bypassing Alembic for test)...")
+engine_conn_attempted = False
+try:
+    print(f"Using DATABASE_URL: {settings.DATABASE_URL}")  # Print the URL being used
+    print(f"Engine object: {engine}")
+    engine_conn_attempted = True  # Mark that we are about to try connecting
+
+    # Attempt a very basic connection first
+    print("Attempting a direct engine connection test...")
+    with engine.connect() as connection:
+        print("Engine.connect() was successful. Connection established.")
+        # Optionally, execute a simple query
+        # result = connection.execute(text("SELECT 1"))
+        # print(f"Direct engine query result: {result.scalar_one_or_none()}")
+    print("Direct engine connection test passed.")
+
+    print("Now attempting Base.metadata.create_all(bind=engine)...")
+    Base.metadata.create_all(bind=engine)
+    print("Base.metadata.create_all(bind=engine) executed successfully.")
+except Exception as e:
+    print("--------------------------------------------------------------------")
+    print(
+        f"!!! ERROR during database initialization (engine_conn_attempted: {engine_conn_attempted}) !!!"
+    )
+    print(f"Error type: {type(e)}")
+    print(f"Error message: {e}")
+    print("Full traceback:")
+    traceback.print_exc()  # This will print the full stack trace
+    print("--------------------------------------------------------------------")
+    # Depending on how critical this is for startup, you might want to:
+    # import sys
+    # sys.exit(f"FATAL: Could not create database tables: {e}")
+# --- End Temporary DB connection testing ---
+
 # from api.routers import plans # etc.
 
 app = FastAPI(

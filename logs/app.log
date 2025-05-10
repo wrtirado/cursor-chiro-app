@@ -393,3 +393,27 @@ Traceback (most recent call last):
     raise exc
 sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) 505, message='Invalid response status', url='https://chiro-app-wrtirado.aws-us-west-2.turso.io/'
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-05-08 11:58:31,213 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92f68b90 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 11:58:31,216 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92f68b90 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 11:58:31,464 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92f68b90 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-08 12:00:48,902 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8dad3340 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 12:00:48,903 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8dad3340 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 12:00:49,129 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8dad3340 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-08 12:30:19,863 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92da3430 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 12:30:19,865 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92da3430 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 12:30:20,060 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff92da3430 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-08 12:31:05,391 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8ff224e0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 12:31:05,392 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8ff224e0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 12:31:05,557 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff8ff224e0 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-08 12:35:03,075 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffab8132a0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 12:35:03,076 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffab8132a0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 12:35:03,300 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffab8132a0 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-08 12:55:06,664 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9f363110 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-08 12:55:06,666 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9f363110 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-08 12:55:06,984 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffff9f363110 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-09 04:21:22,762 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa53331b0 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-09 04:21:22,763 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa53331b0 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-09 04:21:23,071 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffa53331b0 name='Thread-1 (_thread_main)' stopped>: thread did stop
+2025-05-09 04:23:38,440 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' stopped>: created
+2025-05-09 04:23:38,441 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' started loop=<uvloop.Loop running=True closed=False debug=False>>: thread ready
+2025-05-09 04:23:38,652 - libsql_client.dbapi2._async_executor - INFO - <AsyncExecutor at 0xffffb28c3160 name='Thread-1 (_thread_main)' stopped>: thread did stop

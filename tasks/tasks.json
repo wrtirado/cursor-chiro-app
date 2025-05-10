@@ -1637,7 +1637,7 @@
           "description": "Create a backup of all existing migration files in the alembic/versions/ directory and then remove them from the active project directory.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Create a backup directory outside the project structure (e.g., 'alembic_backup/')\n2. Copy all files from 'alembic/versions/' to the backup directory with their original filenames and timestamps preserved\n3. Document the backup location in a README file within the backup directory\n4. Remove all migration script files from the 'alembic/versions/' directory\n5. Verify the directory is empty except for any necessary __init__.py file\n\nTesting approach:\n- Confirm all files were properly backed up by comparing file counts and checksums\n- Verify the alembic/versions/ directory is properly cleaned",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {
@@ -1648,7 +1648,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Review the current env.py file in the Alembic directory\n2. Update the database URL handling to properly connect to libSQL/SQLite\n3. Modify any SQLAlchemy configuration options that need adjustment for libSQL compatibility\n4. Ensure proper handling of SQLite-specific constraints and types\n5. Add comments explaining the libSQL-specific configurations\n6. Update any render_item or include_object functions to handle SQLite-specific schema elements\n\nTesting approach:\n- Run a basic Alembic command like 'alembic current' to verify the configuration works\n- Check logs for any SQLite-specific warnings or errors",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 29
         },
         {

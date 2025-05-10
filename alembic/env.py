@@ -4,6 +4,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import text
 
 from alembic import context
 
@@ -14,7 +15,9 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), ".."
 # from api.database.session import Base
 
 # Explicitly import models to ensure they are registered with Base.metadata
+# This should make Base.metadata available globally in this script if models are loaded.
 import api.models.base
+from api.database.session import Base  # Import Base directly
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -30,17 +33,20 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-# Set target_metadata initially to None or fetch Base here if preferred
-# Option 1: Set to None initially
-target_metadata = None
-# Option 2: Fetch here (might still have import timing issues depending on project)
-# from api.database.session import Base as GlobalBase
-# target_metadata = GlobalBase.metadata
+# Set target_metadata using the imported Base
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+# Function to prevent Alembic from managing sqlite_sequence table
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name == "sqlite_sequence":
+        return False
+    return True
 
 
 def run_migrations_offline() -> None:
@@ -55,12 +61,18 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = os.environ.get("DATABASE_URL")
+    if not url:
+        raise ValueError(
+            "DATABASE_URL environment variable not set for Alembic offline mode"
+        )
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -74,20 +86,43 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    db_url = os.environ.get("DATABASE_URL")
+    if not db_url:
+        raise ValueError(
+            "DATABASE_URL environment variable not set for Alembic online mode"
+        )
+
+    # Create a configuration dictionary for the engine
+    # The poolclass=pool.NullPool is important for Alembic's online mode.
+    engine_config = {
+        "sqlalchemy.url": db_url,
+        "poolclass": pool.NullPool,  # Ensure NullPool is correctly passed if not part of prefix handling
+    }
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        engine_config,  # Use our constructed config
+        prefix="sqlalchemy.",  # Keep prefix if 'sqlalchemy.url' is used, or adjust if not.
+        # If prefix is kept, ensure your key is 'sqlalchemy.url'.
+        # If not using prefix or key is just 'url', adjust accordingly.
+        # For simplicity and directness with os.environ:
+        # from sqlalchemy import create_engine
+        # connectable = create_engine(db_url, poolclass=pool.NullPool)
+        # This bypasses engine_from_config if simpler.
+        # Let's stick to engine_from_config but ensure it gets the URL.
     )
 
     with connectable.connect() as connection:
-        # Re-import Base and set metadata here to ensure it's populated
-        from api.database.session import Base
-
-        current_target_metadata = Base.metadata
+        # Ensure foreign keys are enabled for SQLite when in online mode
+        if connection.dialect.name == "sqlite":
+            connection.execute(text("PRAGMA foreign_keys=ON"))
+            # app_log.info(
+            #     "SQLite PRAGMA foreign_keys=ON executed."
+            # )  # Optional: for logging - app_log needs to be defined/imported
 
         context.configure(
-            connection=connection, target_metadata=current_target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object,
         )
 
         with context.begin_transaction():

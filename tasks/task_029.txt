@@ -33,7 +33,7 @@ Note: This approach will erase the previous migration history, meaning that exis
 6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema
 
 # Subtasks:
-## 1. Back up and clean existing Alembic migration files [pending]
+## 1. Back up and clean existing Alembic migration files [done]
 ### Dependencies: None
 ### Description: Create a backup of all existing migration files in the alembic/versions/ directory and then remove them from the active project directory.
 ### Details:
@@ -48,7 +48,7 @@ Testing approach:
 - Confirm all files were properly backed up by comparing file counts and checksums
 - Verify the alembic/versions/ directory is properly cleaned
 
-## 2. Update Alembic environment configuration for libSQL [pending]
+## 2. Update Alembic environment configuration for libSQL [done]
 ### Dependencies: 29.1
 ### Description: Modify the Alembic environment configuration in env.py to ensure proper compatibility with libSQL/SQLite.
 ### Details:
