@@ -11,7 +11,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from api.database.session import Base
-from api.core.encryption import EncryptedType
 
 # Re-defining tables from init_schema.sql using SQLAlchemy ORM
 
@@ -53,7 +52,7 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, index=True)
     office_id = Column(Integer, ForeignKey("offices.office_id", ondelete="SET NULL"))
     role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
-    name = Column(EncryptedType(), nullable=False)
+    name = Column(Text, nullable=False)
     # Encrypting email: Makes direct lookup via email complex.
     # Consider if lookup is essential or if user_id is primary lookup key.
     # If email lookup needed, maybe store a hash of the email for lookup and encrypt the actual email.
@@ -67,9 +66,7 @@ class User(Base):
     email = Column(
         Text, unique=True, index=True, nullable=False
     )  # Plaintext for lookup
-    password_hash = Column(
-        Text, nullable=False
-    )  # Password hashes are already secure
+    password_hash = Column(Text, nullable=False)  # Password hashes are already secure
     join_code = Column(Text, unique=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -95,8 +92,8 @@ class TherapyPlan(Base):
     chiropractor_id = Column(
         Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
-    title = Column(EncryptedType(), nullable=False)
-    description = Column(EncryptedType())
+    title = Column(Text, nullable=False)
+    description = Column(Text)
     version = Column(Integer, default=1)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -111,8 +108,8 @@ class PlanExercise(Base):
     plan_id = Column(
         Integer, ForeignKey("therapyplans.plan_id", ondelete="CASCADE"), nullable=False
     )
-    title = Column(EncryptedType(), nullable=False)
-    instructions = Column(EncryptedType())
+    title = Column(Text, nullable=False)
+    instructions = Column(Text)
     sequence_order = Column(Integer, nullable=False)
     image_url = Column(Text)
     video_url = Column(Text)
@@ -159,7 +156,7 @@ class Progress(Base):
         nullable=False,
     )
     completed_at = Column(DateTime)
-    notes = Column(EncryptedType())
+    notes = Column(Text)
     assignment = relationship("PlanAssignment", back_populates="progress")
     exercise = relationship("PlanExercise", back_populates="progress_entries")
 

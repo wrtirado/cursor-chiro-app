@@ -7,8 +7,8 @@ Migrating the backend from PostgreSQL to libSQL/SQLite involves significant chan
 - **Current:** Uses the `postgres:15-alpine` image, standard Postgres environment variables (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`), and a specific volume (`postgres_data`).
 - **Change Required:**
   - Replace the `db` service definition in `docker-compose.yml`.
-  - Use a libSQL server image (e.g., `ghcr.io/tursodatabase/libsql-server`) or configure for a local file-based database (`.db`/`.sqlite`).
-  - Update the `DATABASE_URL` environment variable in the `api` service configuration to use the SQLite/libSQL format (e.g., `sqlite+libsql://...` or `sqlite:///path/to/database.db`).
+  - Use a libSQL server image (e.g., `ghcr.io/tursodatabase/libsql-server`) for a local container, or configure for a local file-based database (`.db`/`.sqlite`).
+  - Update the `DATABASE_URL` environment variable in the `api` service configuration to use the SQLite/libSQL format (e.g., `sqlite+libsql://db:8080` or `sqlite:///path/to/database.db`).
   - Adapt environment variables for database configuration as needed for libSQL.
   - Modify volume definitions for persistent storage.
 - **Difficulty:** Moderate. Requires sourcing and correctly configuring the libSQL environment within Docker Compose.

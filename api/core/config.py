@@ -27,10 +27,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 
     # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite+libsql://db:8080?mode=rw"
-    )
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+libsql://db:8080?mode=rw")
 
     # JWT settings
     SECRET_KEY: str = os.getenv(
@@ -41,13 +38,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
     )
-
-    # Fernet encryption key (MUST be 32 url-safe base64-encoded bytes)
-    # Generate using: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-    # FOR PRODUCTION: Use a proper key management system (e.g., Vault, AWS KMS)
-    ENCRYPTION_KEY: str = os.getenv(
-        "ENCRYPTION_KEY", ""
-    )  # Default empty, should be set in .env
 
     # Optional TLS Configuration (paths to cert/key files)
     # These would be used if running Uvicorn directly with TLS, not typically with Docker/reverse proxy

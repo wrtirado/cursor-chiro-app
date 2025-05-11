@@ -1,6 +1,6 @@
 # Tirado Chiro App
 
-This project is a FastAPI-based backend for the Tirado Chiropractic mobile and web applications. It uses Docker Compose for local development, libSQL (Turso) for the database, and MinIO for media storage.
+This project is a FastAPI-based backend for the Tirado Chiropractic mobile and web applications. It uses Docker Compose for local development, libSQL (running in a local container) for the database, and MinIO for media storage.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ This project is a FastAPI-based backend for the Tirado Chiropractic mobile and w
    docker compose up --build
    ```
 
-   This will start the API, libSQL database, and MinIO services.
+   This will start the API, local libSQL database, and MinIO services.
 
 3. **Wait for the API to be up.**
 
@@ -59,27 +59,10 @@ This project is a FastAPI-based backend for the Tirado Chiropractic mobile and w
   - `DATABASE_URL` (not required for local dev; set by Docker Compose)
   - `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, etc.
   - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (for seeding admin)
-  - `ENCRYPTION_KEY` (required for Fernet encryption; must be a 32-byte url-safe base64 string)
-
-### Generating a Fernet ENCRYPTION_KEY
-
-You must set a valid Fernet key for encryption. Generate one with:
-
-```sh
-docker compose exec api python scripts/generate_fernet_key.py
-```
-
-Or, if running locally:
-
-```sh
-python scripts/generate_fernet_key.py
-```
-
-Copy the output and set it as `ENCRYPTION_KEY` in your `.env` file or environment variables.
 
 ## Database Notes
 
-- The app uses [libSQL (Turso)](https://libsql.org/) for local development, running in a Docker container.
+- The app uses [libSQL](https://libsql.org/) for local development, running in a Docker container.
 - Tables are created automatically from SQLAlchemy models on first run.
 - **Initial data (roles, admin user) must be seeded manually as described above.**
 
