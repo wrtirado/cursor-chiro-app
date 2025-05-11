@@ -1763,7 +1763,7 @@
       "description": "Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.",
       "details": "This task involves removing all application-level field encryption that's no longer needed due to database-level encryption:\n\n1. Identify all SQLAlchemy models using EncryptedType fields\n2. Convert these fields to their base types (String, Integer, etc.)\n3. Remove all imports and usage of Fernet and EncryptedType throughout the codebase\n4. Update database migration scripts to convert encrypted columns to plain data types\n5. Remove encryption-related utility functions and helper methods\n6. Update any API endpoints or services that handle encryption/decryption logic\n7. Remove encryption-related environment variables (ENCRYPTION_KEY, etc.) from:\n   - .env files\n   - Docker configurations\n   - CI/CD pipelines\n   - Deployment templates\n8. Update documentation to reflect that field-level encryption has been removed and security is now handled at the database level\n9. Ensure any data serialization/deserialization logic that handled encrypted fields is updated\n10. Check for any custom validation logic that might have been specific to encrypted fields\n\nBefore making changes, create a backup of the database to ensure data can be recovered if needed.",
       "testStrategy": "1. Create a comprehensive test plan covering all affected models and functionality:\n   - Unit tests: Verify models function correctly with plain field types\n   - Integration tests: Ensure API endpoints correctly handle the non-encrypted data\n   - Migration tests: Verify data integrity after migration from encrypted to non-encrypted fields\n\n2. Specific test cases:\n   - Test CRUD operations on all previously encrypted fields\n   - Verify data consistency by comparing pre-migration and post-migration data samples\n   - Test boundary conditions (empty values, max length values, special characters)\n   - Ensure search functionality works on previously encrypted fields\n   - Verify that removing encryption doesn't break any filtering or sorting operations\n\n3. Security validation:\n   - Confirm TLS connections are properly configured\n   - Verify libSQL TDE is correctly protecting the database\n   - Run security scans to ensure no sensitive data is exposed\n\n4. Performance testing:\n   - Measure and document any performance improvements from removing encryption overhead\n\n5. Regression testing:\n   - Run the full test suite to ensure no functionality is broken by these changes",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
       "priority": "medium",
       "subtasks": [
@@ -1773,7 +1773,7 @@
           "description": "Create a comprehensive inventory of all SQLAlchemy models using EncryptedType fields, documenting their current types, encryption methods, and where they're used in the codebase.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Search the codebase for all imports of 'EncryptedType' and 'Fernet'\n2. Identify all model classes using these imports\n3. For each model, document:\n   - Model name\n   - Encrypted field names\n   - Base data types (String, Integer, etc.)\n   - Any special handling or validation logic\n4. Create a mapping document showing current encrypted fields and their target plain types\n5. Identify any custom encryption/decryption utility functions\n\nTesting approach:\n- This is an audit task, so verify completeness by using grep/search tools\n- Cross-reference findings with database schema to ensure all encrypted columns are identified",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         },
         {
@@ -1784,7 +1784,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Create a new Alembic migration script\n2. For each encrypted field identified in subtask 1:\n   - Add migration code to decrypt the data in-place\n   - Modify column types to remove encryption\n   - Ensure proper data type conversion\n3. Include transaction handling for safety\n4. Add rollback capability in case of failure\n5. Test the migration on a copy of production data\n6. Document the migration process\n\nTesting approach:\n- Test migration on a copy of the database\n- Verify data integrity by comparing decrypted values with expected values\n- Test rollback functionality\n- Ensure all data types are correctly preserved",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         },
         {
@@ -1796,7 +1796,7 @@
             2
           ],
           "details": "Implementation steps:\n1. For each model identified in subtask 1:\n   - Replace EncryptedType fields with their base types\n   - Remove Fernet and EncryptedType imports\n   - Update any type hints or annotations\n2. Update model validation methods that might reference encryption\n3. Update any model methods that handle encryption/decryption\n4. Remove any special handling for encrypted fields in model methods\n5. Update model tests to reflect the changes\n\nTesting approach:\n- Run unit tests for all modified models\n- Test CRUD operations with the updated models\n- Verify serialization/deserialization still works correctly\n- Ensure model validation still functions properly",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         },
         {
@@ -1807,7 +1807,7 @@
             3
           ],
           "details": "Implementation steps:\n1. Identify all services and API endpoints that interact with previously encrypted fields\n2. Remove any encryption/decryption operations in these components\n3. Update data validation logic that might have been specific to encrypted fields\n4. Update serialization/deserialization logic for API responses\n5. Remove any special handling for encrypted fields in business logic\n6. Update error handling related to encryption/decryption\n\nTesting approach:\n- Run unit tests for all modified services\n- Test API endpoints with various inputs\n- Verify correct data handling without encryption\n- Test edge cases that might have been handled differently with encryption",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         },
         {
@@ -1819,7 +1819,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Remove all encryption utility functions and helper methods\n2. Delete encryption-related environment variables from:\n   - .env files and templates\n   - Docker configurations\n   - CI/CD pipeline configurations\n   - Deployment templates\n   - Kubernetes/infrastructure configs\n3. Update configuration loading code to remove references to encryption keys\n4. Remove any encryption-related test fixtures or mocks\n5. Clean up imports of removed utilities throughout the codebase\n\nTesting approach:\n- Verify application starts without encryption environment variables\n- Run the test suite to ensure no references to removed utilities\n- Check deployment processes work without encryption configuration\n- Verify no runtime errors occur due to missing encryption utilities",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         },
         {
@@ -1834,7 +1834,7 @@
             5
           ],
           "details": "Implementation steps:\n1. Update documentation to reflect that field-level encryption has been removed\n2. Document that security is now handled at the database level (libSQL TDE and TLS)\n3. Update developer guides, API documentation, and security documentation\n4. Perform a final codebase search for any remaining references to:\n   - Fernet\n   - EncryptedType\n   - Encryption keys\n   - Encryption/decryption functions\n5. Run a full test suite to verify application functionality\n6. Update any data seeding scripts or fixtures that might have used encrypted data\n\nTesting approach:\n- Comprehensive end-to-end testing of the application\n- Verify all documentation accurately reflects the new security approach\n- Run security scans to ensure no sensitive data is exposed\n- Verify all tests pass with the updated codebase",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 31
         }
       ]

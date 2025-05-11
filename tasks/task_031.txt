@@ -1,6 +1,6 @@
 # Task ID: 31
 # Title: Remove Fernet/EncryptedType Field Encryption from Codebase
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: medium
 # Description: Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.
@@ -49,7 +49,7 @@ Before making changes, create a backup of the database to ensure data can be rec
    - Run the full test suite to ensure no functionality is broken by these changes
 
 # Subtasks:
-## 1. Audit and inventory all encrypted fields in models [pending]
+## 1. Audit and inventory all encrypted fields in models [done]
 ### Dependencies: None
 ### Description: Create a comprehensive inventory of all SQLAlchemy models using EncryptedType fields, documenting their current types, encryption methods, and where they're used in the codebase.
 ### Details:
@@ -68,7 +68,7 @@ Testing approach:
 - This is an audit task, so verify completeness by using grep/search tools
 - Cross-reference findings with database schema to ensure all encrypted columns are identified
 
-## 2. Create database migration script for decryption [pending]
+## 2. Create database migration script for decryption [done]
 ### Dependencies: 31.1
 ### Description: Develop a database migration script that will safely convert encrypted column data to plaintext while preserving the original information.
 ### Details:
@@ -89,7 +89,7 @@ Testing approach:
 - Test rollback functionality
 - Ensure all data types are correctly preserved
 
-## 3. Update SQLAlchemy models to remove EncryptedType [pending]
+## 3. Update SQLAlchemy models to remove EncryptedType [done]
 ### Dependencies: 31.1, 31.2
 ### Description: Modify all SQLAlchemy model definitions to replace EncryptedType fields with their base types (String, Integer, etc.).
 ### Details:
@@ -109,7 +109,7 @@ Testing approach:
 - Verify serialization/deserialization still works correctly
 - Ensure model validation still functions properly
 
-## 4. Update service layer and API endpoints [pending]
+## 4. Update service layer and API endpoints [done]
 ### Dependencies: 31.3
 ### Description: Modify service layer code and API endpoints to remove any encryption/decryption logic and handle plaintext data directly.
 ### Details:
@@ -127,7 +127,7 @@ Testing approach:
 - Verify correct data handling without encryption
 - Test edge cases that might have been handled differently with encryption
 
-## 5. Remove encryption utilities and environment variables [pending]
+## 5. Remove encryption utilities and environment variables [done]
 ### Dependencies: 31.3, 31.4
 ### Description: Clean up all encryption-related utility functions, helper methods, and environment variables from the codebase and configuration files.
 ### Details:
@@ -149,7 +149,7 @@ Testing approach:
 - Check deployment processes work without encryption configuration
 - Verify no runtime errors occur due to missing encryption utilities
 
-## 6. Update documentation and finalize removal [pending]
+## 6. Update documentation and finalize removal [done]
 ### Dependencies: 31.1, 31.2, 31.3, 31.4, 31.5
 ### Description: Update all documentation to reflect the removal of field-level encryption and perform final verification that all encryption code has been removed.
 ### Details:
