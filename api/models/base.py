@@ -21,7 +21,6 @@ class Company(Base):
     name = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
-    # payment_info = Column(JSONB) # Add later
     offices = relationship("Office", back_populates="company")
 
 

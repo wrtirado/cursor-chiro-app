@@ -304,56 +304,77 @@
     {
       "id": 9,
       "title": "Payment Processing API with HIPAA Compliance",
-      "description": "Implement payment handling functionality for services at company or office level with HIPAA-compliant data handling.",
+      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with a payment gateway. Your SaaS payment provider API keys will be stored in .env, not the database.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Use libSQL/SQLite JSON1 extension for handling the payment_info JSON field, ensuring compatibility with the new database system.",
-      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test JSON1 extension functionality with libSQL/SQLite to ensure proper storage and retrieval of payment configuration.",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing subscription payments at the Office level. Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office.",
+      "testStrategy": "Test subscription billing with test credentials. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway.",
       "subtasks": [
         {
-          "id": 9.1,
-          "title": "Implement secure storage for payment configuration",
-          "description": "Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field using libSQL/SQLite JSON1 extension",
-          "status": "pending"
+          "id": 1,
+          "title": "Revert `payment_config` from `Company` Model & Clean Alembic",
+          "description": "Remove the `payment_config` JSON column from the `Company` model in `api/models/base.py`. Create a new Alembic migration to reflect this removal or ensure the previous migration that added it is cleanly reversed/removed if no other changes depend on it.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.2,
-          "title": "Develop company/office payment structure",
-          "description": "Implement logic to determine payment handling based on company vs. office level configuration",
-          "status": "pending"
+          "id": 2,
+          "title": "Define and Add Subscription Fields to `Office` Model",
+          "description": "Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.3,
-          "title": "Implement HIPAA-compliant audit logging",
-          "description": "Add detailed audit trails for all payment-related operations using libSQL/SQLite",
-          "status": "pending"
+          "id": 3,
+          "title": "Generate Alembic Migration for `Office` Subscription Fields",
+          "description": "After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.4,
-          "title": "Implement RBAC for payment endpoints",
-          "description": "Ensure payment endpoints enforce proper role-based access controls",
-          "status": "pending"
+          "id": 4,
+          "title": "HIPAA-Compliant Audit Logging for Billing Events",
+          "description": "Implement detailed audit trails for all office-level subscription and billing-related operations (e.g., subscription creation, status changes, payment attempts) using libSQL/SQLite.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.5,
-          "title": "Verify BAA with payment processor",
-          "description": "Ensure Business Associate Agreement is in place with payment gateway provider",
-          "status": "pending"
+          "id": 5,
+          "title": "Verify BAA with Chosen SaaS Payment Processor",
+          "description": "Ensure a Business Associate Agreement (BAA) is in place with the payment gateway provider selected for handling the SaaS subscription billing for offices.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.6,
-          "title": "Implement data encryption",
-          "description": "Add encryption for all payment data at rest and in transit, adapting encryption methods for libSQL/SQLite",
-          "status": "pending"
+          "id": 6,
+          "title": "Secure Storage and Transmission of Payment Provider References",
+          "description": "Ensure any stored references to payment provider entities (e.g., customer IDs for offices, subscription IDs) are handled securely within the database. All data transmission related to billing (e.g., to/from payment gateway) must use TLS 1.2+.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.7,
-          "title": "Add data minimization for invoices",
-          "description": "Implement practices to limit ePHI exposure in billing documents according to the Privacy Rule",
-          "status": "pending"
+          "id": 7,
+          "title": "Data Minimization for SaaS Invoices to Offices",
+          "description": "Implement practices to limit unnecessary data exposure in invoices generated by the SaaS for its customers (Offices), aligning with privacy principles.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         }
       ]
     },

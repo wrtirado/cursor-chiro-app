@@ -1,6 +1,6 @@
 # Task ID: 29
 # Title: Overhaul Alembic Migrations for libSQL/SQLite Compatibility
-# Status: done
+# Status: pending
 # Dependencies: 28
 # Priority: high
 # Description: Reset the Alembic migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models.
