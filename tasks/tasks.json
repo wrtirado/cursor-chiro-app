@@ -304,14 +304,14 @@
     {
       "id": 9,
       "title": "Payment Processing API with HIPAA Compliance",
-      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with a payment gateway. Your SaaS payment provider API keys will be stored in .env, not the database.",
+      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with a payment gateway. Your SaaS payment provider API keys will be stored in .env, not the database. All billing and payment logic should align with the canonical specification in docs/payment-plan.md.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing subscription payments at the Office level. Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office.",
-      "testStrategy": "Test subscription billing with test credentials. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway.",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing subscription payments at the Office level, following the specifications in docs/payment-plan.md. Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office, adhering to the payment plan structure defined in the documentation.",
+      "testStrategy": "Test subscription billing with test credentials, ensuring alignment with docs/payment-plan.md specifications. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway.",
       "subtasks": [
         {
           "id": 1,
@@ -325,7 +325,7 @@
         {
           "id": 2,
           "title": "Define and Add Subscription Fields to `Office` Model",
-          "description": "Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`.",
+          "description": "Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`. Ensure all fields align with the payment plan structure defined in docs/payment-plan.md.",
           "details": "",
           "status": "pending",
           "dependencies": [],
@@ -371,6 +371,132 @@
           "id": 7,
           "title": "Data Minimization for SaaS Invoices to Offices",
           "description": "Implement practices to limit unnecessary data exposure in invoices generated by the SaaS for its customers (Offices), aligning with privacy principles.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 8,
+          "title": "Review and Implement Payment Plan Documentation",
+          "description": "Thoroughly review docs/payment-plan.md to ensure all implementation details for billing and payment processing align with the canonical specification. Update implementation plans as needed to match the documented requirements.",
+          "details": "This includes reviewing payment tiers, billing cycles, upgrade/downgrade logic, trial periods, and any other payment-related specifications in the documentation.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 9,
+          "title": "Align Billing API and Data Models with payment-plan.md",
+          "description": "Review docs/payment-plan.md and ensure all billing API endpoints, data models, and business logic are consistent with the specifications in this document. Update or add additional fields, endpoints, or logic as needed to fully implement the payment and billing structure described.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 10,
+          "title": "Design and Implement Invoice Table",
+          "description": "Create a table to store monthly and one-off invoices for each office, including billing period, total, status, and references to line items, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 11,
+          "title": "Design and Implement Invoice Line Item Table",
+          "description": "Create a table to store detailed line items for each invoice (e.g., patient activations, setup fees), as specified in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 12,
+          "title": "Update Patient/User Model for Billing Status",
+          "description": "Add fields to the patient/user model to track activation/deactivation dates and billing status for each billing cycle, supporting the per-patient billing logic in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 13,
+          "title": "Implement Patient Activation Billing Logic",
+          "description": "Ensure that activating a patient account adds a line item to the current invoice for the office. Handle reactivation and deactivation logic as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 14,
+          "title": "Implement Monthly Invoice Generation Logic",
+          "description": "At the start of each billing cycle, generate invoices for all offices, including all active patients and any reactivations. Ensure deactivated accounts are not billed in future cycles unless reactivated, per docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 15,
+          "title": "Implement One-Off Invoice/Charge Logic (e.g., Setup Fee)",
+          "description": "Allow creation of one-off invoices/charges for offices (e.g., onboarding/setup fee) outside the regular billing cycle, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 16,
+          "title": "Integrate with Payment Provider for Invoicing and Payments",
+          "description": "Ensure each office has a customer record in the payment provider. Generate and send invoices via the payment provider, and track payment status and update invoice records accordingly, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 17,
+          "title": "Implement API Endpoints for Invoice Retrieval and Payment Status",
+          "description": "Create endpoints for offices to view their invoices, line items, and payment status, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 18,
+          "title": "Implement Audit Logging for All Billing Events",
+          "description": "Log all billing-related actions (invoice creation, payment, patient activation, etc.) for compliance, as described in docs/payment-plan.md and developer-compliance-guide.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 19,
+          "title": "Implement Data Minimization and Security for Billing Data",
+          "description": "Ensure only necessary billing data is exposed via the API and that all sensitive data is handled securely, as described in docs/payment-plan.md and developer-compliance-guide.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 20,
+          "title": "Write Tests for Billing Logic and API Endpoints",
+          "description": "Add unit and integration tests to verify correct billing, invoice generation, and payment processing, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 21,
+          "title": "Document Billing API and Data Model",
+          "description": "Update or create documentation for the billing API, data models, and business logic, referencing docs/payment-plan.md.",
           "details": "",
           "status": "pending",
           "dependencies": [],
