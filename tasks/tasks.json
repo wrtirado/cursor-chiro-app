@@ -1985,6 +1985,65 @@
           "parentTaskId": 31
         }
       ]
+    },
+    {
+      "id": 32,
+      "title": "Implement Subscription Pricing Plans with Feature Gating",
+      "description": "Create a tiered pricing structure with feature access control based on subscription plans. Integrate with the existing Stripe payment processing system to handle plan selection, upgrades, and downgrades.",
+      "details": "This task requires implementing a comprehensive subscription plan system:\n\n1. Database Changes:\n   - Create a new `Plans` table with fields: `id`, `name` (Basic, Pro, Enterprise), `price`, `billing_frequency` (monthly/annual), `features` (JSON field storing allowed features), `stripe_price_id`, `created_at`, `updated_at`\n   - Add `current_plan_id` (foreign key to Plans table) and `subscription_status` fields to the `Office` table\n\n2. Feature Gating Implementation:\n   - Create a centralized FeatureAccess service class that handles all permission checks\n   - Implement methods like `canAccessFeature(officeId, featureName)` that check if an office's plan includes specific features\n   - Create middleware for protecting routes based on subscription level\n   - Add UI indicators for premium features\n\n3. Stripe Integration:\n   - Map internal plan IDs to Stripe product/price IDs\n   - Implement plan change functionality (upgrades/downgrades)\n   - Handle prorated billing for mid-cycle changes\n   - Update webhook handlers to process subscription events\n\n4. Admin Interface:\n   - Create admin tools to manage plans and their features\n   - Add ability to view and modify customer subscriptions\n\n5. User Experience:\n   - Implement plan selection during signup\n   - Create plan comparison page\n   - Add upgrade prompts when users attempt to access premium features\n\nRefer to docs/payment-plan.md for the specific billing structure and feature sets for each plan tier. Ensure all plan-related logic is centralized for easy updates to pricing or feature sets.",
+      "testStrategy": "Testing should cover all aspects of the subscription system:\n\n1. Unit Tests:\n   - Test FeatureAccess service with various plan/feature combinations\n   - Verify plan upgrade/downgrade logic handles all edge cases\n   - Test proration calculations\n\n2. Integration Tests:\n   - Verify Stripe API interactions for subscription creation, updates, and cancellations\n   - Test webhook handling for subscription events\n   - Ensure database updates correctly when plan changes occur\n\n3. End-to-End Tests:\n   - Complete user journeys: signup with plan selection, upgrade flow, downgrade flow\n   - Verify feature access is properly restricted based on plan\n   - Test plan change with billing implications\n\n4. Manual Testing:\n   - Use Stripe test mode to verify complete subscription lifecycle\n   - Verify UI elements correctly show/hide based on subscription status\n   - Test upgrade prompts when accessing gated features\n\n5. Edge Cases:\n   - Test subscription cancellation and reinstatement\n   - Verify handling of failed payments\n   - Test plan changes near billing cycle boundaries\n\nCreate a test matrix covering all features and their availability in each plan tier to ensure comprehensive coverage.",
+      "status": "pending",
+      "dependencies": [
+        9
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design and Implement Plans Table",
+          "description": "Create a Plans table to define available pricing tiers (e.g., Basic, Pro, Enterprise), their prices, billing intervals, and included features. Ensure the table structure supports easy addition or modification of plans.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 2,
+          "title": "Add current_plan_id Field to Office Table",
+          "description": "Add a current_plan_id field to the Office table to reference the selected plan for each office. Ensure this field is properly indexed and supports plan upgrades/downgrades.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 3,
+          "title": "Implement Feature Gating Logic Based on Plan",
+          "description": "Centralize logic to check feature access based on the office's current plan. Use decorators, middleware, or service-layer checks to enforce plan-based feature access throughout the app.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 4,
+          "title": "Integrate Plan Selection and Upgrades/Downgrades with Billing and Stripe",
+          "description": "Implement endpoints and business logic for offices to select, upgrade, or downgrade their plan. Ensure changes are reflected in Stripe (or other payment provider) and that billing is prorated or adjusted as needed.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 5,
+          "title": "Document Plan and Feature Gating System",
+          "description": "Update developer and user documentation to describe available plans, included features, and how feature gating is enforced. Reference docs/payment-plan.md and ensure documentation is clear for future maintenance.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        }
+      ]
     }
   ],
   "metadata": {
