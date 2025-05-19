@@ -34,11 +34,25 @@ services:
     ports:
       - "8080:8080" # Default libSQL server port
     volumes:
-      - libsql_data:/data
+      - ./db_data:/var/lib/sqld  # Mount to a local directory
     environment:
       - LIBSQL_ADMIN_TOKEN=changeme # Change this in production
     networks:
       - app-network
+
+    # db:
+    # image: ghcr.io/tursodatabase/libsql-server:latest
+    # user: root
+    # ports:
+    #   - "8080:8080" # Default libSQL server port
+    # volumes:
+    #   # - libsql_data:/data # Comment out or remove named volume
+    #   - ./db_data:/data    # Use a bind mount to a local directory
+    # environment:
+    #   - LIBSQL_ADMIN_TOKEN=changeme # Change this in production
+    # command: sqld -d /data/app.db --http-listen-addr 0.0.0.0:8080
+    # networks:
+    #   - app-network
 
   api:
     build:

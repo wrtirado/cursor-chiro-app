@@ -31,3 +31,7 @@ build/
 # Ignore all files in logs/ but keep the directory itself
 logs/*
 !logs/.gitkeep 
+
+# Ignore database files
+db_data/*
+!db_data/.gitkeep

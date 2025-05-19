@@ -61,72 +61,40 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = os.environ.get("DATABASE_URL")
-    if not url:
-        raise ValueError(
-            "DATABASE_URL environment variable not set for Alembic offline mode"
-        )
-
-    context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
-        include_object=include_object,
-    )
-
-    with context.begin_transaction():
-        context.run_migrations()
+    # url = config.get_main_option("sqlalchemy.url")
+    # context.configure(
+    #     url=url,
+    #     target_metadata=target_metadata,
+    #     literal_binds=True,
+    #     dialect_opts={"paramstyle": "named"},
+    # )
+    #
+    # with context.begin_transaction():
+    #     context.run_migrations()
+    print("Alembic offline migrations are currently disabled.")
+    return  # Prevent further execution
 
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
-    and associate a connection with the context.
+    and associate a ulcnection with the context.
 
     """
-    db_url = os.environ.get("DATABASE_URL")
-    if not db_url:
-        raise ValueError(
-            "DATABASE_URL environment variable not set for Alembic online mode"
-        )
-
-    # Create a configuration dictionary for the engine
-    # The poolclass=pool.NullPool is important for Alembic's online mode.
-    engine_config = {
-        "sqlalchemy.url": db_url,
-        "poolclass": pool.NullPool,  # Ensure NullPool is correctly passed if not part of prefix handling
-    }
-
-    connectable = engine_from_config(
-        engine_config,  # Use our constructed config
-        prefix="sqlalchemy.",  # Keep prefix if 'sqlalchemy.url' is used, or adjust if not.
-        # If prefix is kept, ensure your key is 'sqlalchemy.url'.
-        # If not using prefix or key is just 'url', adjust accordingly.
-        # For simplicity and directness with os.environ:
-        # from sqlalchemy import create_engine
-        # connectable = create_engine(db_url, poolclass=pool.NullPool)
-        # This bypasses engine_from_config if simpler.
-        # Let's stick to engine_from_config but ensure it gets the URL.
-    )
-
-    with connectable.connect() as connection:
-        # Ensure foreign keys are enabled for SQLite when in online mode
-        if connection.dialect.name == "sqlite":
-            connection.execute(text("PRAGMA foreign_keys=ON"))
-            # app_log.info(
-            #     "SQLite PRAGMA foreign_keys=ON executed."
-            # )  # Optional: for logging - app_log needs to be defined/imported
-
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            include_object=include_object,
-        )
-
-        with context.begin_transaction():
-            context.run_migrations()
+    # connectable = engine_from_config(
+    #     config.get_section(config.config_ini_section, {}),
+    #     prefix="sqlalchemy.",
+    #     poolclass=pool.NullPool,
+    # )
+    #
+    # with connectable.connect() as connection:
+    #     context.configure(connection=connection, target_metadata=target_metadata)
+    #
+    #     with context.begin_transaction():
+    #         context.run_migrations()
+    print("Alembic online migrations are currently disabled.")
+    return  # Prevent further execution
 
 
 if context.is_offline_mode():

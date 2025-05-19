@@ -37,6 +37,35 @@ class Office(Base):
     company = relationship("Company", back_populates="offices")
     users = relationship("User", back_populates="office")
     branding = relationship("Branding", back_populates="office", uselist=False)
+    # Subscription and billing fields for SaaS billing
+    subscription_status = Column(
+        String,  # Use string for hybrid enum approach
+        nullable=False,
+        default="inactive",  # Default status
+        doc="Current subscription status (e.g., active, past_due, canceled, trialing, inactive)",
+    )
+    payment_provider_customer_id = Column(
+        String,
+        nullable=True,
+        unique=True,
+        doc="Reference to customer ID in payment provider (e.g., Stripe)",
+    )
+    payment_provider_subscription_id = Column(
+        String,
+        nullable=True,
+        unique=True,
+        doc="Reference to subscription ID in payment provider (e.g., Stripe)",
+    )
+    current_plan_id = Column(
+        Integer,
+        nullable=True,
+        doc="Current plan ID (FK to plans table, nullable if not subscribed)",
+    )
+    billing_cycle_anchor_date = Column(
+        DateTime,
+        nullable=True,
+        doc="Datetime when the current billing cycle started for this office",
+    )
 
 
 class Role(Base):
