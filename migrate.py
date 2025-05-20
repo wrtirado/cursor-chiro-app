@@ -1,33 +1,111 @@
 import typer
 import os
 from datetime import datetime
+import libsql_client
+from dotenv import load_dotenv
 
 app = typer.Typer(help="Custom migration tool for libSQL.")
 MIGRATIONS_DIR = "migrations"
 
 
+# --- Configuration and DB Connection ---
+def get_db_url(db_url_override: str = None) -> str:
+    if db_url_override:
+        return db_url_override
+    load_dotenv()
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        typer.secho(
+            "Error: DATABASE_URL not found in environment or .env file. "
+            "Please set it or use the --db-url option.",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(code=1)
+    return db_url
+
+
+def create_db_client(db_url: str):
+    try:
+        # For local .db file, url should be like: file:local.db
+        # For remote server: libsql://<your-host>.turso.io?authToken=<your-token>
+        # The libsql_client will also handle http/https URLs for libSQL.
+        client = libsql_client.create_client(url=db_url)
+        return client
+    except Exception as e:
+        typer.secho(f"Error connecting to database: {e}", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+
+# --- End Configuration and DB Connection ---
+
+
 @app.command()
-def status():
+def status(
+    db_url_override: str = typer.Option(
+        None, "--db-url", help="Override DATABASE_URL from environment/dotenv"
+    )
+):
     """Show current migration state."""
-    typer.echo("Status: Not implemented yet")
+    actual_db_url = get_db_url(db_url_override)
+    typer.echo(f"Using database URL: {actual_db_url}")
+    client = None
+    try:
+        client = create_db_client(actual_db_url)
+        # Test connection with a simple query
+        rs = client.execute("SELECT 1")
+        if rs.rows and rs.rows[0][0] == 1:
+            typer.secho("Database connection successful.", fg=typer.colors.GREEN)
+        else:
+            typer.secho(
+                "Database connection test failed to return expected result.",
+                fg=typer.colors.YELLOW,
+            )
+
+        typer.echo("Status: Not implemented yet (beyond connection test)")
+
+    except typer.Exit:  # Catch Exit from create_db_client or get_db_url
+        raise
+    except Exception as e:
+        typer.secho(f"An error occurred: {e}", fg=typer.colors.RED)
+    finally:
+        if client:
+            client.close()
 
 
 @app.command()
-def up(step: int = typer.Option(None, help="Number of migrations to apply")):
+def up(
+    step: int = typer.Option(None, help="Number of migrations to apply"),
+    db_url_override: str = typer.Option(
+        None, "--db-url", help="Override DATABASE_URL from environment/dotenv"
+    ),
+):
     """Apply all (or N) pending migrations."""
+    actual_db_url = get_db_url(db_url_override)
+    # client = create_db_client(actual_db_url)
+    # ... rest of the implementation ...
+    # client.close()
     if step:
-        typer.echo(f"Up: Not implemented yet (step={step})")
+        typer.echo(f"Up: Not implemented yet (step={step}) using DB: {actual_db_url}")
     else:
-        typer.echo("Up: Not implemented yet (all)")
+        typer.echo(f"Up: Not implemented yet (all) using DB: {actual_db_url}")
 
 
 @app.command()
-def down(step: int = typer.Option(None, help="Number of migrations to roll back")):
+def down(
+    step: int = typer.Option(None, help="Number of migrations to roll back"),
+    db_url_override: str = typer.Option(
+        None, "--db-url", help="Override DATABASE_URL from environment/dotenv"
+    ),
+):
     """Rollback the most recent (or N) migrations."""
+    actual_db_url = get_db_url(db_url_override)
+    # client = create_db_client(actual_db_url)
+    # ... rest of the implementation ...
+    # client.close()
     if step:
-        typer.echo(f"Down: Not implemented yet (step={step})")
+        typer.echo(f"Down: Not implemented yet (step={step}) using DB: {actual_db_url}")
     else:
-        typer.echo("Down: Not implemented yet (1)")
+        typer.echo(f"Down: Not implemented yet (1) using DB: {actual_db_url}")
 
 
 @app.command()
