@@ -327,7 +327,7 @@
           "title": "Define and Add Subscription Fields to `Office` Model",
           "description": "Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`. Ensure all fields align with the payment plan structure defined in docs/payment-plan.md.",
           "details": "",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },
@@ -335,7 +335,7 @@
           "id": 3,
           "title": "Generate Alembic Migration for `Office` Subscription Fields",
           "description": "After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.",
-          "details": "",
+          "details": "\n\n<info added on 2025-05-20T03:49:09.977Z>\nThe Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. \n\nWhen Alembic is re-enabled, we'll need to:\n1. Run `alembic revision --autogenerate -m \"Add subscription fields to Office model\"` to generate the migration script\n2. Review the generated script to ensure it correctly captures all field additions\n3. Test the migration on a staging database before applying to production\n4. Document the migration in our schema change log\n\nThis subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.\n</info added on 2025-05-20T03:49:09.977Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -345,7 +345,7 @@
           "title": "HIPAA-Compliant Audit Logging for Billing Events",
           "description": "Implement detailed audit trails for all office-level subscription and billing-related operations (e.g., subscription creation, status changes, payment attempts) using libSQL/SQLite.",
           "details": "",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },

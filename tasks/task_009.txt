@@ -17,7 +17,7 @@ Test subscription billing with test credentials, ensuring alignment with docs/pa
 ### Details:
 
 
-## 2. Define and Add Subscription Fields to `Office` Model [pending]
+## 2. Define and Add Subscription Fields to `Office` Model [done]
 ### Dependencies: None
 ### Description: Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`. Ensure all fields align with the payment plan structure defined in docs/payment-plan.md.
 ### Details:
@@ -29,7 +29,19 @@ Test subscription billing with test credentials, ensuring alignment with docs/pa
 ### Details:
 
 
-## 4. HIPAA-Compliant Audit Logging for Billing Events [pending]
+<info added on 2025-05-20T03:49:09.977Z>
+The Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. 
+
+When Alembic is re-enabled, we'll need to:
+1. Run `alembic revision --autogenerate -m "Add subscription fields to Office model"` to generate the migration script
+2. Review the generated script to ensure it correctly captures all field additions
+3. Test the migration on a staging database before applying to production
+4. Document the migration in our schema change log
+
+This subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.
+</info added on 2025-05-20T03:49:09.977Z>
+
+## 4. HIPAA-Compliant Audit Logging for Billing Events [done]
 ### Dependencies: None
 ### Description: Implement detailed audit trails for all office-level subscription and billing-related operations (e.g., subscription creation, status changes, payment attempts) using libSQL/SQLite.
 ### Details:

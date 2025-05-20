@@ -11,6 +11,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from api.database.session import Base
+from api.models.audit import BillingAuditLog  # noqa
 
 # Re-defining tables from init_schema.sql using SQLAlchemy ORM
 
