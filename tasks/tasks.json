@@ -335,7 +335,7 @@
           "id": 3,
           "title": "Generate Alembic Migration for `Office` Subscription Fields",
           "description": "After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.",
-          "details": "\n\n<info added on 2025-05-20T03:49:09.977Z>\nThe Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. \n\nWhen Alembic is re-enabled, we'll need to:\n1. Run `alembic revision --autogenerate -m \"Add subscription fields to Office model\"` to generate the migration script\n2. Review the generated script to ensure it correctly captures all field additions\n3. Test the migration on a staging database before applying to production\n4. Document the migration in our schema change log\n\nThis subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.\n</info added on 2025-05-20T03:49:09.977Z>",
+          "details": "\n\n<info added on 2025-05-20T03:49:09.977Z>\nThe Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. \n\nWhen Alembic is re-enabled, we'll need to:\n1. Run `alembic revision --autogenerate -m \"Add subscription fields to Office model\"` to generate the migration script\n2. Review the generated script to ensure it correctly captures all field additions\n3. Test the migration on a staging database before applying to production\n4. Document the migration in our schema change log\n\nThis subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.\n</info added on 2025-05-20T03:49:09.977Z>\n<info added on 2025-05-20T19:56:24.570Z>\nThe migration process is now handled by our custom migration tool for libSQL (developed in Task #33) instead of Alembic. Schema changes for the Office model (from subtask 9.2) will need to be properly migrated using this new approach.\n\nWhen implementing the subscription fields migration:\n1. Create a new migration file using `libsql-migrate create \"Add subscription fields to Office model\"`\n2. Define both the up and down migration functions in the generated file\n3. Test the migration on a local database instance\n4. Apply to staging using `libsql-migrate apply --env=staging`\n5. After verification, apply to production with `libsql-migrate apply --env=production`\n6. Update the schema change log with details of the migration\n\nThis custom migration tool addresses the previous libSQL/driver instability issues while providing reliable schema versioning.\n</info added on 2025-05-20T19:56:24.570Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -1769,14 +1769,15 @@
     {
       "id": 29,
       "title": "Overhaul Alembic Migrations for libSQL/SQLite Compatibility",
-      "description": "Reset the Alembic migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models.",
-      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Modify the `env.py` file in the Alembic directory if necessary to ensure proper configuration for libSQL\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using Alembic's standard upgrade path. A separate data migration strategy may be needed for production environments.",
-      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run `alembic upgrade head` to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test downgrade functionality with `alembic downgrade base`\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
+      "description": "Reset the migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models using the new custom migration tool.",
       "status": "pending",
       "dependencies": [
-        28
+        28,
+        33
       ],
       "priority": "high",
+      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the custom migration tool (developed in Task 33)\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Configure the custom migration tool for proper libSQL integration\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using the standard upgrade path. A separate data migration strategy may be needed for production environments.",
+      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run the custom migration tool to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test rollback functionality with the custom migration tool\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
       "subtasks": [
         {
           "id": 1,
@@ -1831,6 +1832,53 @@
           ],
           "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
           "status": "done",
+          "parentTaskId": 29
+        },
+        {
+          "id": 6,
+          "title": "Adapt existing migrations to use the custom migration tool",
+          "description": "Convert the existing migration files to work with the new custom migration tool developed in Task #33.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implementation steps:\n1. Review the structure and format required by the new custom migration tool\n2. Convert the initial migration created in subtask 3 to the format required by the custom tool\n3. Ensure all schema definitions are correctly translated to the new format\n4. Verify that all table definitions, indices, and constraints are preserved in the conversion\n5. Update any references to Alembic-specific functions or methods\n\nTesting approach:\n- Verify the converted migration file is valid for the custom migration tool\n- Compare the schema that would be generated by both approaches to ensure equivalence\n- Check for any functionality that might be missing in the conversion",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 7,
+          "title": "Update migration application and rollback procedures",
+          "description": "Replace Alembic-specific migration commands with the equivalent commands from the custom migration tool.",
+          "dependencies": [
+            6
+          ],
+          "details": "Implementation steps:\n1. Document the commands to apply migrations using the custom migration tool\n2. Document the commands to roll back migrations using the custom migration tool\n3. Update any scripts or documentation that reference 'alembic upgrade' or 'alembic downgrade'\n4. Create examples of common migration scenarios using the new tool\n5. Update CI/CD pipelines to use the new migration commands\n\nTesting approach:\n- Test applying migrations to a fresh database\n- Test rolling back migrations\n- Verify the commands work in all environments (development, testing, production)\n- Ensure the migration state is correctly tracked by the new tool",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 8,
+          "title": "Update developer documentation for the new migration workflow",
+          "description": "Create comprehensive documentation for developers on how to use the custom migration tool for all database schema changes.",
+          "dependencies": [
+            6,
+            7
+          ],
+          "details": "Implementation steps:\n1. Create a new documentation file explaining the custom migration tool workflow\n2. Document how to create new migrations\n3. Document how to apply and roll back migrations\n4. Provide examples of common migration scenarios\n5. Update any existing documentation that references Alembic\n6. Create a migration guide for developers transitioning from Alembic\n7. Document any differences in behavior or capabilities between Alembic and the custom tool\n\nTesting approach:\n- Have another developer follow the documentation to create and apply a test migration\n- Verify all commands and examples work as described\n- Ensure the documentation covers all common migration scenarios",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 9,
+          "title": "Final testing with the custom migration tool",
+          "description": "Perform comprehensive testing of the database schema using the custom migration tool.",
+          "dependencies": [
+            6,
+            7,
+            8
+          ],
+          "details": "Implementation steps:\n1. Create a fresh libSQL/SQLite database\n2. Apply the initial migration using the custom migration tool\n3. Verify all tables, indices, and constraints are created correctly\n4. Test the application's functionality with the new database schema\n5. Test the rollback functionality\n6. Verify that the migration state is correctly tracked\n7. Test creating and applying a new migration\n\nTesting approach:\n- Run a full suite of integration tests against the database\n- Verify all CRUD operations work correctly\n- Test complex queries and transactions\n- Ensure the application functions correctly with the new schema\n- Verify migration state tracking works correctly across multiple migrations",
+          "status": "pending",
           "parentTaskId": 29
         }
       ]
@@ -2042,6 +2090,145 @@
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 32
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "title": "Task #33: Develop Custom Database Migration Tool for libSQL",
+      "description": "Create a custom database migration tool that interfaces with libSQL to manage schema changes, supporting version control of database structure with capabilities to apply, rollback, and track migrations.",
+      "details": "The migration tool should be implemented as a standalone CLI utility that interfaces directly with our libSQL database. Key requirements include:\n\n1. **Migration Creation**: Provide a command to generate new migration files with timestamps for ordering (e.g., `20230615120000_add_user_table.sql`).\n\n2. **Migration Structure**: Each migration should contain both \"up\" (apply) and \"down\" (rollback) SQL scripts.\n\n3. **Migration Tracking**: Create a migrations table in the database to track which migrations have been applied, including timestamp, name, and execution status.\n\n4. **Core Commands**:\n   - `migrate:status` - Show current migration state\n   - `migrate:up` - Apply all pending migrations\n   - `migrate:up --step=N` - Apply N pending migrations\n   - `migrate:down` - Rollback the most recent migration\n   - `migrate:down --step=N` - Rollback N most recent migrations\n   - `migrate:create NAME` - Create a new migration file\n\n5. **Error Handling**: Implement transaction support to ensure migrations are atomic - either fully applied or fully rolled back.\n\n6. **Compatibility**: Ensure compatibility with libSQL's specific features and syntax differences from standard SQLite.\n\n7. **Integration**: The tool should be easily invokable from our CI/CD pipeline and development environments.\n\n8. **Documentation**: Include comprehensive documentation on how to use the tool, create migrations, and troubleshoot common issues.\n\n9. **Configuration**: Support configuration via environment variables and/or config files for database connection details.\n\n10. **Logging**: Implement detailed logging of all migration operations for debugging and audit purposes.\n\nConsider using a language that's already common in our stack for implementation. The tool should be designed with our specific libSQL implementation in mind, particularly considering the changes made in Task #30 for SQLite compatibility.",
+      "testStrategy": "Testing for the migration tool should be comprehensive and include:\n\n1. **Unit Tests**:\n   - Test each command function independently with mocked database connections\n   - Verify proper file generation for new migrations\n   - Test parsing and validation of migration files\n   - Verify proper ordering of migrations based on timestamps\n\n2. **Integration Tests**:\n   - Set up a test libSQL database instance\n   - Test the full migration lifecycle:\n     - Create multiple migrations\n     - Apply them in sequence\n     - Verify database schema changes\n     - Roll back migrations\n     - Verify schema returns to previous states\n   - Test error scenarios (e.g., conflicting migrations, syntax errors)\n   - Test the migrations table structure and content after operations\n\n3. **Edge Cases**:\n   - Test behavior when migrations are applied out of order\n   - Test handling of failed migrations\n   - Test recovery from interrupted migrations\n   - Test with very large migration files\n   - Test concurrent migration attempts\n\n4. **Manual Testing Checklist**:\n   - Verify all CLI commands work as expected\n   - Test integration with actual project database\n   - Verify logging output is clear and useful\n   - Test on all supported development environments\n\n5. **CI Integration**:\n   - Add automated tests to CI pipeline\n   - Create a test that verifies migrations can be applied to a clean database\n\n6. **Documentation Verification**:\n   - Ensure all commands are properly documented\n   - Verify examples in documentation work as described\n\nThe testing should verify that the tool can safely manage our database schema across development, staging, and production environments without data loss or corruption.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design CLI structure and command interface",
+          "description": "Define the command-line interface structure, argument parsing, and command handlers for the migration tool.",
+          "dependencies": [],
+          "details": "Implement the core CLI structure using a library like Commander.js or Click (Python). Define all required commands (migrate:status, migrate:up, migrate:down, migrate:create) with their respective options and help documentation. Set up the basic project structure, including entry point, command routing, and help text generation.",
+          "status": "pending",
+          "testStrategy": "Write unit tests for command parsing and routing logic. Test each command with various argument combinations to ensure correct behavior."
+        },
+        {
+          "id": 2,
+          "title": "Implement migration file template and creation",
+          "description": "Create functionality to generate new migration files with proper timestamps and structure for up/down operations.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement the migrate:create command to generate migration files with timestamp prefixes (e.g., 20230615120000_add_user_table.sql). Create templates for migrations that include sections for 'up' and 'down' SQL scripts. Ensure proper file naming, validation, and placement in a designated migrations directory.",
+          "status": "pending",
+          "testStrategy": "Test file creation with various migration names, verify timestamp format, file structure, and content template."
+        },
+        {
+          "id": 3,
+          "title": "Develop database connection and configuration module",
+          "description": "Create a module to handle database connections and configuration management for the migration tool.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement configuration loading from environment variables and/or config files. Create a database connection module that interfaces with libSQL, handling connection pooling, retries, and error states. Support different environments (development, testing, production) with appropriate connection parameters.",
+          "status": "pending",
+          "testStrategy": "Test configuration loading from different sources, connection establishment, error handling, and connection pool management."
+        },
+        {
+          "id": 4,
+          "title": "Create migrations tracking table and schema",
+          "description": "Design and implement the database schema for tracking applied migrations.",
+          "dependencies": [
+            3
+          ],
+          "details": "Create a migrations table in the database with columns for migration ID, name, timestamp, applied_at, and status. Implement functions to initialize this table if it doesn't exist. Ensure the table can properly track the state of all migrations that have been applied or rolled back.",
+          "status": "pending",
+          "testStrategy": "Test table creation, schema validation, and basic operations for recording migration status."
+        },
+        {
+          "id": 5,
+          "title": "Implement migration status reporting",
+          "description": "Develop the migrate:status command to show the current state of all migrations.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implement logic to scan the migrations directory, compare with the migrations table, and report which migrations are pending, applied, or rolled back. Format the output in a clear, tabular format showing timestamps, names, and statuses. Include summary statistics (e.g., '5 of 10 migrations applied').",
+          "status": "pending",
+          "testStrategy": "Test with various combinations of applied and pending migrations. Verify correct status reporting and formatting."
+        },
+        {
+          "id": 6,
+          "title": "Implement migration up logic with transaction support",
+          "description": "Develop the core functionality to apply pending migrations with transaction support.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implement the migrate:up command to apply pending migrations in timestamp order. Support the --step=N option to limit the number of migrations applied. Wrap each migration in a transaction to ensure atomicity. Parse and execute the 'up' portion of each migration file. Update the migrations table to reflect successful applications.",
+          "status": "pending",
+          "testStrategy": "Test applying single and multiple migrations, transaction rollback on error, and step limiting. Verify migrations table is correctly updated."
+        },
+        {
+          "id": 7,
+          "title": "Implement migration down logic with rollback support",
+          "description": "Develop functionality to roll back applied migrations in reverse order.",
+          "dependencies": [
+            6
+          ],
+          "details": "Implement the migrate:down command to roll back the most recent migration(s). Support the --step=N option to control how many migrations to roll back. Parse and execute the 'down' portion of each migration file. Update the migrations table to reflect successful rollbacks. Include safeguards to prevent accidental rollback of all migrations.",
+          "status": "pending",
+          "testStrategy": "Test rolling back single and multiple migrations, transaction handling, and step limiting. Verify migrations table is correctly updated after rollbacks."
+        },
+        {
+          "id": 8,
+          "title": "Implement logging and error handling system",
+          "description": "Create a comprehensive logging and error handling system for the migration tool.",
+          "dependencies": [
+            6,
+            7
+          ],
+          "details": "Implement structured logging for all operations with configurable verbosity levels. Log migration attempts, successes, failures, and SQL errors. Create specific error types for different failure scenarios (connection issues, SQL errors, file system errors). Implement graceful error handling with helpful error messages and suggested remediation steps.",
+          "status": "pending",
+          "testStrategy": "Test logging output at different verbosity levels. Simulate various error conditions and verify appropriate error handling and messaging."
+        },
+        {
+          "id": 9,
+          "title": "Create comprehensive documentation",
+          "description": "Develop user and developer documentation for the migration tool.",
+          "dependencies": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8
+          ],
+          "details": "Create comprehensive documentation including: installation guide, command reference with examples, migration file format specification, configuration options, troubleshooting guide, and developer documentation for extending the tool. Include examples of common migration patterns and best practices.",
+          "status": "pending",
+          "testStrategy": "Review documentation for completeness and accuracy. Test following the documentation to perform common tasks to ensure it's correct and comprehensive."
+        },
+        {
+          "id": 10,
+          "title": "Implement CI/CD integration and deployment",
+          "description": "Create scripts and configurations for integrating the migration tool with CI/CD pipelines.",
+          "dependencies": [
+            6,
+            7,
+            8
+          ],
+          "details": "Develop scripts for running migrations in CI/CD environments. Create Docker configuration for containerized usage. Implement safeguards for production environments (confirmation prompts, dry-run mode). Create example configurations for common CI/CD platforms (GitHub Actions, Jenkins, etc.). Ensure the tool can be easily invoked from automated deployment processes.",
+          "status": "pending",
+          "testStrategy": "Test integration with at least one CI/CD platform. Verify migrations can be applied automatically during deployment. Test safeguards for production environments."
+        },
+        {
+          "id": 11,
+          "title": "Remove all Alembic code and references from the project",
+          "description": "Delete all Alembic-related code, configuration files, migration scripts, and references from the codebase. This includes removing the alembic/ directory, alembic.ini, any Alembic imports/usages in Python files, and updating documentation to reflect the removal. Ensure no Alembic-specific logic remains and that all migration instructions now reference the new custom migration tool.",
+          "details": "1. Delete the alembic/ directory and all its contents.\n2. Remove alembic.ini from the project root.\n3. Search for and remove all Alembic imports/usages in the codebase (e.g., in api/database, models, or scripts).\n4. Update any documentation (README, docs/, etc.) to remove or replace Alembic references with the new migration tool.\n5. Ensure no Alembic-specific logic remains in any scripts or CI/CD configs.\n6. Verify that all migration instructions and developer onboarding reference the new tool only.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 33
         }
       ]
     }

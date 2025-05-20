@@ -304,56 +304,203 @@
     {
       "id": 9,
       "title": "Payment Processing API with HIPAA Compliance",
-      "description": "Implement payment handling functionality for services at company or office level with HIPAA-compliant data handling.",
+      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with a payment gateway. Your SaaS payment provider API keys will be stored in .env, not the database. All billing and payment logic should align with the canonical specification in docs/payment-plan.md.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing payments, ensuring the gateway is HIPAA-compliant or has a BAA in place. Store payment configuration details (API keys, merchant IDs, etc.) securely in the Companies table payment_info JSON field with encryption at rest. Create endpoints for payment processing and subscription management based on company/office structure with RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Develop configuration for company-level vs. office-level payment handling. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Use libSQL/SQLite JSON1 extension for handling the payment_info JSON field, ensuring compatibility with the new database system.",
-      "testStrategy": "Test payment processing with test credentials. Verify proper recording of payment information and secure storage of configuration details with encryption. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly applied based on company/office hierarchy. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test JSON1 extension functionality with libSQL/SQLite to ensure proper storage and retrieval of payment configuration.",
+      "details": "Integrate with a payment gateway (e.g., Stripe) for processing subscription payments at the Office level, following the specifications in docs/payment-plan.md. Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office, adhering to the payment plan structure defined in the documentation.",
+      "testStrategy": "Test subscription billing with test credentials, ensuring alignment with docs/payment-plan.md specifications. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway.",
       "subtasks": [
         {
-          "id": 9.1,
-          "title": "Implement secure storage for payment configuration",
-          "description": "Create schema for storing payment gateway configuration details in the Companies table payment_info JSON field using libSQL/SQLite JSON1 extension",
-          "status": "pending"
+          "id": 1,
+          "title": "Revert `payment_config` from `Company` Model & Clean Alembic",
+          "description": "Remove the `payment_config` JSON column from the `Company` model in `api/models/base.py`. Create a new Alembic migration to reflect this removal or ensure the previous migration that added it is cleanly reversed/removed if no other changes depend on it.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.2,
-          "title": "Develop company/office payment structure",
-          "description": "Implement logic to determine payment handling based on company vs. office level configuration",
-          "status": "pending"
+          "id": 2,
+          "title": "Define and Add Subscription Fields to `Office` Model",
+          "description": "Define necessary fields for office-level subscriptions (e.g., `subscription_status`, `payment_provider_customer_id`, `payment_provider_subscription_id`, `current_plan_id`, `billing_cycle_anchor_date`). Add these fields to the `Office` model in `api/models/base.py`. Ensure all fields align with the payment plan structure defined in docs/payment-plan.md.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.3,
-          "title": "Implement HIPAA-compliant audit logging",
-          "description": "Add detailed audit trails for all payment-related operations using libSQL/SQLite",
-          "status": "pending"
+          "id": 3,
+          "title": "Generate Alembic Migration for `Office` Subscription Fields",
+          "description": "After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.",
+          "details": "\n\n<info added on 2025-05-20T03:49:09.977Z>\nThe Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. \n\nWhen Alembic is re-enabled, we'll need to:\n1. Run `alembic revision --autogenerate -m \"Add subscription fields to Office model\"` to generate the migration script\n2. Review the generated script to ensure it correctly captures all field additions\n3. Test the migration on a staging database before applying to production\n4. Document the migration in our schema change log\n\nThis subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.\n</info added on 2025-05-20T03:49:09.977Z>\n<info added on 2025-05-20T19:56:24.570Z>\nThe migration process is now handled by our custom migration tool for libSQL (developed in Task #33) instead of Alembic. Schema changes for the Office model (from subtask 9.2) will need to be properly migrated using this new approach.\n\nWhen implementing the subscription fields migration:\n1. Create a new migration file using `libsql-migrate create \"Add subscription fields to Office model\"`\n2. Define both the up and down migration functions in the generated file\n3. Test the migration on a local database instance\n4. Apply to staging using `libsql-migrate apply --env=staging`\n5. After verification, apply to production with `libsql-migrate apply --env=production`\n6. Update the schema change log with details of the migration\n\nThis custom migration tool addresses the previous libSQL/driver instability issues while providing reliable schema versioning.\n</info added on 2025-05-20T19:56:24.570Z>",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.4,
-          "title": "Implement RBAC for payment endpoints",
-          "description": "Ensure payment endpoints enforce proper role-based access controls",
-          "status": "pending"
+          "id": 4,
+          "title": "HIPAA-Compliant Audit Logging for Billing Events",
+          "description": "Implement detailed audit trails for all office-level subscription and billing-related operations (e.g., subscription creation, status changes, payment attempts) using libSQL/SQLite.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.5,
-          "title": "Verify BAA with payment processor",
-          "description": "Ensure Business Associate Agreement is in place with payment gateway provider",
-          "status": "pending"
+          "id": 5,
+          "title": "Verify BAA with Chosen SaaS Payment Processor",
+          "description": "Ensure a Business Associate Agreement (BAA) is in place with the payment gateway provider selected for handling the SaaS subscription billing for offices.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.6,
-          "title": "Implement data encryption",
-          "description": "Add encryption for all payment data at rest and in transit, adapting encryption methods for libSQL/SQLite",
-          "status": "pending"
+          "id": 6,
+          "title": "Secure Storage and Transmission of Payment Provider References",
+          "description": "Ensure any stored references to payment provider entities (e.g., customer IDs for offices, subscription IDs) are handled securely within the database. All data transmission related to billing (e.g., to/from payment gateway) must use TLS 1.2+.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         },
         {
-          "id": 9.7,
-          "title": "Add data minimization for invoices",
-          "description": "Implement practices to limit ePHI exposure in billing documents according to the Privacy Rule",
-          "status": "pending"
+          "id": 7,
+          "title": "Data Minimization for SaaS Invoices to Offices",
+          "description": "Implement practices to limit unnecessary data exposure in invoices generated by the SaaS for its customers (Offices), aligning with privacy principles.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 8,
+          "title": "Review and Implement Payment Plan Documentation",
+          "description": "Thoroughly review docs/payment-plan.md to ensure all implementation details for billing and payment processing align with the canonical specification. Update implementation plans as needed to match the documented requirements.",
+          "details": "This includes reviewing payment tiers, billing cycles, upgrade/downgrade logic, trial periods, and any other payment-related specifications in the documentation.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 9,
+          "title": "Align Billing API and Data Models with payment-plan.md",
+          "description": "Review docs/payment-plan.md and ensure all billing API endpoints, data models, and business logic are consistent with the specifications in this document. Update or add additional fields, endpoints, or logic as needed to fully implement the payment and billing structure described.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 10,
+          "title": "Design and Implement Invoice Table",
+          "description": "Create a table to store monthly and one-off invoices for each office, including billing period, total, status, and references to line items, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 11,
+          "title": "Design and Implement Invoice Line Item Table",
+          "description": "Create a table to store detailed line items for each invoice (e.g., patient activations, setup fees), as specified in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 12,
+          "title": "Update Patient/User Model for Billing Status",
+          "description": "Add fields to the patient/user model to track activation/deactivation dates and billing status for each billing cycle, supporting the per-patient billing logic in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 13,
+          "title": "Implement Patient Activation Billing Logic",
+          "description": "Ensure that activating a patient account adds a line item to the current invoice for the office. Handle reactivation and deactivation logic as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 14,
+          "title": "Implement Monthly Invoice Generation Logic",
+          "description": "At the start of each billing cycle, generate invoices for all offices, including all active patients and any reactivations. Ensure deactivated accounts are not billed in future cycles unless reactivated, per docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 15,
+          "title": "Implement One-Off Invoice/Charge Logic (e.g., Setup Fee)",
+          "description": "Allow creation of one-off invoices/charges for offices (e.g., onboarding/setup fee) outside the regular billing cycle, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 16,
+          "title": "Integrate with Payment Provider for Invoicing and Payments",
+          "description": "Ensure each office has a customer record in the payment provider. Generate and send invoices via the payment provider, and track payment status and update invoice records accordingly, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 17,
+          "title": "Implement API Endpoints for Invoice Retrieval and Payment Status",
+          "description": "Create endpoints for offices to view their invoices, line items, and payment status, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 18,
+          "title": "Implement Audit Logging for All Billing Events",
+          "description": "Log all billing-related actions (invoice creation, payment, patient activation, etc.) for compliance, as described in docs/payment-plan.md and developer-compliance-guide.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 19,
+          "title": "Implement Data Minimization and Security for Billing Data",
+          "description": "Ensure only necessary billing data is exposed via the API and that all sensitive data is handled securely, as described in docs/payment-plan.md and developer-compliance-guide.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 20,
+          "title": "Write Tests for Billing Logic and API Endpoints",
+          "description": "Add unit and integration tests to verify correct billing, invoice generation, and payment processing, as described in docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 21,
+          "title": "Document Billing API and Data Model",
+          "description": "Update or create documentation for the billing API, data models, and business logic, referencing docs/payment-plan.md.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
         }
       ]
     },
@@ -1622,14 +1769,15 @@
     {
       "id": 29,
       "title": "Overhaul Alembic Migrations for libSQL/SQLite Compatibility",
-      "description": "Reset the Alembic migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models.",
-      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Modify the `env.py` file in the Alembic directory if necessary to ensure proper configuration for libSQL\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using Alembic's standard upgrade path. A separate data migration strategy may be needed for production environments.",
-      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run `alembic upgrade head` to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test downgrade functionality with `alembic downgrade base`\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
+      "description": "Reset the migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models using the new custom migration tool.",
       "status": "pending",
       "dependencies": [
-        28
+        28,
+        33
       ],
       "priority": "high",
+      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the custom migration tool (developed in Task 33)\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Configure the custom migration tool for proper libSQL integration\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using the standard upgrade path. A separate data migration strategy may be needed for production environments.",
+      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run the custom migration tool to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test rollback functionality with the custom migration tool\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
       "subtasks": [
         {
           "id": 1,
@@ -1684,6 +1832,53 @@
           ],
           "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
           "status": "done",
+          "parentTaskId": 29
+        },
+        {
+          "id": 6,
+          "title": "Adapt existing migrations to use the custom migration tool",
+          "description": "Convert the existing migration files to work with the new custom migration tool developed in Task #33.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implementation steps:\n1. Review the structure and format required by the new custom migration tool\n2. Convert the initial migration created in subtask 3 to the format required by the custom tool\n3. Ensure all schema definitions are correctly translated to the new format\n4. Verify that all table definitions, indices, and constraints are preserved in the conversion\n5. Update any references to Alembic-specific functions or methods\n\nTesting approach:\n- Verify the converted migration file is valid for the custom migration tool\n- Compare the schema that would be generated by both approaches to ensure equivalence\n- Check for any functionality that might be missing in the conversion",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 7,
+          "title": "Update migration application and rollback procedures",
+          "description": "Replace Alembic-specific migration commands with the equivalent commands from the custom migration tool.",
+          "dependencies": [
+            6
+          ],
+          "details": "Implementation steps:\n1. Document the commands to apply migrations using the custom migration tool\n2. Document the commands to roll back migrations using the custom migration tool\n3. Update any scripts or documentation that reference 'alembic upgrade' or 'alembic downgrade'\n4. Create examples of common migration scenarios using the new tool\n5. Update CI/CD pipelines to use the new migration commands\n\nTesting approach:\n- Test applying migrations to a fresh database\n- Test rolling back migrations\n- Verify the commands work in all environments (development, testing, production)\n- Ensure the migration state is correctly tracked by the new tool",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 8,
+          "title": "Update developer documentation for the new migration workflow",
+          "description": "Create comprehensive documentation for developers on how to use the custom migration tool for all database schema changes.",
+          "dependencies": [
+            6,
+            7
+          ],
+          "details": "Implementation steps:\n1. Create a new documentation file explaining the custom migration tool workflow\n2. Document how to create new migrations\n3. Document how to apply and roll back migrations\n4. Provide examples of common migration scenarios\n5. Update any existing documentation that references Alembic\n6. Create a migration guide for developers transitioning from Alembic\n7. Document any differences in behavior or capabilities between Alembic and the custom tool\n\nTesting approach:\n- Have another developer follow the documentation to create and apply a test migration\n- Verify all commands and examples work as described\n- Ensure the documentation covers all common migration scenarios",
+          "status": "pending",
+          "parentTaskId": 29
+        },
+        {
+          "id": 9,
+          "title": "Final testing with the custom migration tool",
+          "description": "Perform comprehensive testing of the database schema using the custom migration tool.",
+          "dependencies": [
+            6,
+            7,
+            8
+          ],
+          "details": "Implementation steps:\n1. Create a fresh libSQL/SQLite database\n2. Apply the initial migration using the custom migration tool\n3. Verify all tables, indices, and constraints are created correctly\n4. Test the application's functionality with the new database schema\n5. Test the rollback functionality\n6. Verify that the migration state is correctly tracked\n7. Test creating and applying a new migration\n\nTesting approach:\n- Run a full suite of integration tests against the database\n- Verify all CRUD operations work correctly\n- Test complex queries and transactions\n- Ensure the application functions correctly with the new schema\n- Verify migration state tracking works correctly across multiple migrations",
+          "status": "pending",
           "parentTaskId": 29
         }
       ]
@@ -1763,9 +1958,151 @@
       "description": "Remove application-level field encryption (Fernet/EncryptedType) from all models and code since database security is now handled by libSQL TDE and TLS connections.",
       "details": "This task involves removing all application-level field encryption that's no longer needed due to database-level encryption:\n\n1. Identify all SQLAlchemy models using EncryptedType fields\n2. Convert these fields to their base types (String, Integer, etc.)\n3. Remove all imports and usage of Fernet and EncryptedType throughout the codebase\n4. Update database migration scripts to convert encrypted columns to plain data types\n5. Remove encryption-related utility functions and helper methods\n6. Update any API endpoints or services that handle encryption/decryption logic\n7. Remove encryption-related environment variables (ENCRYPTION_KEY, etc.) from:\n   - .env files\n   - Docker configurations\n   - CI/CD pipelines\n   - Deployment templates\n8. Update documentation to reflect that field-level encryption has been removed and security is now handled at the database level\n9. Ensure any data serialization/deserialization logic that handled encrypted fields is updated\n10. Check for any custom validation logic that might have been specific to encrypted fields\n\nBefore making changes, create a backup of the database to ensure data can be recovered if needed.",
       "testStrategy": "1. Create a comprehensive test plan covering all affected models and functionality:\n   - Unit tests: Verify models function correctly with plain field types\n   - Integration tests: Ensure API endpoints correctly handle the non-encrypted data\n   - Migration tests: Verify data integrity after migration from encrypted to non-encrypted fields\n\n2. Specific test cases:\n   - Test CRUD operations on all previously encrypted fields\n   - Verify data consistency by comparing pre-migration and post-migration data samples\n   - Test boundary conditions (empty values, max length values, special characters)\n   - Ensure search functionality works on previously encrypted fields\n   - Verify that removing encryption doesn't break any filtering or sorting operations\n\n3. Security validation:\n   - Confirm TLS connections are properly configured\n   - Verify libSQL TDE is correctly protecting the database\n   - Run security scans to ensure no sensitive data is exposed\n\n4. Performance testing:\n   - Measure and document any performance improvements from removing encryption overhead\n\n5. Regression testing:\n   - Run the full test suite to ensure no functionality is broken by these changes",
+      "status": "done",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Audit and inventory all encrypted fields in models",
+          "description": "Create a comprehensive inventory of all SQLAlchemy models using EncryptedType fields, documenting their current types, encryption methods, and where they're used in the codebase.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Search the codebase for all imports of 'EncryptedType' and 'Fernet'\n2. Identify all model classes using these imports\n3. For each model, document:\n   - Model name\n   - Encrypted field names\n   - Base data types (String, Integer, etc.)\n   - Any special handling or validation logic\n4. Create a mapping document showing current encrypted fields and their target plain types\n5. Identify any custom encryption/decryption utility functions\n\nTesting approach:\n- This is an audit task, so verify completeness by using grep/search tools\n- Cross-reference findings with database schema to ensure all encrypted columns are identified",
+          "status": "done",
+          "parentTaskId": 31
+        },
+        {
+          "id": 2,
+          "title": "Create database migration script for decryption",
+          "description": "Develop a database migration script that will safely convert encrypted column data to plaintext while preserving the original information.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create a new Alembic migration script\n2. For each encrypted field identified in subtask 1:\n   - Add migration code to decrypt the data in-place\n   - Modify column types to remove encryption\n   - Ensure proper data type conversion\n3. Include transaction handling for safety\n4. Add rollback capability in case of failure\n5. Test the migration on a copy of production data\n6. Document the migration process\n\nTesting approach:\n- Test migration on a copy of the database\n- Verify data integrity by comparing decrypted values with expected values\n- Test rollback functionality\n- Ensure all data types are correctly preserved",
+          "status": "done",
+          "parentTaskId": 31
+        },
+        {
+          "id": 3,
+          "title": "Update SQLAlchemy models to remove EncryptedType",
+          "description": "Modify all SQLAlchemy model definitions to replace EncryptedType fields with their base types (String, Integer, etc.).",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. For each model identified in subtask 1:\n   - Replace EncryptedType fields with their base types\n   - Remove Fernet and EncryptedType imports\n   - Update any type hints or annotations\n2. Update model validation methods that might reference encryption\n3. Update any model methods that handle encryption/decryption\n4. Remove any special handling for encrypted fields in model methods\n5. Update model tests to reflect the changes\n\nTesting approach:\n- Run unit tests for all modified models\n- Test CRUD operations with the updated models\n- Verify serialization/deserialization still works correctly\n- Ensure model validation still functions properly",
+          "status": "done",
+          "parentTaskId": 31
+        },
+        {
+          "id": 4,
+          "title": "Update service layer and API endpoints",
+          "description": "Modify service layer code and API endpoints to remove any encryption/decryption logic and handle plaintext data directly.",
+          "dependencies": [
+            3
+          ],
+          "details": "Implementation steps:\n1. Identify all services and API endpoints that interact with previously encrypted fields\n2. Remove any encryption/decryption operations in these components\n3. Update data validation logic that might have been specific to encrypted fields\n4. Update serialization/deserialization logic for API responses\n5. Remove any special handling for encrypted fields in business logic\n6. Update error handling related to encryption/decryption\n\nTesting approach:\n- Run unit tests for all modified services\n- Test API endpoints with various inputs\n- Verify correct data handling without encryption\n- Test edge cases that might have been handled differently with encryption",
+          "status": "done",
+          "parentTaskId": 31
+        },
+        {
+          "id": 5,
+          "title": "Remove encryption utilities and environment variables",
+          "description": "Clean up all encryption-related utility functions, helper methods, and environment variables from the codebase and configuration files.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "Implementation steps:\n1. Remove all encryption utility functions and helper methods\n2. Delete encryption-related environment variables from:\n   - .env files and templates\n   - Docker configurations\n   - CI/CD pipeline configurations\n   - Deployment templates\n   - Kubernetes/infrastructure configs\n3. Update configuration loading code to remove references to encryption keys\n4. Remove any encryption-related test fixtures or mocks\n5. Clean up imports of removed utilities throughout the codebase\n\nTesting approach:\n- Verify application starts without encryption environment variables\n- Run the test suite to ensure no references to removed utilities\n- Check deployment processes work without encryption configuration\n- Verify no runtime errors occur due to missing encryption utilities",
+          "status": "done",
+          "parentTaskId": 31
+        },
+        {
+          "id": 6,
+          "title": "Update documentation and finalize removal",
+          "description": "Update all documentation to reflect the removal of field-level encryption and perform final verification that all encryption code has been removed.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "details": "Implementation steps:\n1. Update documentation to reflect that field-level encryption has been removed\n2. Document that security is now handled at the database level (libSQL TDE and TLS)\n3. Update developer guides, API documentation, and security documentation\n4. Perform a final codebase search for any remaining references to:\n   - Fernet\n   - EncryptedType\n   - Encryption keys\n   - Encryption/decryption functions\n5. Run a full test suite to verify application functionality\n6. Update any data seeding scripts or fixtures that might have used encrypted data\n\nTesting approach:\n- Comprehensive end-to-end testing of the application\n- Verify all documentation accurately reflects the new security approach\n- Run security scans to ensure no sensitive data is exposed\n- Verify all tests pass with the updated codebase",
+          "status": "done",
+          "parentTaskId": 31
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "title": "Implement Subscription Pricing Plans with Feature Gating",
+      "description": "Create a tiered pricing structure with feature access control based on subscription plans. Integrate with the existing Stripe payment processing system to handle plan selection, upgrades, and downgrades.",
+      "details": "This task requires implementing a comprehensive subscription plan system:\n\n1. Database Changes:\n   - Create a new `Plans` table with fields: `id`, `name` (Basic, Pro, Enterprise), `price`, `billing_frequency` (monthly/annual), `features` (JSON field storing allowed features), `stripe_price_id`, `created_at`, `updated_at`\n   - Add `current_plan_id` (foreign key to Plans table) and `subscription_status` fields to the `Office` table\n\n2. Feature Gating Implementation:\n   - Create a centralized FeatureAccess service class that handles all permission checks\n   - Implement methods like `canAccessFeature(officeId, featureName)` that check if an office's plan includes specific features\n   - Create middleware for protecting routes based on subscription level\n   - Add UI indicators for premium features\n\n3. Stripe Integration:\n   - Map internal plan IDs to Stripe product/price IDs\n   - Implement plan change functionality (upgrades/downgrades)\n   - Handle prorated billing for mid-cycle changes\n   - Update webhook handlers to process subscription events\n\n4. Admin Interface:\n   - Create admin tools to manage plans and their features\n   - Add ability to view and modify customer subscriptions\n\n5. User Experience:\n   - Implement plan selection during signup\n   - Create plan comparison page\n   - Add upgrade prompts when users attempt to access premium features\n\nRefer to docs/payment-plan.md for the specific billing structure and feature sets for each plan tier. Ensure all plan-related logic is centralized for easy updates to pricing or feature sets.",
+      "testStrategy": "Testing should cover all aspects of the subscription system:\n\n1. Unit Tests:\n   - Test FeatureAccess service with various plan/feature combinations\n   - Verify plan upgrade/downgrade logic handles all edge cases\n   - Test proration calculations\n\n2. Integration Tests:\n   - Verify Stripe API interactions for subscription creation, updates, and cancellations\n   - Test webhook handling for subscription events\n   - Ensure database updates correctly when plan changes occur\n\n3. End-to-End Tests:\n   - Complete user journeys: signup with plan selection, upgrade flow, downgrade flow\n   - Verify feature access is properly restricted based on plan\n   - Test plan change with billing implications\n\n4. Manual Testing:\n   - Use Stripe test mode to verify complete subscription lifecycle\n   - Verify UI elements correctly show/hide based on subscription status\n   - Test upgrade prompts when accessing gated features\n\n5. Edge Cases:\n   - Test subscription cancellation and reinstatement\n   - Verify handling of failed payments\n   - Test plan changes near billing cycle boundaries\n\nCreate a test matrix covering all features and their availability in each plan tier to ensure comprehensive coverage.",
+      "status": "pending",
+      "dependencies": [
+        9
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design and Implement Plans Table",
+          "description": "Create a Plans table to define available pricing tiers (e.g., Basic, Pro, Enterprise), their prices, billing intervals, and included features. Ensure the table structure supports easy addition or modification of plans.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 2,
+          "title": "Add current_plan_id Field to Office Table",
+          "description": "Add a current_plan_id field to the Office table to reference the selected plan for each office. Ensure this field is properly indexed and supports plan upgrades/downgrades.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 3,
+          "title": "Implement Feature Gating Logic Based on Plan",
+          "description": "Centralize logic to check feature access based on the office's current plan. Use decorators, middleware, or service-layer checks to enforce plan-based feature access throughout the app.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 4,
+          "title": "Integrate Plan Selection and Upgrades/Downgrades with Billing and Stripe",
+          "description": "Implement endpoints and business logic for offices to select, upgrade, or downgrade their plan. Ensure changes are reflected in Stripe (or other payment provider) and that billing is prorated or adjusted as needed.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        },
+        {
+          "id": 5,
+          "title": "Document Plan and Feature Gating System",
+          "description": "Update developer and user documentation to describe available plans, included features, and how feature gating is enforced. Reference docs/payment-plan.md and ensure documentation is clear for future maintenance.",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 32
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "title": "Task #33: Develop Custom Database Migration Tool for libSQL",
+      "description": "Create a custom database migration tool that interfaces with libSQL to manage schema changes, supporting version control of database structure with capabilities to apply, rollback, and track migrations.",
+      "details": "The migration tool should be implemented as a standalone CLI utility that interfaces directly with our libSQL database. Key requirements include:\n\n1. **Migration Creation**: Provide a command to generate new migration files with timestamps for ordering (e.g., `20230615120000_add_user_table.sql`).\n\n2. **Migration Structure**: Each migration should contain both \"up\" (apply) and \"down\" (rollback) SQL scripts.\n\n3. **Migration Tracking**: Create a migrations table in the database to track which migrations have been applied, including timestamp, name, and execution status.\n\n4. **Core Commands**:\n   - `migrate:status` - Show current migration state\n   - `migrate:up` - Apply all pending migrations\n   - `migrate:up --step=N` - Apply N pending migrations\n   - `migrate:down` - Rollback the most recent migration\n   - `migrate:down --step=N` - Rollback N most recent migrations\n   - `migrate:create NAME` - Create a new migration file\n\n5. **Error Handling**: Implement transaction support to ensure migrations are atomic - either fully applied or fully rolled back.\n\n6. **Compatibility**: Ensure compatibility with libSQL's specific features and syntax differences from standard SQLite.\n\n7. **Integration**: The tool should be easily invokable from our CI/CD pipeline and development environments.\n\n8. **Documentation**: Include comprehensive documentation on how to use the tool, create migrations, and troubleshoot common issues.\n\n9. **Configuration**: Support configuration via environment variables and/or config files for database connection details.\n\n10. **Logging**: Implement detailed logging of all migration operations for debugging and audit purposes.\n\nConsider using a language that's already common in our stack for implementation. The tool should be designed with our specific libSQL implementation in mind, particularly considering the changes made in Task #30 for SQLite compatibility.",
+      "testStrategy": "Testing for the migration tool should be comprehensive and include:\n\n1. **Unit Tests**:\n   - Test each command function independently with mocked database connections\n   - Verify proper file generation for new migrations\n   - Test parsing and validation of migration files\n   - Verify proper ordering of migrations based on timestamps\n\n2. **Integration Tests**:\n   - Set up a test libSQL database instance\n   - Test the full migration lifecycle:\n     - Create multiple migrations\n     - Apply them in sequence\n     - Verify database schema changes\n     - Roll back migrations\n     - Verify schema returns to previous states\n   - Test error scenarios (e.g., conflicting migrations, syntax errors)\n   - Test the migrations table structure and content after operations\n\n3. **Edge Cases**:\n   - Test behavior when migrations are applied out of order\n   - Test handling of failed migrations\n   - Test recovery from interrupted migrations\n   - Test with very large migration files\n   - Test concurrent migration attempts\n\n4. **Manual Testing Checklist**:\n   - Verify all CLI commands work as expected\n   - Test integration with actual project database\n   - Verify logging output is clear and useful\n   - Test on all supported development environments\n\n5. **CI Integration**:\n   - Add automated tests to CI pipeline\n   - Create a test that verifies migrations can be applied to a clean database\n\n6. **Documentation Verification**:\n   - Ensure all commands are properly documented\n   - Verify examples in documentation work as described\n\nThe testing should verify that the tool can safely manage our database schema across development, staging, and production environments without data loss or corruption.",
       "status": "pending",
       "dependencies": [],
-      "priority": "medium"
+      "priority": "medium",
+      "subtasks": []
     }
   ],
   "metadata": {

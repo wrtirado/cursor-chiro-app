@@ -1,0 +1,152 @@
+# Task ID: 33
+# Title: Task #33: Develop Custom Database Migration Tool for libSQL
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Create a custom database migration tool that interfaces with libSQL to manage schema changes, supporting version control of database structure with capabilities to apply, rollback, and track migrations.
+# Details:
+The migration tool should be implemented as a standalone CLI utility that interfaces directly with our libSQL database. Key requirements include:
+
+1. **Migration Creation**: Provide a command to generate new migration files with timestamps for ordering (e.g., `20230615120000_add_user_table.sql`).
+
+2. **Migration Structure**: Each migration should contain both "up" (apply) and "down" (rollback) SQL scripts.
+
+3. **Migration Tracking**: Create a migrations table in the database to track which migrations have been applied, including timestamp, name, and execution status.
+
+4. **Core Commands**:
+   - `migrate:status` - Show current migration state
+   - `migrate:up` - Apply all pending migrations
+   - `migrate:up --step=N` - Apply N pending migrations
+   - `migrate:down` - Rollback the most recent migration
+   - `migrate:down --step=N` - Rollback N most recent migrations
+   - `migrate:create NAME` - Create a new migration file
+
+5. **Error Handling**: Implement transaction support to ensure migrations are atomic - either fully applied or fully rolled back.
+
+6. **Compatibility**: Ensure compatibility with libSQL's specific features and syntax differences from standard SQLite.
+
+7. **Integration**: The tool should be easily invokable from our CI/CD pipeline and development environments.
+
+8. **Documentation**: Include comprehensive documentation on how to use the tool, create migrations, and troubleshoot common issues.
+
+9. **Configuration**: Support configuration via environment variables and/or config files for database connection details.
+
+10. **Logging**: Implement detailed logging of all migration operations for debugging and audit purposes.
+
+Consider using a language that's already common in our stack for implementation. The tool should be designed with our specific libSQL implementation in mind, particularly considering the changes made in Task #30 for SQLite compatibility.
+
+# Test Strategy:
+Testing for the migration tool should be comprehensive and include:
+
+1. **Unit Tests**:
+   - Test each command function independently with mocked database connections
+   - Verify proper file generation for new migrations
+   - Test parsing and validation of migration files
+   - Verify proper ordering of migrations based on timestamps
+
+2. **Integration Tests**:
+   - Set up a test libSQL database instance
+   - Test the full migration lifecycle:
+     - Create multiple migrations
+     - Apply them in sequence
+     - Verify database schema changes
+     - Roll back migrations
+     - Verify schema returns to previous states
+   - Test error scenarios (e.g., conflicting migrations, syntax errors)
+   - Test the migrations table structure and content after operations
+
+3. **Edge Cases**:
+   - Test behavior when migrations are applied out of order
+   - Test handling of failed migrations
+   - Test recovery from interrupted migrations
+   - Test with very large migration files
+   - Test concurrent migration attempts
+
+4. **Manual Testing Checklist**:
+   - Verify all CLI commands work as expected
+   - Test integration with actual project database
+   - Verify logging output is clear and useful
+   - Test on all supported development environments
+
+5. **CI Integration**:
+   - Add automated tests to CI pipeline
+   - Create a test that verifies migrations can be applied to a clean database
+
+6. **Documentation Verification**:
+   - Ensure all commands are properly documented
+   - Verify examples in documentation work as described
+
+The testing should verify that the tool can safely manage our database schema across development, staging, and production environments without data loss or corruption.
+
+# Subtasks:
+## 1. Design CLI structure and command interface [pending]
+### Dependencies: None
+### Description: Define the command-line interface structure, argument parsing, and command handlers for the migration tool.
+### Details:
+Implement the core CLI structure using a library like Commander.js or Click (Python). Define all required commands (migrate:status, migrate:up, migrate:down, migrate:create) with their respective options and help documentation. Set up the basic project structure, including entry point, command routing, and help text generation.
+
+## 2. Implement migration file template and creation [pending]
+### Dependencies: 33.1
+### Description: Create functionality to generate new migration files with proper timestamps and structure for up/down operations.
+### Details:
+Implement the migrate:create command to generate migration files with timestamp prefixes (e.g., 20230615120000_add_user_table.sql). Create templates for migrations that include sections for 'up' and 'down' SQL scripts. Ensure proper file naming, validation, and placement in a designated migrations directory.
+
+## 3. Develop database connection and configuration module [pending]
+### Dependencies: 33.1
+### Description: Create a module to handle database connections and configuration management for the migration tool.
+### Details:
+Implement configuration loading from environment variables and/or config files. Create a database connection module that interfaces with libSQL, handling connection pooling, retries, and error states. Support different environments (development, testing, production) with appropriate connection parameters.
+
+## 4. Create migrations tracking table and schema [pending]
+### Dependencies: 33.3
+### Description: Design and implement the database schema for tracking applied migrations.
+### Details:
+Create a migrations table in the database with columns for migration ID, name, timestamp, applied_at, and status. Implement functions to initialize this table if it doesn't exist. Ensure the table can properly track the state of all migrations that have been applied or rolled back.
+
+## 5. Implement migration status reporting [pending]
+### Dependencies: 33.3, 33.4
+### Description: Develop the migrate:status command to show the current state of all migrations.
+### Details:
+Implement logic to scan the migrations directory, compare with the migrations table, and report which migrations are pending, applied, or rolled back. Format the output in a clear, tabular format showing timestamps, names, and statuses. Include summary statistics (e.g., '5 of 10 migrations applied').
+
+## 6. Implement migration up logic with transaction support [pending]
+### Dependencies: 33.3, 33.4
+### Description: Develop the core functionality to apply pending migrations with transaction support.
+### Details:
+Implement the migrate:up command to apply pending migrations in timestamp order. Support the --step=N option to limit the number of migrations applied. Wrap each migration in a transaction to ensure atomicity. Parse and execute the 'up' portion of each migration file. Update the migrations table to reflect successful applications.
+
+## 7. Implement migration down logic with rollback support [pending]
+### Dependencies: 33.6
+### Description: Develop functionality to roll back applied migrations in reverse order.
+### Details:
+Implement the migrate:down command to roll back the most recent migration(s). Support the --step=N option to control how many migrations to roll back. Parse and execute the 'down' portion of each migration file. Update the migrations table to reflect successful rollbacks. Include safeguards to prevent accidental rollback of all migrations.
+
+## 8. Implement logging and error handling system [pending]
+### Dependencies: 33.6, 33.7
+### Description: Create a comprehensive logging and error handling system for the migration tool.
+### Details:
+Implement structured logging for all operations with configurable verbosity levels. Log migration attempts, successes, failures, and SQL errors. Create specific error types for different failure scenarios (connection issues, SQL errors, file system errors). Implement graceful error handling with helpful error messages and suggested remediation steps.
+
+## 9. Create comprehensive documentation [pending]
+### Dependencies: 33.1, 33.2, 33.5, 33.6, 33.7, 33.8
+### Description: Develop user and developer documentation for the migration tool.
+### Details:
+Create comprehensive documentation including: installation guide, command reference with examples, migration file format specification, configuration options, troubleshooting guide, and developer documentation for extending the tool. Include examples of common migration patterns and best practices.
+
+## 10. Implement CI/CD integration and deployment [pending]
+### Dependencies: 33.6, 33.7, 33.8
+### Description: Create scripts and configurations for integrating the migration tool with CI/CD pipelines.
+### Details:
+Develop scripts for running migrations in CI/CD environments. Create Docker configuration for containerized usage. Implement safeguards for production environments (confirmation prompts, dry-run mode). Create example configurations for common CI/CD platforms (GitHub Actions, Jenkins, etc.). Ensure the tool can be easily invoked from automated deployment processes.
+
+## 11. Remove all Alembic code and references from the project [pending]
+### Dependencies: None
+### Description: Delete all Alembic-related code, configuration files, migration scripts, and references from the codebase. This includes removing the alembic/ directory, alembic.ini, any Alembic imports/usages in Python files, and updating documentation to reflect the removal. Ensure no Alembic-specific logic remains and that all migration instructions now reference the new custom migration tool.
+### Details:
+1. Delete the alembic/ directory and all its contents.
+2. Remove alembic.ini from the project root.
+3. Search for and remove all Alembic imports/usages in the codebase (e.g., in api/database, models, or scripts).
+4. Update any documentation (README, docs/, etc.) to remove or replace Alembic references with the new migration tool.
+5. Ensure no Alembic-specific logic remains in any scripts or CI/CD configs.
+6. Verify that all migration instructions and developer onboarding reference the new tool only.
+

@@ -40,6 +40,19 @@ When Alembic is re-enabled, we'll need to:
 
 This subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.
 </info added on 2025-05-20T03:49:09.977Z>
+<info added on 2025-05-20T19:56:24.570Z>
+The migration process is now handled by our custom migration tool for libSQL (developed in Task #33) instead of Alembic. Schema changes for the Office model (from subtask 9.2) will need to be properly migrated using this new approach.
+
+When implementing the subscription fields migration:
+1. Create a new migration file using `libsql-migrate create "Add subscription fields to Office model"`
+2. Define both the up and down migration functions in the generated file
+3. Test the migration on a local database instance
+4. Apply to staging using `libsql-migrate apply --env=staging`
+5. After verification, apply to production with `libsql-migrate apply --env=production`
+6. Update the schema change log with details of the migration
+
+This custom migration tool addresses the previous libSQL/driver instability issues while providing reliable schema versioning.
+</info added on 2025-05-20T19:56:24.570Z>
 
 ## 4. HIPAA-Compliant Audit Logging for Billing Events [done]
 ### Dependencies: None
