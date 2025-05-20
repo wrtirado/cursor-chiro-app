@@ -2109,7 +2109,7 @@
           "description": "Define the command-line interface structure, argument parsing, and command handlers for the migration tool.",
           "dependencies": [],
           "details": "Implement the core CLI structure using a library like Commander.js or Click (Python). Define all required commands (migrate:status, migrate:up, migrate:down, migrate:create) with their respective options and help documentation. Set up the basic project structure, including entry point, command routing, and help text generation.\n<info added on 2025-05-20T21:12:18.197Z>\nImplement the core CLI structure using a modern CLI library such as Commander.js (Node.js), Click (Python), or Typer (Python). External dependencies are recommended for this task to provide a more robust, user-friendly, and maintainable command-line interface. These libraries offer significant advantages in argument parsing, help text generation, command routing, and error handling.\n\nDefine all required commands (migrate:status, migrate:up, migrate:down, migrate:create) with their respective options and comprehensive help documentation. The chosen library should facilitate better UX through clear error messages, command suggestions, and auto-generated help text.\n\nSet up the basic project structure, including entry point, command routing, and help text generation, leveraging the CLI library's features for extensibility and maintainability.\n\nDocument all external dependencies in requirements.txt (Python) or package.json (Node.js) with specific version requirements to ensure reproducible builds.\n</info added on 2025-05-20T21:12:18.197Z>",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Write unit tests for command parsing and routing logic. Test each command with various argument combinations to ensure correct behavior."
         },
         {
@@ -2226,7 +2226,7 @@
           "title": "Remove all Alembic code and references from the project",
           "description": "Delete all Alembic-related code, configuration files, migration scripts, and references from the codebase. This includes removing the alembic/ directory, alembic.ini, any Alembic imports/usages in Python files, and updating documentation to reflect the removal. Ensure no Alembic-specific logic remains and that all migration instructions now reference the new custom migration tool.",
           "details": "1. Delete the alembic/ directory and all its contents.\n2. Remove alembic.ini from the project root.\n3. Search for and remove all Alembic imports/usages in the codebase (e.g., in api/database, models, or scripts).\n4. Update any documentation (README, docs/, etc.) to remove or replace Alembic references with the new migration tool.\n5. Ensure no Alembic-specific logic remains in any scripts or CI/CD configs.\n6. Verify that all migration instructions and developer onboarding reference the new tool only.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 33
         }

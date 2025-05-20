@@ -79,7 +79,7 @@ Testing for the migration tool should be comprehensive and include:
 The testing should verify that the tool can safely manage our database schema across development, staging, and production environments without data loss or corruption.
 
 # Subtasks:
-## 1. Design CLI structure and command interface [pending]
+## 1. Design CLI structure and command interface [done]
 ### Dependencies: None
 ### Description: Define the command-line interface structure, argument parsing, and command handlers for the migration tool.
 ### Details:
@@ -148,7 +148,7 @@ Create comprehensive documentation including: installation guide, command refere
 ### Details:
 Develop scripts for running migrations in CI/CD environments. Create Docker configuration for containerized usage. Implement safeguards for production environments (confirmation prompts, dry-run mode). Create example configurations for common CI/CD platforms (GitHub Actions, Jenkins, etc.). Ensure the tool can be easily invoked from automated deployment processes.
 
-## 11. Remove all Alembic code and references from the project [pending]
+## 11. Remove all Alembic code and references from the project [done]
 ### Dependencies: None
 ### Description: Delete all Alembic-related code, configuration files, migration scripts, and references from the codebase. This includes removing the alembic/ directory, alembic.ini, any Alembic imports/usages in Python files, and updating documentation to reflect the removal. Ensure no Alembic-specific logic remains and that all migration instructions now reference the new custom migration tool.
 ### Details:
