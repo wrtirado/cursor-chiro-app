@@ -12,4 +12,4 @@ pydantic-settings
 pydantic[email]
 python-multipart
 minio
-alembic
+typer==0.12.3

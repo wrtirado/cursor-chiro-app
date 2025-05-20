@@ -44,7 +44,7 @@ This document outlines key security and compliance features implemented in the A
   - _(Review and add others as necessary)_
 - **Developer Responsibility:**
   - **Identify Sensitive Fields:** When adding new models/fields containing potential ePHI, consider if they require encryption and apply the `EncryptedType` in `api/models/base.py`.
-  - **Database Migrations:** Adding/removing `EncryptedType` requires a corresponding Alembic database migration (`op.alter_column` changing the type, usually to/from `sa.Text`). Handle existing data carefully during migrations.
+  - **Database Migrations:** Adding/removing `EncryptedType` requires a corresponding database migration using the custom migration tool for libSQL. Handle existing data carefully during migrations.
   - **Key Management:** Understand that changing the `ENCRYPTION_KEY` will make previously encrypted data unreadable unless the old key is available for decryption (requires more complex key rotation logic not yet implemented).
 
 ## 4. Secure Data Handling (`api/core/exceptions.py`, Pydantic Schemas)

@@ -32,15 +32,12 @@ Migrating the backend from PostgreSQL to libSQL/SQLite involves significant chan
   - **Encryption (`EncryptedType`):** Should still work as it relies on `Text`, which maps cleanly to SQLite's `TEXT` affinity.
 - **Difficulty:** Moderate. Requires careful review and potential modification of all data types used in models, with special attention to timestamps and JSON.
 
-## 4. Alembic Migrations (`alembic/` directory)
+## 4. Database Migrations (Custom Migration Tool)
 
-- **Current:** Existing migration scripts (`*.py` files in `alembic/versions/`) contain PostgreSQL-specific SQL operations and type definitions.
-- **Change Required:** Existing migration scripts are **largely incompatible** with SQLite due to differences in SQL syntax, type handling, and `ALTER TABLE` support.
-  - **Option A (Hard):** Manually edit every existing migration file to use SQLite-compatible syntax and operations. Very complex and error-prone.
-  - **Option B (Easier, Loses History):** Delete all files within `alembic/versions/`. Generate a single new "initial" migration based on the SQLite-adapted models (`alembic revision --autogenerate -m "Initial schema for SQLite/libSQL"`).
-  - Alembic's autogenerate feature may behave differently with SQLite.
-  - SQLite's limited `ALTER TABLE` often forces Alembic into "batch mode" for complex changes, which can be fragile.
-- **Difficulty:** **Very High.** This is a major undertaking. Reworking existing migrations is difficult; starting fresh simplifies the process but erases the schema evolution history.
+- **Current:** Existing migration scripts (previously in `alembic/versions/`) are now obsolete. All migration management is handled by the new custom migration tool for libSQL.
+- **Option B (Easier, Loses History):** Delete all files within the old `alembic/versions/` directory. Generate a single new "initial" migration using the custom migration tool based on the SQLite-adapted models.
+- The custom migration tool is designed for SQLite/libSQL compatibility and replaces all Alembic-specific workflows.
+- SQLite's limited `ALTER TABLE` support is handled by the new tool's migration logic, not Alembic's batch mode.
 
 ## 5. Raw SQL & Initialization (`database/init_schema.sql`, `scripts/seed_admin.py`)
 

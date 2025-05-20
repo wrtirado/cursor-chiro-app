@@ -22,7 +22,7 @@ import api.models.base
 import traceback  # Add this import for more detailed error printing
 
 # WARNING: This is for initial setup/testing ...
-print("Attempting to create database tables directly (bypassing Alembic for test)...")
+print("Attempting to create database tables directly for test...")
 engine_conn_attempted = False
 try:
     print(f"Using DATABASE_URL: {settings.DATABASE_URL}")  # Print the URL being used
