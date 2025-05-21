@@ -34,9 +34,10 @@ services:
     ports:
       - "8080:8080" # Default libSQL server port
     volumes:
-      - ./db_data:/var/lib/sqld  # Mount to a local directory
+      - libsql_data:/var/lib/sqld  # Use named volume
     environment:
       - LIBSQL_ADMIN_TOKEN=changeme # Change this in production
+    command: sqld --http-listen-addr 0.0.0.0:8080 # Ensure it listens on all interfaces
     networks:
       - app-network
 

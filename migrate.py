@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import libsql_client
 from dotenv import load_dotenv
+import asyncio
 
 app = typer.Typer(help="Custom migration tool for libSQL.")
 MIGRATIONS_DIR = "migrations"
@@ -26,13 +27,22 @@ def get_db_url(db_url_override: str = None) -> str:
 
 def create_db_client(db_url: str):
     try:
-        # For local .db file, url should be like: file:local.db
-        # For remote server: libsql://<your-host>.turso.io?authToken=<your-token>
-        # The libsql_client will also handle http/https URLs for libSQL.
-        client = libsql_client.create_client(url=db_url)
+        adapted_db_url = db_url
+        if db_url.startswith("sqlite+libsql://"):
+            adapted_db_url = db_url.replace("sqlite+libsql://", "http://", 1)
+        elif db_url.startswith("libsql://"):
+            pass
+        elif db_url.startswith("sqlite+http://"):
+            adapted_db_url = db_url.replace("sqlite+http://", "http://", 1)
+        elif db_url.startswith("sqlite+ws://"):
+            adapted_db_url = db_url.replace("sqlite+ws://", "ws://", 1)
+
+        typer.echo(f"Attempting to connect with adapted URL: {adapted_db_url}")
+        client = libsql_client.create_client(url=adapted_db_url)
+        # typer.echo("Successfully created DB client.") # Optional
         return client
     except Exception as e:
-        typer.secho(f"Error connecting to database: {e}", fg=typer.colors.RED)
+        typer.secho(f"Error creating database client: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
 
@@ -48,28 +58,31 @@ def status(
     """Show current migration state."""
     actual_db_url = get_db_url(db_url_override)
     typer.echo(f"Using database URL: {actual_db_url}")
-    client = None
+
+    async def _run_db_operations():
+        nonlocal actual_db_url
+        client = None
+        try:
+            client = create_db_client(actual_db_url)
+            rs = await client.execute("SELECT 1")
+            if rs.rows and rs.rows[0][0] == 1:
+                typer.secho("Database connection successful.", fg=typer.colors.GREEN)
+            else:
+                typer.secho(
+                    "Database connection test failed to return expected result.",
+                    fg=typer.colors.YELLOW,
+                )
+            typer.echo("Status: Not implemented yet (beyond connection test)")
+        finally:
+            if client:
+                await client.close()
+
     try:
-        client = create_db_client(actual_db_url)
-        # Test connection with a simple query
-        rs = client.execute("SELECT 1")
-        if rs.rows and rs.rows[0][0] == 1:
-            typer.secho("Database connection successful.", fg=typer.colors.GREEN)
-        else:
-            typer.secho(
-                "Database connection test failed to return expected result.",
-                fg=typer.colors.YELLOW,
-            )
-
-        typer.echo("Status: Not implemented yet (beyond connection test)")
-
-    except typer.Exit:  # Catch Exit from create_db_client or get_db_url
+        asyncio.run(_run_db_operations())
+    except typer.Exit:
         raise
     except Exception as e:
         typer.secho(f"An error occurred: {e}", fg=typer.colors.RED)
-    finally:
-        if client:
-            client.close()
 
 
 @app.command()
