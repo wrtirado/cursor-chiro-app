@@ -94,13 +94,13 @@ Set up the basic project structure, including entry point, command routing, and 
 Document all external dependencies in requirements.txt (Python) or package.json (Node.js) with specific version requirements to ensure reproducible builds.
 </info added on 2025-05-20T21:12:18.197Z>
 
-## 2. Implement migration file template and creation [pending]
+## 2. Implement migration file template and creation [done]
 ### Dependencies: 33.1
 ### Description: Create functionality to generate new migration files with proper timestamps and structure for up/down operations.
 ### Details:
 Implement the migrate:create command to generate migration files with timestamp prefixes (e.g., 20230615120000_add_user_table.sql). Create templates for migrations that include sections for 'up' and 'down' SQL scripts. Ensure proper file naming, validation, and placement in a designated migrations directory.
 
-## 3. Develop database connection and configuration module [pending]
+## 3. Develop database connection and configuration module [done]
 ### Dependencies: 33.1
 ### Description: Create a module to handle database connections and configuration management for the migration tool.
 ### Details:

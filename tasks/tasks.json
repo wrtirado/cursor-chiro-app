@@ -2120,7 +2120,7 @@
             1
           ],
           "details": "Implement the migrate:create command to generate migration files with timestamp prefixes (e.g., 20230615120000_add_user_table.sql). Create templates for migrations that include sections for 'up' and 'down' SQL scripts. Ensure proper file naming, validation, and placement in a designated migrations directory.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test file creation with various migration names, verify timestamp format, file structure, and content template."
         },
         {
@@ -2131,7 +2131,7 @@
             1
           ],
           "details": "Implement configuration loading from environment variables and/or config files. Create a database connection module that interfaces with libSQL, handling connection pooling, retries, and error states. Support different environments (development, testing, production) with appropriate connection parameters.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test configuration loading from different sources, connection establishment, error handling, and connection pool management."
         },
         {
