@@ -1,0 +1,72 @@
+name: Run Database Migrations
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  run_migrations:
+    runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.DB_URL }} # Store your database URL in GitHub secrets
+      # Add other necessary environment variables here
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build migration tool image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./migration_tool.Dockerfile
+          push: false # Don't push to a registry for this example
+          tags: migration-tool:latest
+          load: true # Load the image into the local Docker daemon
+
+      - name: Run migrations (on push to main/develop)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        run: |
+          echo "Attempting to apply migrations..."
+          docker run --rm --env DB_URL="$DB_URL" migration-tool:latest migrate:up
+          # If your tool supports a dry run, you might do that first
+          # docker run --rm --env DB_URL="$DB_URL" migration-tool:latest migrate:up --dry-run
+
+      - name: Check migration status (on pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Checking migration status..."
+          # Assuming your tool has a dry-run or status check that doesn't modify the DB
+          # This is a placeholder; adapt to your tool's capabilities
+          docker run --rm --env DB_URL="$DB_URL" migration-tool:latest migrate:status
+          # Or, if you have a dry-run for `up` that's safe:
+          # docker run --rm --env DB_URL="$DB_URL" migration-tool:latest migrate:up --dry-run
+
+      # Add a step here for production deployment that requires manual approval
+      # if you want to gate production migrations.
+      # Example using GitHub environments and manual approval:
+      # - name: Deploy to Production (Manual Approval)
+      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      #   uses: trstringer/manual-approval@v1
+      #   with:
+      #     secret: ${{ secrets.APPROVAL_TOKEN }} # A secret only known to approvers
+      #     approvers: user1,user2
+      #     minimum-approvals: 1
+      #     issue-title: "Production Migration Approval for commit ${{ github.sha }}"
+      #     issue-body: "Please approve or deny the migration for commit ${{ github.sha }}."
+      #     exclude-workflow-initiator-as-approver: true
+      # - name: Run migrations on Production
+      #   if: success() # only runs if manual approval step succeeded
+      #   run: |
+      #     echo "Applying migrations to production..."
+      #     # Ensure you have a separate DB_URL_PRODUCTION or similar for this step
+      #     docker run --rm --env DB_URL="${{ secrets.DB_URL_PRODUCTION }}" migration-tool:latest migrate:up
