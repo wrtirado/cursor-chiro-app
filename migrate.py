@@ -91,6 +91,39 @@ def parse_migration_sql(filepath: str) -> list[str]:
     return statements
 
 
+def parse_migration_sql_down(filepath: str) -> list[str]:
+    """
+    Parses a migration SQL file and extracts the DOWN script.
+    Returns the SQL commands for the DOWN migration as a list of statements.
+    """
+    try:
+        with open(filepath, "r") as f:
+            lines = f.readlines()
+    except IOError:
+        typer.secho(f"Error reading migration file: {filepath}", fg=typer.colors.RED)
+        return []
+
+    down_script_lines = []
+    in_down_script = False
+    for line in lines:
+        if line.strip().lower() == "-- down script":
+            in_down_script = True
+            continue
+        if in_down_script and line.strip().lower() == "-- up script":
+            break
+
+        if in_down_script:
+            down_script_lines.append(line)
+
+    full_down_script = "".join(down_script_lines).strip()
+    statements = []
+    for stmt in full_down_script.split(";"):
+        stripped_stmt = stmt.strip()
+        if stripped_stmt and not stripped_stmt.startswith("--"):
+            statements.append(stripped_stmt)
+    return statements
+
+
 async def ensure_migrations_table_exists(client: libsql_client.client.Client):
     """Ensures the migrations table exists in the database."""
     create_table_sql = """
@@ -139,7 +172,20 @@ def status(
                     "Database connection test query failed.",
                     fg=typer.colors.YELLOW,
                 )
-            typer.echo("Status: Not implemented yet (beyond connection test)")
+
+            rs_applied = await client.execute(
+                "SELECT version FROM migrations ORDER BY version ASC"
+            )
+            applied_versions = [row[0] for row in rs_applied.rows]
+
+            if applied_versions:
+                typer.secho("Applied migrations:", fg=typer.colors.BLUE)
+                for version in applied_versions:
+                    typer.echo(f"  - {version}")
+            else:
+                typer.secho("No migrations have been applied.", fg=typer.colors.YELLOW)
+
+            # typer.echo("Status: Not implemented yet (beyond connection test)") # Old message removed
         finally:
             if client:
                 await client.close()
@@ -278,20 +324,126 @@ def up(
 
 @app.command()
 def down(
-    step: int = typer.Option(None, help="Number of migrations to roll back"),
+    step: int = typer.Option(
+        1, help="Number of migrations to roll back. Defaults to 1."
+    ),
     db_url_override: str = typer.Option(
         None, "--db-url", help="Override DATABASE_URL from environment/dotenv"
     ),
 ):
     """Rollback the most recent (or N) migrations."""
     actual_db_url = get_db_url(db_url_override)
-    # client = create_db_client(actual_db_url)
-    # ... rest of the implementation ...
-    # client.close()
-    if step:
-        typer.echo(f"Down: Not implemented yet (step={step}) using DB: {actual_db_url}")
-    else:
-        typer.echo(f"Down: Not implemented yet (1) using DB: {actual_db_url}")
+    typer.echo(f"Attempting to roll back migrations using DB: {actual_db_url}")
+
+    async def _rollback_migrations_down():
+        nonlocal step
+        nonlocal actual_db_url
+        client = None
+        try:
+            client = create_db_client(actual_db_url)
+            await ensure_migrations_table_exists(client)
+
+            rs_applied = await client.execute(
+                "SELECT version FROM migrations ORDER BY version DESC"
+            )
+            applied_migrations = [row[0] for row in rs_applied.rows]
+
+            if not applied_migrations:
+                typer.secho(
+                    "No migrations have been applied; nothing to roll back.",
+                    fg=typer.colors.YELLOW,
+                )
+                return
+
+            if step <= 0:
+                typer.secho("Step count must be positive.", fg=typer.colors.RED)
+                return
+
+            migrations_to_rollback = applied_migrations[:step]
+
+            if not migrations_to_rollback:
+                typer.secho(
+                    "No migrations to roll back for the given criteria.",
+                    fg=typer.colors.YELLOW,
+                )
+                return
+
+            typer.echo(
+                f"Identified {len(migrations_to_rollback)} migration(s) to roll back (newest first):"
+            )
+            for mig_filename in migrations_to_rollback:
+                typer.echo(f"  - Will attempt to roll back: {mig_filename}")
+
+            rolled_back_count = 0
+            for mig_filename in migrations_to_rollback:
+                typer.echo(f"Rolling back migration: {mig_filename}...")
+                filepath = os.path.join(MIGRATIONS_DIR, mig_filename)
+
+                if not os.path.exists(filepath):
+                    typer.secho(
+                        f"  Migration file not found: {filepath}. Cannot roll back.",
+                        fg=typer.colors.RED,
+                    )
+                    raise Exception(
+                        f"Migration file {mig_filename} not found, cannot perform rollback."
+                    )
+
+                list_of_sql_statements = parse_migration_sql_down(filepath)
+                if not list_of_sql_statements:
+                    typer.secho(
+                        f"  No executable DOWN statements found in: {mig_filename}. Proceeding to unmark.",
+                        fg=typer.colors.YELLOW,
+                    )
+                else:
+                    try:
+                        await client.batch(list_of_sql_statements)
+                        typer.secho(
+                            f"  Successfully executed DOWN script for: {mig_filename}",
+                            fg=typer.colors.GREEN,
+                        )
+                    except Exception as e:
+                        typer.secho(
+                            f"  Error executing DOWN script for {mig_filename}: {e}",
+                            fg=typer.colors.RED,
+                        )
+                        raise Exception(
+                            f"Failed to execute DOWN script for {mig_filename}. Error: {e}"
+                        )
+
+                delete_sql = "DELETE FROM migrations WHERE version = ?"
+                await client.execute(delete_sql, (mig_filename,))
+
+                typer.secho(
+                    f"  Successfully unmarked migration as applied: {mig_filename}",
+                    fg=typer.colors.GREEN,
+                )
+                rolled_back_count += 1
+
+            if rolled_back_count > 0:
+                typer.secho(
+                    f"\nSuccessfully rolled back {rolled_back_count} migration(s).",
+                    fg=typer.colors.CYAN,
+                )
+            elif not migrations_to_rollback:  # Should have been caught earlier
+                pass
+            else:  # No migrations were actually rolled back (e.g. step was 0 or other logic issue)
+                typer.secho(
+                    "No migrations were rolled back in this run.",
+                    fg=typer.colors.YELLOW,
+                )
+
+        finally:
+            if client:
+                await client.close()
+
+    try:
+        asyncio.run(_rollback_migrations_down())
+    except typer.Exit:
+        raise
+    except Exception as e:
+        typer.secho(
+            f"An error occurred during 'down' command: {e}", fg=typer.colors.RED
+        )
 
 
 @app.command()

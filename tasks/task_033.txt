@@ -106,25 +106,25 @@ Implement the migrate:create command to generate migration files with timestamp 
 ### Details:
 Implement configuration loading from environment variables and/or config files. Create a database connection module that interfaces with libSQL, handling connection pooling, retries, and error states. Support different environments (development, testing, production) with appropriate connection parameters.
 
-## 4. Create migrations tracking table and schema [pending]
+## 4. Create migrations tracking table and schema [done]
 ### Dependencies: 33.3
 ### Description: Design and implement the database schema for tracking applied migrations.
 ### Details:
 Create a migrations table in the database with columns for migration ID, name, timestamp, applied_at, and status. Implement functions to initialize this table if it doesn't exist. Ensure the table can properly track the state of all migrations that have been applied or rolled back.
 
-## 5. Implement migration status reporting [pending]
+## 5. Implement migration status reporting [done]
 ### Dependencies: 33.3, 33.4
 ### Description: Develop the migrate:status command to show the current state of all migrations.
 ### Details:
 Implement logic to scan the migrations directory, compare with the migrations table, and report which migrations are pending, applied, or rolled back. Format the output in a clear, tabular format showing timestamps, names, and statuses. Include summary statistics (e.g., '5 of 10 migrations applied').
 
-## 6. Implement migration up logic with transaction support [pending]
+## 6. Implement migration up logic with transaction support [done]
 ### Dependencies: 33.3, 33.4
 ### Description: Develop the core functionality to apply pending migrations with transaction support.
 ### Details:
 Implement the migrate:up command to apply pending migrations in timestamp order. Support the --step=N option to limit the number of migrations applied. Wrap each migration in a transaction to ensure atomicity. Parse and execute the 'up' portion of each migration file. Update the migrations table to reflect successful applications.
 
-## 7. Implement migration down logic with rollback support [pending]
+## 7. Implement migration down logic with rollback support [done]
 ### Dependencies: 33.6
 ### Description: Develop functionality to roll back applied migrations in reverse order.
 ### Details:

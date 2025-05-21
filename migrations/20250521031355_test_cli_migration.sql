@@ -2,7 +2,7 @@
 -- CREATED_AT: 2025-05-21T03:13:55.210780
 
 -- UP script
-CREATE TABLE test_from_migration (id INTEGER PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS test_from_migration (id INTEGER PRIMARY KEY);
 
 -- DOWN script
--- Test comment for DOWN script.
+DROP TABLE IF EXISTS test_from_migration;

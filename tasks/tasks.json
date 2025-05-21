@@ -2142,7 +2142,7 @@
             3
           ],
           "details": "Create a migrations table in the database with columns for migration ID, name, timestamp, applied_at, and status. Implement functions to initialize this table if it doesn't exist. Ensure the table can properly track the state of all migrations that have been applied or rolled back.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test table creation, schema validation, and basic operations for recording migration status."
         },
         {
@@ -2154,7 +2154,7 @@
             4
           ],
           "details": "Implement logic to scan the migrations directory, compare with the migrations table, and report which migrations are pending, applied, or rolled back. Format the output in a clear, tabular format showing timestamps, names, and statuses. Include summary statistics (e.g., '5 of 10 migrations applied').",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test with various combinations of applied and pending migrations. Verify correct status reporting and formatting."
         },
         {
@@ -2166,7 +2166,7 @@
             4
           ],
           "details": "Implement the migrate:up command to apply pending migrations in timestamp order. Support the --step=N option to limit the number of migrations applied. Wrap each migration in a transaction to ensure atomicity. Parse and execute the 'up' portion of each migration file. Update the migrations table to reflect successful applications.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test applying single and multiple migrations, transaction rollback on error, and step limiting. Verify migrations table is correctly updated."
         },
         {
@@ -2177,7 +2177,7 @@
             6
           ],
           "details": "Implement the migrate:down command to roll back the most recent migration(s). Support the --step=N option to control how many migrations to roll back. Parse and execute the 'down' portion of each migration file. Update the migrations table to reflect successful rollbacks. Include safeguards to prevent accidental rollback of all migrations.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test rolling back single and multiple migrations, transaction handling, and step limiting. Verify migrations table is correctly updated after rollbacks."
         },
         {
