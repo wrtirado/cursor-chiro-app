@@ -1,0 +1,182 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Rule: Database Migrations with migrate.py
+
+**Version:** 1.0
+**Date:** 2024-05-21
+**Maintainer:** Project Team
+
+## 1. Purpose
+
+This rule provides guidelines and standard procedures for managing database schema changes using the custom `migrate.py` tool. It is designed for use with the project's libSQL database. Adherence to this rule ensures consistency, reliability, and a clear history of database modifications.
+
+## 2. When to Use This Rule
+
+Always consult and follow this rule when:
+
+*   Planning or implementing any database schema changes (e.g., creating tables, adding columns, modifying indexes).
+*   Creating new migration scripts.
+*   Applying or rolling back migrations in any environment (local, development, staging, production).
+*   Troubleshooting issues related to database migrations.
+
+## 3. Overview of `migrate.py`
+
+`migrate.py` is a command-line interface (CLI) tool tailored for this project to handle database migrations. Key features include:
+
+*   **Timestamped SQL Files:** Migrations are defined in `.sql` files with a `YYYYMMDDHHMMSS_descriptive_name.sql` naming convention.
+*   **UP and DOWN Scripts:** Each migration file contains distinct sections for applying (`-- UP script`) and reverting (`-- DOWN script`) changes.
+*   **Migration Tracking:** Applied migrations are recorded in a dedicated `migrations` table within the target database.
+*   **Logging:** All operations, errors, and significant events are logged to `logs/migration.log` and also output to the console.
+*   **Configuration:** Primarily driven by the `DATABASE_URL` environment variable, with command-line overrides available.
+
+## 4. Key Concepts
+
+### 4.1. Migration Files
+
+*   **Location:** All migration files must reside in the `migrations/` directory at the root of the project.
+*   **Naming Convention:** `YYYYMMDDHHMMSS_descriptive_name.sql`. The timestamp ensures chronological order, and the name should briefly describe the change (e.g., `20240521100000_create_users_table.sql`).
+*   **Structure:**
+    ```sql
+    -- MIGRATION: <filename>
+    -- CREATED_AT: <iso_timestamp>
+
+    -- UP script
+    -- SQL statements for applying the migration.
+    -- Example: CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL);
+    -- Statements should be separated by a semicolon.
+    -- Do NOT include BEGIN; or COMMIT; as batch execution handles transactions.
+
+    -- DOWN script
+    -- SQL statements for rolling back (reverting) the migration.
+    -- Example: DROP TABLE IF EXISTS users;
+    -- Statements should be separated by a semicolon.
+    -- Do NOT include BEGIN; or COMMIT;
+    ```
+*   **Comments:** SQL comments (`--`) can be used. Lines starting with `--` within the UP/DOWN script sections are ignored by the parser unless they are the section markers themselves.
+
+### 4.2. `migrations` Table
+
+The `migrate.py` tool automatically creates and manages a table named `migrations` in your database. This table stores:
+*   `id`: An auto-incrementing primary key.
+*   `version`: The filename of the applied migration (e.g., `20240521100000_create_users_table.sql`). This is unique.
+*   `applied_at`: A timestamp indicating when the migration was applied.
+
+**Do not manually alter this table unless absolutely necessary and with full understanding of the consequences.**
+
+### 4.3. Logging
+
+*   **Console Output:** `migrate.py` provides informative messages to the console during its execution, including status updates and errors.
+*   **File Logging:** Detailed logs, including timestamps, log levels, file/line numbers, messages, and stack traces for errors, are written to `logs/migration.log`. This file is crucial for debugging.
+    *   The `logs/` directory and its contents (except for `.gitkeep`) should be in your `.gitignore`.
+
+## 5. CLI Commands
+
+All commands are run from the project root directory.
+
+### 5.1. `create <migration_name>`
+
+*   **Purpose:** Generates a new, timestamped migration SQL file.
+*   **Usage:** `python migrate.py create <name_for_migration>`
+*   **Example:** `python migrate.py create add_profile_to_users`
+    *   This would create a file like `migrations/20240521100530_add_profile_to_users.sql`.
+*   **Action:** Creates the file in `migrations/` with the standard UP/DOWN script template. It will also create the `migrations/` directory if it doesn't exist.
+
+### 5.2. `status [--db-url <override_url>]`
+
+*   **Purpose:** Displays the current state of migrations.
+*   **Usage:** `python migrate.py status`
+*   **Action:**
+    *   Checks database connectivity.
+    *   Reports all migrations that have been applied to the database by querying the `migrations` table.
+    *   Does not show pending migrations (use `up` command preview for that).
+*   **Option:** `--db-url <url>`: Overrides the `DATABASE_URL` from the environment for this command.
+
+### 5.3. `up [--step <number>] [--db-url <override_url>]`
+
+*   **Purpose:** Applies pending migrations to the database.
+*   **Usage:**
+    *   `python migrate.py up` (applies all pending migrations)
+    *   `python migrate.py up --step N` (applies the next N pending migrations)
+*   **Action:**
+    *   Identifies migration files in `migrations/` that are not present in the `migrations` table.
+    *   Applies them in chronological (filename) order.
+    *   Executes the SQL statements found in the `-- UP script` section of each file.
+    *   Records each successfully applied migration in the `migrations` table.
+*   **Options:**
+    *   `--step <number>`: Limits the number of migrations applied.
+    *   `--db-url <url>`: Overrides `DATABASE_URL`.
+
+### 5.4. `down [--step <number>] [--db-url <override_url>]`
+
+*   **Purpose:** Rolls back (reverts) previously applied migrations.
+*   **Usage:**
+    *   `python migrate.py down` (rolls back the most recent 1 migration)
+    *   `python migrate.py down --step N` (rolls back the N most recent migrations)
+*   **Action:**
+    *   Identifies the N most recently applied migrations from the `migrations` table.
+    *   Executes the SQL statements from the `-- DOWN script` section of the corresponding migration files, in reverse order of application.
+    *   Removes the record of the rolled-back migration from the `migrations` table.
+*   **Options:**
+    *   `--step <number>`: Specifies how many migrations to roll back (default is 1).
+    *   `--db-url <url>`: Overrides `DATABASE_URL`.
+*   **Caution:** The migration file must exist in the `migrations/` directory for the DOWN script to be executed. If the file is missing, the tool will only attempt to unmark it from the `migrations` table and log an error.
+
+## 6. Configuration
+
+*   **`.env` file:** The primary way to configure the database connection is by setting the `DATABASE_URL` variable in a `.env` file at the project root.
+    *   Example for local Dockerized `sqld`: `DATABASE_URL="http://localhost:8080"`
+    *   Example for Turso: `DATABASE_URL="libsql://your-db-name.turso.io?authToken=YOUR_TOKEN"`
+    *   Example for local SQLite file: `DATABASE_URL="sqlite:///./local_dev.db"` (or `file:local_dev.db`)
+*   **`--db-url` option:** This command-line flag can be used with `status`, `up`, and `down` commands to temporarily override the `DATABASE_URL`. This is useful for targeting different database instances without changing the `.env` file.
+
+## 7. Workflow for Schema Changes
+
+1.  **Plan:** Define the schema change required.
+2.  **Create Migration File:**
+    *   Run `python migrate.py create descriptive_migration_name`.
+3.  **Implement SQL:**
+    *   Open the newly generated `.sql` file in `migrations/`.
+    *   Write the necessary SQL statements under `-- UP script`.
+    *   Write the corresponding SQL statements to revert the changes under `-- DOWN script`. Ensure this accurately undoes the UP script.
+4.  **Test Locally:**
+    *   Ensure your local database is running and `DATABASE_URL` points to it.
+    *   Apply the migration: `python migrate.py up` (or `python migrate.py up --step 1` if you have other pending migrations you don't want to apply yet).
+    *   Verify the schema changes in your local database using a DB inspector tool.
+    *   Test rollback: `python migrate.py down`. Verify the schema is reverted.
+    *   Re-apply if satisfied: `python migrate.py up`.
+5.  **Commit:** Add and commit the new migration file(s) to your Git repository.
+    *   `git add migrations/YYYYMMDDHHMMSS_descriptive_migration_name.sql`
+    *   `git commit -m "feat: add migration for X feature"`
+6.  **Deploy & Apply in Target Environments:**
+    *   When deploying your application to staging or production, ensure the `migrate.py up` command is run as part of your deployment process to apply new migrations.
+
+## 8. Best Practices & Important Considerations
+
+*   **Idempotency:** Strive to make your UP and DOWN scripts idempotent. This means they can be run multiple times without causing errors or unintended side effects (e.g., use `CREATE TABLE IF NOT EXISTS ...`, `DROP TABLE IF EXISTS ...`, `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...`).
+*   **Atomicity:** `libsql-client`'s `batch()` method, used by `migrate.py` for UP and DOWN scripts, typically wraps the statements in a transaction. Therefore, **do NOT include `BEGIN;`, `COMMIT;`, or `ROLLBACK;` statements within your migration SQL scripts.** The tool handles this.
+*   **No Data Migrations (Generally):** This tool is primarily designed for **schema migrations**. For complex data migrations (transforming existing data), consider using separate, dedicated scripts or more specialized tools. Simple data updates directly related to a schema change (e.g., populating a new non-null column with a default value) might be acceptable.
+*   **Sequential Application:** Migrations are discovered and intended to be applied in lexicographical order of their filenames. The timestamp prefix ensures they are processed chronologically.
+*   **Never Edit Applied Migrations:** Once a migration has been successfully applied to a shared environment (like staging or production), **DO NOT EDIT ITS FILE**. If you need to make corrections or further changes:
+    1.  Create a *new* migration file to address the issue.
+    2.  If a faulty migration was applied and needs a fix that can't be a new forward migration, you might need to:
+        *   Roll back the faulty migration in the affected environments (if its DOWN script is safe).
+        *   Correct the faulty migration file *locally*.
+        *   Create a *new* migration file that re-applies the corrected logic (potentially with a new timestamp).
+        *   Alternatively, create a new migration that directly fixes the issues introduced by the faulty one. This is often safer.
+*   **Keep Migrations Small and Focused:** Each migration file should represent a single, logical unit of change. This makes them easier to understand, test, and roll back if necessary.
+*   **Test Down Scripts Thoroughly:** Untested or incorrect DOWN scripts can lead to data loss or an inconsistent database state if a rollback is needed.
+## 9. Troubleshooting
+
+1.  **Check Console Output:** The first place to look for errors.
+2.  **Examine `logs/migration.log`:** Provides detailed stack traces and error messages that might not be fully displayed on the console.
+3.  **Run `python migrate.py status`:** Helps understand which migrations the database thinks have been applied.
+4.  **Verify `DATABASE_URL`:** Ensure it's correct for the target environment and that the database server is accessible.
+5.  **Check File Paths and Names:** Ensure migration files are in the `migrations/` directory and correctly named.
+6.  **SQL Syntax:** Double-check the SQL syntax within your migration files. Test complex SQL directly against the database if unsure.
+
+---
+This rule provides a solid foundation for managing your database migrations.
+
