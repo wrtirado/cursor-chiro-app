@@ -5,17 +5,38 @@ import libsql_client
 from dotenv import load_dotenv
 import asyncio
 import logging
+import re
 
 # --- Logging Configuration ---
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s",
-    handlers=[
-        logging.FileHandler("logs/migration.log"),  # Log to a file in logs/ directory
-        logging.StreamHandler(),  # Log to console
-    ],
+# Create a file handler
+file_handler = logging.FileHandler("logs/migration.log")
+file_handler.setLevel(logging.DEBUG)  # Set file handler to DEBUG
+file_handler.setFormatter(
+    logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    )
 )
+
+# Create a console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)  # Console can remain INFO
+console_handler.setFormatter(
+    logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    )
+)
+
+# Get the root logger
+root_logger = logging.getLogger()
+root_logger.setLevel(
+    logging.DEBUG
+)  # Set root logger to DEBUG to allow DEBUG messages through
+root_logger.handlers = []  # Clear existing handlers if any (e.g., from basicConfig)
+root_logger.addHandler(file_handler)
+root_logger.addHandler(console_handler)
+
 logger = logging.getLogger(__name__)
+# --- End Logging Configuration ---
 
 
 # --- Custom Exceptions ---
@@ -177,15 +198,14 @@ def get_migration_files() -> list[str]:
         raise MigrationFileError(f"Could not list migration files: {e}") from e
 
 
-def parse_migration_sql(filepath: str) -> list[str]:
+def parse_migration_sql(filepath: str) -> str:
     """
-    Parses a migration SQL file and extracts the UP script.
-    Returns the SQL commands for the UP migration as a list of statements.
+    Parses a migration SQL file and extracts the UP script content as a single string.
     """
-    logger.info(f"Parsing UP script from migration file: {filepath}")
+    logger.info(f"Reading UP script content from migration file: {filepath}")
     try:
         with open(filepath, "r") as f:
-            lines = f.readlines()
+            content = f.read()
     except IOError as e:
         logger.error(f"IOError reading migration file {filepath}: {e}", exc_info=True)
         typer.secho(
@@ -196,45 +216,38 @@ def parse_migration_sql(filepath: str) -> list[str]:
             f"Could not read migration file {filepath}: {e}"
         ) from e
 
-    up_script_lines = []
-    in_up_script = False
-    for line in lines:
-        if line.strip().lower() == "-- up script":
-            in_up_script = True
-            continue
-        if line.strip().lower() == "-- down script":
-            in_up_script = False
-            break
+    up_script_marker = "-- UP script"
+    down_script_marker = "-- DOWN script"
 
-        if in_up_script:
-            up_script_lines.append(line)
+    up_start_index = content.lower().find(up_script_marker.lower())
+    if up_start_index == -1:
+        logger.warning(f"No '{up_script_marker}' found in {filepath}")
+        return ""
 
-    full_up_script = "".join(up_script_lines).strip()
-    if not full_up_script:
+    up_start_index += len(up_script_marker)
+
+    down_start_index = content.lower().find(down_script_marker.lower(), up_start_index)
+    if down_start_index == -1:
+        up_script_content = content[up_start_index:]
+    else:
+        up_script_content = content[up_start_index:down_start_index]
+
+    final_content = up_script_content.strip()
+    if not final_content:
         logger.warning(
-            f"No UP script content found in {filepath} between -- UP script and -- DOWN script markers."
+            f"No UP script content found in {filepath} between '{up_script_marker}' and '{down_script_marker}' markers."
         )
-        # Return empty list, let caller decide if this is an error
-        return []
-
-    statements = []
-    for stmt in full_up_script.split(";"):
-        stripped_stmt = stmt.strip()
-        if stripped_stmt and not stripped_stmt.startswith("--"):
-            statements.append(stripped_stmt)
-    logger.info(f"Parsed {len(statements)} UP statements from {filepath}")
-    return statements
+    return final_content
 
 
-def parse_migration_sql_down(filepath: str) -> list[str]:
+def parse_migration_sql_down(filepath: str) -> str:
     """
-    Parses a migration SQL file and extracts the DOWN script.
-    Returns the SQL commands for the DOWN migration as a list of statements.
+    Parses a migration SQL file and extracts the DOWN script content as a single string.
     """
-    logger.info(f"Parsing DOWN script from migration file: {filepath}")
+    logger.info(f"Reading DOWN script content from migration file: {filepath}")
     try:
         with open(filepath, "r") as f:
-            lines = f.readlines()
+            content = f.read()
     except IOError as e:
         logger.error(f"IOError reading migration file {filepath}: {e}", exc_info=True)
         typer.secho(
@@ -245,35 +258,33 @@ def parse_migration_sql_down(filepath: str) -> list[str]:
             f"Could not read migration file {filepath}: {e}"
         ) from e
 
-    down_script_lines = []
-    in_down_script = False
-    for line in lines:
-        if line.strip().lower() == "-- down script":
-            in_down_script = True
-            continue
-        if (
-            in_down_script and line.strip().lower() == "-- up script"
-        ):  # Stop if UP script section encountered
-            break
+    down_script_marker = "-- DOWN script"
+    up_script_marker_for_end = (
+        "-- UP script"  # To stop reading if UP script starts again
+    )
 
-        if in_down_script:
-            down_script_lines.append(line)
+    down_start_index = content.lower().find(down_script_marker.lower())
+    if down_start_index == -1:
+        logger.warning(f"No '{down_script_marker}' found in {filepath}")
+        return ""
 
-    full_down_script = "".join(down_script_lines).strip()
-    if not full_down_script:
+    down_start_index += len(down_script_marker)
+
+    # Find where the DOWN script might end (start of UP script or end of file)
+    up_again_start_index = content.lower().find(
+        up_script_marker_for_end.lower(), down_start_index
+    )
+    if up_again_start_index != -1:
+        down_script_content = content[down_start_index:up_again_start_index]
+    else:
+        down_script_content = content[down_start_index:]
+
+    final_content = down_script_content.strip()
+    if not final_content:
         logger.warning(
-            f"No DOWN script content found in {filepath} after -- DOWN script marker."
+            f"No DOWN script content found in {filepath} after '{down_script_marker}' marker."
         )
-        # Return empty list, let caller decide if this is an error
-        return []
-
-    statements = []
-    for stmt in full_down_script.split(";"):
-        stripped_stmt = stmt.strip()
-        if stripped_stmt and not stripped_stmt.startswith("--"):
-            statements.append(stripped_stmt)
-    logger.info(f"Parsed {len(statements)} DOWN statements from {filepath}")
-    return statements
+    return final_content
 
 
 async def ensure_migrations_table_exists(client: libsql_client.client.Client):
@@ -491,8 +502,8 @@ def up(
                 filepath = os.path.join(MIGRATIONS_DIR, mig_filename)
 
                 try:
-                    list_of_sql_statements = parse_migration_sql(filepath)
-                    if not list_of_sql_statements:
+                    full_up_script = parse_migration_sql(filepath)
+                    if not full_up_script:
                         logger.error(
                             f"No executable UP statements found in {mig_filename} or parsing failed."
                         )
@@ -500,17 +511,168 @@ def up(
                             f"  Error: No executable UP statements found in: {mig_filename}. Migration script might be empty or malformed.",
                             fg=typer.colors.RED,
                         )
-                        # Consider this a failure for this specific migration
                         raise MigrationFileError(
                             f"No UP statements in {mig_filename} or parsing error."
                         )
 
-                    logger.debug(
-                        f"Executing {len(list_of_sql_statements)} UP statements for {mig_filename}: {list_of_sql_statements}"
-                    )
-                    await client.batch(list_of_sql_statements)
+                    logger.debug(f"--- Full UP Script for {mig_filename} ---")
+                    logger.debug(full_up_script)
+                    logger.debug("--- End Full UP Script ---")
+
+                    script_to_process = str(full_up_script)
+                    processed_parts_for_batch = []
+
                     logger.info(
-                        f"Successfully executed UP statements for {mig_filename}"
+                        "Starting DDL processing: searching for CREATE TRIGGER statements."
+                    )
+                    while True:
+                        script_lower = script_to_process.lower()
+                        trigger_start_keyword = "create trigger"
+                        end_trigger_keyword = "end;"
+                        trigger_start_idx = script_lower.find(trigger_start_keyword)
+
+                        if trigger_start_idx == -1:
+                            logger.debug("No more 'CREATE TRIGGER' keywords found.")
+                            break
+
+                        # Add the part of the script before this trigger to processed_parts_for_batch
+                        # This part should contain simple statements to be batched.
+                        pre_trigger_script = script_to_process[
+                            :trigger_start_idx
+                        ].strip()
+                        if pre_trigger_script:
+                            processed_parts_for_batch.append(pre_trigger_script)
+
+                        # Find the end of this trigger statement (looking for 'END;')
+                        # This assumes triggers are not nested and 'END;' is the terminator.
+                        # A more robust parser would handle nested BEGIN/END or different terminators.
+                        # For now, let's try a simple approach assuming our triggers are straightforward.
+                        # This will find the *next* "end;"
+                        # A proper SQL parser would be better here.
+
+                        # To make it slightly more robust for simple BEGIN...END; blocks:
+                        # Find 'BEGIN' for this trigger
+                        begin_idx_abs = -1
+                        temp_search_script = script_to_process[trigger_start_idx:]
+                        temp_begin_idx_rel = temp_search_script.lower().find("begin")
+                        if temp_begin_idx_rel != -1:
+                            begin_idx_abs = (
+                                trigger_start_idx + temp_begin_idx_rel + len("begin")
+                            )
+
+                        end_trigger_idx_marker_start = -1
+                        if begin_idx_abs != -1:
+                            # Search for 'END;' after 'BEGIN'
+                            end_trigger_idx_marker_start = script_lower.find(
+                                end_trigger_keyword, begin_idx_abs
+                            )
+                        else:  # No explicit BEGIN found after CREATE TRIGGER NAME ..., try finding END; anyway
+                            logger.warning(
+                                f"No 'BEGIN' found for trigger starting at index {trigger_start_idx}. Searching for 'END;' from {trigger_start_idx}"
+                            )
+                            end_trigger_idx_marker_start = script_lower.find(
+                                end_trigger_keyword, trigger_start_idx
+                            )
+
+                        if end_trigger_idx_marker_start != -1:
+                            trigger_end_idx = end_trigger_idx_marker_start + len(
+                                end_trigger_keyword
+                            )
+                            extracted_trigger_sql = script_to_process[
+                                trigger_start_idx:trigger_end_idx
+                            ].strip()
+
+                            logger.info(
+                                f"Extracted TRIGGER DDL (heuristic):\\n{extracted_trigger_sql}"
+                            )
+                            try:
+                                await client.execute(extracted_trigger_sql)
+                                logger.info(
+                                    "Successfully executed extracted TRIGGER DDL."
+                                )
+                            except Exception as e_trigger:
+                                logger.error(
+                                    f"Error executing TRIGGER DDL: {extracted_trigger_sql}\\nError: {e_trigger}",
+                                    exc_info=True,
+                                )
+                                raise MigrationSQLError(
+                                    f"Failed to execute trigger DDL: {e_trigger}"
+                                ) from e_trigger
+
+                            script_to_process = script_to_process[trigger_end_idx:]
+                        else:
+                            logger.error(
+                                f"Found 'CREATE TRIGGER' at index {trigger_start_idx} but could not find a corresponding 'END;'. Halting processing of this migration."
+                            )
+                            # Add remaining script to ensure it's not lost if error occurs after some triggers
+                            if script_to_process[trigger_start_idx:].strip():
+                                processed_parts_for_batch.append(
+                                    script_to_process[trigger_start_idx:].strip()
+                                )
+                            raise MigrationFileError(
+                                f"Malformed TRIGGER statement in {mig_filename}: No 'END;' found after 'CREATE TRIGGER'."
+                            )
+
+                    # Add any remaining script after the last trigger (or if no triggers were found)
+                    if script_to_process.strip():
+                        processed_parts_for_batch.append(script_to_process.strip())
+
+                    logger.info("Finished searching for TRIGGER DDLs.")
+
+                    # Process remaining script: separate INSERTs for Roles, batch the rest
+                    statements_for_main_batch = []
+                    insert_roles_statements = []
+
+                    if script_to_process.strip():
+                        logger.debug(
+                            "Processing remaining script part for main batch and Role INSERTs."
+                        )
+                        potential_statements = [
+                            stmt.strip()
+                            for stmt in script_to_process.strip().split(";")
+                            if stmt.strip() and not stmt.strip().startswith("--")
+                        ]
+                        for stmt in potential_statements:
+                            if stmt.lower().startswith("insert into roles"):
+                                insert_roles_statements.append(stmt)
+                            else:
+                                statements_for_main_batch.append(stmt)
+
+                    # Batch execute DDL (CREATE TABLE, CREATE INDEX, etc.)
+                    if statements_for_main_batch:
+                        logger.debug(
+                            f"Executing main batch of {len(statements_for_main_batch)} statements (DDL, non-Role INSERTs)."
+                        )
+                        logger.debug(
+                            f"Main batch statements: {statements_for_main_batch}"
+                        )
+                        await client.batch(statements_for_main_batch)
+                        logger.info(
+                            "Successfully executed main batch of DDL statements."
+                        )
+                    else:
+                        logger.info(
+                            "No DDL statements (CREATE TABLE, etc.) to execute in main batch."
+                        )
+
+                    # Execute INSERT INTO Roles statements individually
+                    if insert_roles_statements:
+                        logger.info(
+                            f"Executing {len(insert_roles_statements)} INSERT INTO Roles statements individually."
+                        )
+                        for insert_sql in insert_roles_statements:
+                            logger.debug(f"Executing: {insert_sql}")
+                            await client.execute(
+                                insert_sql
+                            )  # No parameters needed as values are in the string
+                        logger.info(
+                            "Successfully executed INSERT INTO Roles statements."
+                        )
+                    else:
+                        logger.info("No INSERT INTO Roles statements found to execute.")
+
+                    logger.info(
+                        f"Successfully processed UP statements for {mig_filename}"
                     )
 
                     insert_sql = "INSERT INTO migrations (version) VALUES (?)"
@@ -726,8 +888,8 @@ def down(
                         f"Migration file {mig_filename} not found, cannot perform rollback."
                     )
                 try:
-                    list_of_sql_statements = parse_migration_sql_down(filepath)
-                    if not list_of_sql_statements:
+                    full_down_script = parse_migration_sql_down(filepath)
+                    if not full_down_script:
                         logger.warning(
                             f"No executable DOWN statements found in {mig_filename}. Proceeding to unmark only."
                         )
@@ -735,18 +897,42 @@ def down(
                             f"  Warning: No executable DOWN statements found in: {mig_filename}. Will only unmark as applied.",
                             fg=typer.colors.YELLOW,
                         )
+                        # No actual SQL to execute, so skip to unmarking
                     else:
-                        logger.debug(
-                            f"Executing {len(list_of_sql_statements)} DOWN statements for {mig_filename}: {list_of_sql_statements}"
-                        )
-                        await client.batch(list_of_sql_statements)
-                        logger.info(
-                            f"Successfully executed DOWN script for {mig_filename}"
-                        )
-                        typer.secho(
-                            f"  Successfully executed DOWN script for: {mig_filename}",
-                            fg=typer.colors.GREEN,
-                        )
+                        logger.debug(f"--- Full DOWN Script for {mig_filename} ---")
+                        logger.debug(full_down_script)
+                        logger.debug("--- End Full DOWN Script ---")
+
+                        # Simplified: Batch all DOWN statements
+                        simple_down_statements = [
+                            stmt.strip()
+                            for stmt in full_down_script.split(";")
+                            if stmt.strip() and not stmt.strip().startswith("--")
+                        ]
+
+                        if simple_down_statements:
+                            logger.debug(
+                                f"Executing batch of {len(simple_down_statements)} DOWN statements."
+                            )
+                            logger.debug(
+                                f"DOWN statements to batch: {simple_down_statements}"
+                            )
+                            await client.batch(simple_down_statements)
+                            logger.info(
+                                f"Successfully processed DOWN script for {mig_filename}"
+                            )
+                            typer.secho(
+                                f"  Successfully executed DOWN script for: {mig_filename}",
+                                fg=typer.colors.GREEN,
+                            )
+                        else:
+                            logger.warning(
+                                f"The DOWN script for {mig_filename} contained no executable statements after splitting."
+                            )
+                            typer.secho(
+                                f"  Warning: No executable DOWN statements in {mig_filename} to run.",
+                                fg=typer.colors.YELLOW,
+                            )
 
                     delete_sql = "DELETE FROM migrations WHERE version = ?"
                     logger.debug(

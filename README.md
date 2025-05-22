@@ -28,12 +28,13 @@ This project is a FastAPI-based backend for the Tirado Chiropractic mobile and w
 
    - The API should be available at [http://localhost:8000/docs](http://localhost:8000/docs) (FastAPI Swagger UI).
 
-4. **Seed the database with default roles:**
+4. **Run first migration & eed the database with default roles:**
    The database tables are created automatically on first run, but you must seed the default roles before creating an admin user.
 
    Open a new terminal and run:
 
    ```sh
+   docker compose exec api python migrate.py up
    docker compose exec api python scripts/seed_roles.py
    ```
 
