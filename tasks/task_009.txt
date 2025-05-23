@@ -23,7 +23,7 @@ Test subscription billing with test credentials, ensuring alignment with docs/pa
 ### Details:
 
 
-## 3. Generate Alembic Migration for `Office` Subscription Fields [pending]
+## 3. Generate Alembic Migration for `Office` Subscription Fields [done]
 ### Dependencies: None
 ### Description: After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.
 ### Details:
@@ -64,7 +64,25 @@ This custom migration tool addresses the previous libSQL/driver instability issu
 ### Dependencies: None
 ### Description: Ensure a Business Associate Agreement (BAA) is in place with the payment gateway provider selected for handling the SaaS subscription billing for offices.
 ### Details:
+<info added on 2025-05-23T01:39:21.632Z>
+# Payment Processor Selection and BAA Status
 
+## Selection Decision
+- Stripe has been selected as the payment processor after codebase analysis
+- Stripe offers Business Associate Agreement (BAA) for healthcare customers
+
+## Documentation
+- Comprehensive BAA requirements documentation created at docs/payment-processor-baa-requirements.md
+
+## BAA Process Status
+- BAA execution is pending business action
+
+## Next Steps
+1. Contact Stripe healthcare compliance team to initiate BAA process
+2. Legal review of BAA terms
+3. Execute signed agreement
+4. Document BAA in compliance records
+</info added on 2025-05-23T01:39:21.632Z>
 
 ## 6. Secure Storage and Transmission of Payment Provider References [pending]
 ### Dependencies: None

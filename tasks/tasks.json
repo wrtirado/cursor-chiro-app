@@ -336,7 +336,7 @@
           "title": "Generate Alembic Migration for `Office` Subscription Fields",
           "description": "After adding subscription-related fields to the `Office` model, generate a new Alembic migration script to apply these changes to the database schema.",
           "details": "\n\n<info added on 2025-05-20T03:49:09.977Z>\nThe Alembic migrations are currently paused for local development due to libSQL/driver instability. Schema changes for the Office model (from subtask 9.2) are being handled by SQLAlchemy's `create_all()` method during application startup. \n\nWhen Alembic is re-enabled, we'll need to:\n1. Run `alembic revision --autogenerate -m \"Add subscription fields to Office model\"` to generate the migration script\n2. Review the generated script to ensure it correctly captures all field additions\n3. Test the migration on a staging database before applying to production\n4. Document the migration in our schema change log\n\nThis subtask will be revisited when Alembic is re-enabled. In the meantime, ensure all schema changes are properly documented for future migration creation.\n</info added on 2025-05-20T03:49:09.977Z>\n<info added on 2025-05-20T19:56:24.570Z>\nThe migration process is now handled by our custom migration tool for libSQL (developed in Task #33) instead of Alembic. Schema changes for the Office model (from subtask 9.2) will need to be properly migrated using this new approach.\n\nWhen implementing the subscription fields migration:\n1. Create a new migration file using `libsql-migrate create \"Add subscription fields to Office model\"`\n2. Define both the up and down migration functions in the generated file\n3. Test the migration on a local database instance\n4. Apply to staging using `libsql-migrate apply --env=staging`\n5. After verification, apply to production with `libsql-migrate apply --env=production`\n6. Update the schema change log with details of the migration\n\nThis custom migration tool addresses the previous libSQL/driver instability issues while providing reliable schema versioning.\n</info added on 2025-05-20T19:56:24.570Z>",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },
@@ -353,7 +353,7 @@
           "id": 5,
           "title": "Verify BAA with Chosen SaaS Payment Processor",
           "description": "Ensure a Business Associate Agreement (BAA) is in place with the payment gateway provider selected for handling the SaaS subscription billing for offices.",
-          "details": "",
+          "details": "<info added on 2025-05-23T01:39:21.632Z>\n# Payment Processor Selection and BAA Status\n\n## Selection Decision\n- Stripe has been selected as the payment processor after codebase analysis\n- Stripe offers Business Associate Agreement (BAA) for healthcare customers\n\n## Documentation\n- Comprehensive BAA requirements documentation created at docs/payment-processor-baa-requirements.md\n\n## BAA Process Status\n- BAA execution is pending business action\n\n## Next Steps\n1. Contact Stripe healthcare compliance team to initiate BAA process\n2. Legal review of BAA terms\n3. Execute signed agreement\n4. Document BAA in compliance records\n</info added on 2025-05-23T01:39:21.632Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
