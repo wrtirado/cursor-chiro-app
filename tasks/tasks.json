@@ -304,14 +304,14 @@
     {
       "id": 9,
       "title": "Payment Processing API with HIPAA Compliance",
-      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with a payment gateway. Your SaaS payment provider API keys will be stored in .env, not the database. All billing and payment logic should align with the canonical specification in docs/payment-plan.md.",
+      "description": "Integrate payment processing for the SaaS provider to bill individual Offices for software usage. This involves managing subscription status and payment provider details at the Office level, and integrating with Stripe without a BAA. All billing must be office-level only with NO patient information sent to Stripe. Your SaaS payment provider API keys will be stored in .env, not the database. All billing and payment logic should align with the canonical specification in docs/payment-plan.md.",
       "status": "pending",
       "dependencies": [
         5
       ],
       "priority": "medium",
-      "details": "Integrate with a payment gateway (e.g., Stripe) for processing subscription payments at the Office level, following the specifications in docs/payment-plan.md. Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with minimal ePHI inclusion. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office, adhering to the payment plan structure defined in the documentation.",
-      "testStrategy": "Test subscription billing with test credentials, ensuring alignment with docs/payment-plan.md specifications. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway.",
+      "details": "Integrate with Stripe for processing subscription payments at the Office level, following the specifications in docs/payment-plan.md. Implement complete ePHI isolation to ensure no patient information is ever transmitted to Stripe, as we will operate without a Business Associate Agreement (BAA). Store subscription status and billing information in the Office table while keeping payment provider API keys in .env files for security. Create endpoints for subscription management and payment processing with appropriate RBAC controls. Implement billing records and invoice generation with strict data minimization that completely excludes ePHI. Set up webhook handlers for payment events with audit logging. Ensure all payment data transmission uses TLS 1.2+ encryption. Implement detailed audit trails for all payment transactions. Develop functionality to track subscription status, billing cycles, and payment history for each Office, adhering to the payment plan structure defined in the documentation. Design a two-tier data architecture that maintains internal ePHI tracking while generating anonymous aggregate billing entries for external payment processing.",
+      "testStrategy": "Test subscription billing with test credentials, ensuring alignment with docs/payment-plan.md specifications. Verify proper recording of subscription status and billing information at the Office level. Test subscription creation, updates, and cancellations. Ensure proper error handling for failed payments. Validate that payment configurations are correctly loaded from environment variables. Verify audit logs are created for all payment actions. Test RBAC to ensure only authorized users can access payment information. Validate that all API communications use proper encryption. Test webhook handling for payment events from the payment gateway. Implement specific tests to verify complete ePHI isolation in all payment transactions, confirming that no patient information is transmitted to Stripe under any circumstances. Test data sanitization layers to ensure they properly strip all ePHI before data reaches the payment processor.",
       "subtasks": [
         {
           "id": 1,
@@ -353,7 +353,7 @@
           "id": 5,
           "title": "Verify BAA with Chosen SaaS Payment Processor",
           "description": "Ensure a Business Associate Agreement (BAA) is in place with the payment gateway provider selected for handling the SaaS subscription billing for offices.",
-          "details": "<info added on 2025-05-23T01:39:21.632Z>\n# Payment Processor Selection and BAA Status\n\n## Selection Decision\n- Stripe has been selected as the payment processor after codebase analysis\n- Stripe offers Business Associate Agreement (BAA) for healthcare customers\n\n## Documentation\n- Comprehensive BAA requirements documentation created at docs/payment-processor-baa-requirements.md\n\n## BAA Process Status\n- BAA execution is pending business action\n\n## Next Steps\n1. Contact Stripe healthcare compliance team to initiate BAA process\n2. Legal review of BAA terms\n3. Execute signed agreement\n4. Document BAA in compliance records\n</info added on 2025-05-23T01:39:21.632Z>",
+          "details": "<info added on 2025-05-23T01:39:21.632Z>\n# Payment Processor Selection and BAA Status\n\n## Selection Decision\n- Stripe has been selected as the payment processor after codebase analysis\n- Stripe offers Business Associate Agreement (BAA) for healthcare customers\n\n## Documentation\n- Comprehensive BAA requirements documentation created at docs/payment-processor-baa-requirements.md\n\n## BAA Process Status\n- BAA execution is pending business action\n\n## Next Steps\n1. Contact Stripe healthcare compliance team to initiate BAA process\n2. Legal review of BAA terms\n3. Execute signed agreement\n4. Document BAA in compliance records\n</info added on 2025-05-23T01:39:21.632Z>\n<info added on 2025-05-24T22:06:38.662Z>\n# Payment Processor Strategy Update\n\n## Revised Approach\n- Stripe will be used as the payment processor, but WITHOUT a Business Associate Agreement (BAA)\n- Stripe does not offer BAAs due to their data sharing practices with non-HIPAA compliant third parties\n\n## Compliance Requirements\n- NO ePHI can be transmitted to Stripe under any circumstances\n- All payments and invoices must contain office/practice information ONLY\n- Patient information must be completely omitted from all Stripe transactions\n\n## Implementation Guidelines\n- Create data filtering layer to ensure ePHI is stripped before payment processing\n- Implement unique reference IDs that contain no patient identifiers\n- Develop internal mapping system to associate payments with patients within our HIPAA-compliant environment\n\n## Documentation Updates\n- Update docs/payment-processor-baa-requirements.md to reflect new no-ePHI approach\n- Create technical specification for ePHI filtering implementation\n- Document compliance rationale for operating without a BAA\n\n## Next Steps\n1. Design data filtering architecture for payment processing\n2. Update payment workflows to ensure ePHI isolation\n3. Implement additional audit logging for payment-to-patient mapping\n4. Review approach with compliance officer\n</info added on 2025-05-24T22:06:38.662Z>\n<info added on 2025-05-24T22:06:48.378Z>\n# Document Stripe Payment Strategy Without BAA\n\nDocument the approach for using Stripe payment processing without a BAA, ensuring complete ePHI isolation from payment transactions. All payments must contain office information only.\n</info added on 2025-05-24T22:06:48.378Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -371,7 +371,7 @@
           "id": 7,
           "title": "Data Minimization for SaaS Invoices to Offices",
           "description": "Implement practices to limit unnecessary data exposure in invoices generated by the SaaS for its customers (Offices), aligning with privacy principles.",
-          "details": "",
+          "details": "<info added on 2025-05-24T22:06:59.656Z>\nThe payment processing system must implement strict data minimization to ensure NO ePHI is transmitted to Stripe under any circumstances. All invoices and payment records sent to Stripe must contain only office-level information and aggregated billing data, with complete removal of patient identifiers and any other ePHI. This isolation is mandatory since no Business Associate Agreement (BAA) will be established with Stripe. The system should implement data filtering and sanitization layers before any information reaches the payment processor, maintaining a clear boundary between clinical/patient data and financial transaction data. Regular audits should verify this separation is maintained throughout all payment workflows.\n</info added on 2025-05-24T22:06:59.656Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -407,7 +407,7 @@
           "id": 11,
           "title": "Design and Implement Invoice Line Item Table",
           "description": "Create a table to store detailed line items for each invoice (e.g., patient activations, setup fees), as specified in docs/payment-plan.md.",
-          "details": "",
+          "details": "<info added on 2025-05-24T22:07:11.624Z>\nThe Invoice Line Item Table design must implement a strict separation between patient information and billing data sent to Stripe. Design requirements:\n\n1. Use anonymous identifiers for all line items (no patient names, IDs, or other identifiers)\n2. Implement aggregate data representation (e.g., \"Patient Activations: 3 @ $5.00 each\") rather than individual patient entries\n3. Create a dual-purpose schema that maintains internal ePHI tracking capabilities while generating sanitized data for external payment processing\n4. Establish a one-way relationship where internal systems can trace payments to patients, but external systems cannot trace payments back to specific individuals\n5. Include data sanitization functions that strip all PHI before transmitting to Stripe\n6. Document the data flow to demonstrate HIPAA compliance in the separation of billing data from patient information\n</info added on 2025-05-24T22:07:11.624Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -425,7 +425,7 @@
           "id": 13,
           "title": "Implement Patient Activation Billing Logic",
           "description": "Ensure that activating a patient account adds a line item to the current invoice for the office. Handle reactivation and deactivation logic as described in docs/payment-plan.md.",
-          "details": "",
+          "details": "<info added on 2025-05-24T22:07:22.887Z>\nImplement billing logic that maintains strict ePHI separation by creating a two-tier data architecture. Design an internal tracking system that records patient activations with full ePHI data while generating anonymous aggregate billing entries for Stripe integration. Develop a mapping system to count activations per medical office without exposing individual patient identities. Create comprehensive internal audit trails that document all billing-related activities while ensuring only sanitized summary data is transmitted to external payment processors. Implement data validation to verify that no ePHI is included in outbound payment processing requests. Add unit tests to confirm proper data separation and HIPAA compliance throughout the billing workflow.\n</info added on 2025-05-24T22:07:22.887Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -452,7 +452,7 @@
           "id": 16,
           "title": "Integrate with Payment Provider for Invoicing and Payments",
           "description": "Ensure each office has a customer record in the payment provider. Generate and send invoices via the payment provider, and track payment status and update invoice records accordingly, as described in docs/payment-plan.md.",
-          "details": "",
+          "details": "<info added on 2025-05-24T22:07:36.406Z>\nImplement one-off charge functionality for setup fees and other non-recurring charges using the no-BAA Stripe approach. Create data sanitization layers that strip all ePHI before data reaches Stripe. Design the system to generate office-level invoices with aggregated billing data only, removing all patient identifiers. Develop data filtering functions that prevent transmission of patient details when processing one-time charges. Implement anonymous reference ID system for tracking one-off payments that cannot be traced back to individual patients. Establish audit trails to verify and document that ePHI isolation is maintained throughout the one-off charge process. Ensure all setup fees and special charges follow the same ePHI protection standards as recurring payments.\n</info added on 2025-05-24T22:07:36.406Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -479,7 +479,7 @@
           "id": 19,
           "title": "Implement Data Minimization and Security for Billing Data",
           "description": "Ensure only necessary billing data is exposed via the API and that all sensitive data is handled securely, as described in docs/payment-plan.md and developer-compliance-guide.md.",
-          "details": "",
+          "details": "<info added on 2025-05-24T22:07:48.897Z>\nImplement strict ePHI isolation from Stripe payment processing through comprehensive data minimization techniques. Design and build API security layers that filter, validate, and sanitize all outbound data to ensure zero ePHI transmission to Stripe. Create a clear boundary between internal patient data systems and external payment processing by implementing tokenization and data transformation services. Develop real-time monitoring and alerting systems to detect any potential ePHI exposure in payment workflows. Document the technical controls that maintain this isolation, as this represents our primary security control in the absence of a BAA with Stripe. Include validation checkpoints in the data flow to verify no PHI crosses the boundary during payment operations.\n</info added on 2025-05-24T22:07:48.897Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -498,6 +498,33 @@
           "title": "Document Billing API and Data Model",
           "description": "Update or create documentation for the billing API, data models, and business logic, referencing docs/payment-plan.md.",
           "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 22,
+          "title": "Implement ePHI Isolation Layer for Payment Processing",
+          "description": "Design and implement a data filtering layer that ensures complete isolation of ePHI from all payment transactions sent to Stripe, since we will operate without a BAA.",
+          "details": "Create a comprehensive data sanitization system that strips all patient identifiers and other ePHI before any data is transmitted to Stripe. Implement validation checks to verify no ePHI is included in outbound payment requests. Design a system for aggregating patient-related billing data at the office level without exposing individual patient information. Document the technical architecture that maintains this strict separation between internal patient data and external payment processing.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 23,
+          "title": "Create Anonymous Reference System for Patient Billing",
+          "description": "Develop a system that allows internal tracking of patient-related billing while presenting only anonymized aggregate data to Stripe.",
+          "details": "Implement a one-way mapping system where internal systems can trace payments to specific patients, but external systems cannot trace payments back to individuals. Create unique reference IDs for billing items that contain no patient identifiers. Design the database schema to support this dual-purpose functionality while maintaining HIPAA compliance. Document the data flow to demonstrate how patient privacy is protected throughout the billing process.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 24,
+          "title": "Document No-BAA Stripe Integration Approach",
+          "description": "Create comprehensive documentation explaining the technical implementation of Stripe integration without a BAA, focusing on ePHI isolation methods.",
+          "details": "Update docs/payment-processor-baa-requirements.md to reflect the no-BAA approach with Stripe. Create technical specifications for the ePHI filtering implementation. Document the compliance rationale for operating without a BAA. Include detailed explanations of data flows, sanitization processes, and validation checks that ensure no ePHI is transmitted to Stripe. Provide guidelines for developers on maintaining this separation when making future changes to the payment system.",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
