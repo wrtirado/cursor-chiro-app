@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional, List
 import datetime
 from enum import Enum
+from api.core.security_payment import PaymentReferenceSecurity
 
 
 class SubscriptionStatus(str, Enum):
@@ -24,6 +25,24 @@ class OfficeBase(BaseModel):
     billing_cycle_anchor_date: Optional[datetime.datetime] = None
     # company_id will be taken from path parameter during creation typically
 
+    @validator("payment_provider_customer_id")
+    def validate_customer_id(cls, v):
+        """Validate Stripe customer ID format."""
+        if v and not PaymentReferenceSecurity.validate_stripe_customer_id(v):
+            raise ValueError(
+                "Invalid Stripe customer ID format. Must match pattern: cus_[24 alphanumeric chars]"
+            )
+        return v
+
+    @validator("payment_provider_subscription_id")
+    def validate_subscription_id(cls, v):
+        """Validate Stripe subscription ID format."""
+        if v and not PaymentReferenceSecurity.validate_stripe_subscription_id(v):
+            raise ValueError(
+                "Invalid Stripe subscription ID format. Must match pattern: sub_[24 alphanumeric chars]"
+            )
+        return v
+
 
 class OfficeCreate(OfficeBase):
     pass
@@ -37,6 +56,24 @@ class OfficeUpdate(BaseModel):
     payment_provider_subscription_id: Optional[str] = None
     current_plan_id: Optional[int] = None
     billing_cycle_anchor_date: Optional[datetime.datetime] = None
+
+    @validator("payment_provider_customer_id")
+    def validate_customer_id(cls, v):
+        """Validate Stripe customer ID format."""
+        if v and not PaymentReferenceSecurity.validate_stripe_customer_id(v):
+            raise ValueError(
+                "Invalid Stripe customer ID format. Must match pattern: cus_[24 alphanumeric chars]"
+            )
+        return v
+
+    @validator("payment_provider_subscription_id")
+    def validate_subscription_id(cls, v):
+        """Validate Stripe subscription ID format."""
+        if v and not PaymentReferenceSecurity.validate_stripe_subscription_id(v):
+            raise ValueError(
+                "Invalid Stripe subscription ID format. Must match pattern: sub_[24 alphanumeric chars]"
+            )
+        return v
 
 
 class OfficeInDBBase(OfficeBase):

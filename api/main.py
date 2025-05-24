@@ -1,122 +1,177 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # Import CORS Middleware
-
-# Import exception handlers
+import logging
+import os
 from fastapi.exceptions import HTTPException
-from api.core.exceptions import generic_exception_handler, http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-# Import other routers as they are created
 from api.core.config import settings
-from api.core.middleware import SecureHeadersMiddleware  # Import the new middleware
+from api.core.exceptions import http_exception_handler, starlette_exception_handler
+from api.companies.router import router as companies_router
 from api.auth.router import router as auth_router
-from api.users.router import router as users_router  # Import users router
-from api.companies.router import router as companies_router  # Import companies router
+from api.plans.router import router as plans_router
+from api.progress.router import router as progress_router
+from api.media.router import router as media_router
 from api.offices.router import router as offices_router  # Import offices router
-from api.plans.router import router as plans_router  # Import plans router
-from api.media.router import router as media_router  # Import media router
-from api.progress.router import router as progress_router  # Import progress router
+from api.users.router import router as users_router
 
-# --- Temporary for DB connection testing: Create tables ---
-from api.database.session import engine, Base  # ADD THIS LINE
-import api.models.base
-import traceback  # Add this import for more detailed error printing
+from api.core.middleware import SecureHeadersMiddleware  # Import the new middleware
+from api.core.security_validator import (
+    payment_security_validator,
+)  # Import security validator
 
-# WARNING: This is for initial setup/testing ...
-print("Attempting to create database tables directly for test...")
-engine_conn_attempted = False
-try:
-    print(f"Using DATABASE_URL: {settings.DATABASE_URL}")  # Print the URL being used
-    print(f"Engine object: {engine}")
-    engine_conn_attempted = True  # Mark that we are about to try connecting
+# Set up logging configuration
+log_level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
+log_format = "[%(asctime)s] %(levelname)s in %(name)s: %(message)s"
 
-    # Attempt a very basic connection first
-    print("Attempting a direct engine connection test...")
-    with engine.connect() as connection:
-        print("Engine.connect() was successful. Connection established.")
-        # Optionally, execute a simple query
-        # result = connection.execute(text("SELECT 1"))
-        # print(f"Direct engine query result: {result.scalar_one_or_none()}")
-    print("Direct engine connection test passed.")
+# Configure root logger
+logging.basicConfig(
+    level=log_level,
+    format=log_format,
+    handlers=[
+        logging.StreamHandler(),  # Console output
+        logging.FileHandler(settings.APP_LOG_FILE, mode="a"),  # File output
+    ],
+)
 
-    print("Now attempting Base.metadata.create_all(bind=engine)...")
-    Base.metadata.create_all(bind=engine)
-    print("Base.metadata.create_all(bind=engine) executed successfully.")
-except Exception as e:
-    print("--------------------------------------------------------------------")
-    print(
-        f"!!! ERROR during database initialization (engine_conn_attempted: {engine_conn_attempted}) !!!"
-    )
-    print(f"Error type: {type(e)}")
-    print(f"Error message: {e}")
-    print("Full traceback:")
-    traceback.print_exc()  # This will print the full stack trace
-    print("--------------------------------------------------------------------")
-    # Depending on how critical this is for startup, you might want to:
-    # import sys
-    # sys.exit(f"FATAL: Could not create database tables: {e}")
-# --- End Temporary DB connection testing ---
+# Configure audit logging
+audit_logger = logging.getLogger("audit")
+audit_handler = logging.FileHandler(settings.AUDIT_LOG_FILE, mode="a")
+audit_handler.setFormatter(logging.Formatter(log_format))
+audit_logger.addHandler(audit_handler)
+audit_logger.setLevel(logging.INFO)
 
-# from api.routers import plans # etc.
+# Import after logging setup to ensure loggers are configured
+from api.database.session import engine, Base
+from api.models import base
+from api.core.audit_logger import log_application_startup
+
+# Create all tables (SQLAlchemy create_all method)
+# This replaces Alembic migrations for now
+Base.metadata.create_all(bind=engine)
+
+# Also call the startup audit log function
+log_application_startup()
+
+# Configuration note: CORS is applied here instead of per-router
+# because it's a cross-cutting concern that affects all routes.
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="API for the Tirado Chiropractic mobile and web applications.",
-    version="0.1.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    # Register exception handlers
-    exception_handlers={
-        Exception: generic_exception_handler,
-        HTTPException: http_exception_handler,
-        # Add other handlers here if needed, e.g.:
-        # RequestValidationError: validation_exception_handler
-    },
+    # Additional FastAPI configs for production security
+    docs_url=(
+        "/docs" if os.getenv("ENVIRONMENT", "development") == "development" else None
+    ),
+    redoc_url=(
+        "/redoc" if os.getenv("ENVIRONMENT", "development") == "development" else None
+    ),
 )
 
-# Set up CORS Middleware
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,  # Use origins from settings
-    allow_credentials=True,  # Allow cookies/auth headers
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_origins=settings.CORS_ORIGINS,  # Uses the origins from settings
+    allow_credentials=True,
+    allow_methods=["*"],  # Can be more specific: ["GET", "POST", "PUT", "DELETE"]
+    allow_headers=["*"],  # Can be more specific if needed
 )
 
 # Add the Secure Headers Middleware
 app.add_middleware(SecureHeadersMiddleware)
 
-
-@app.get("/")
-def read_root():
-    return {"message": f"Welcome to the {settings.PROJECT_NAME}"}
-
+# Exception handlers
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(StarletteHTTPException, starlette_exception_handler)
 
 # Include routers
-app.include_router(auth_router, prefix=settings.API_V1_STR + "/auth", tags=["auth"])
-app.include_router(
-    users_router, prefix=settings.API_V1_STR + "/users", tags=["users"]
-)  # Add users router
 app.include_router(
     companies_router, prefix=settings.API_V1_STR + "/companies", tags=["companies"]
 )
+app.include_router(auth_router, prefix=settings.API_V1_STR + "/auth", tags=["auth"])
+app.include_router(plans_router, prefix=settings.API_V1_STR + "/plans", tags=["plans"])
+app.include_router(
+    progress_router, prefix=settings.API_V1_STR + "/progress", tags=["progress"]
+)
+app.include_router(media_router, prefix=settings.API_V1_STR + "/media", tags=["media"])
 app.include_router(
     offices_router, prefix=settings.API_V1_STR + "/offices", tags=["offices"]
 )
-app.include_router(
-    plans_router, prefix=settings.API_V1_STR + "/plans", tags=["plans"]
-)  # Add plans router
-app.include_router(
-    media_router, prefix=settings.API_V1_STR + "/media", tags=["media"]
-)  # Add media router
-app.include_router(
-    progress_router, prefix=settings.API_V1_STR + "/progress", tags=["progress"]
-)  # Add progress router
+app.include_router(users_router, prefix=settings.API_V1_STR + "/users", tags=["users"])
 
-# Add middleware (e.g., CORS) if needed later
+
+@app.on_event("startup")
+async def startup_event():
+    """Run security validation on application startup."""
+    logger.info("Running security validation on startup...")
+
+    try:
+        # Run payment security validation
+        results = payment_security_validator.validate_all()
+        summary = payment_security_validator.get_summary()
+
+        # Log summary
+        logger.info(f"Security validation completed: {summary['overall_status']}")
+        logger.info(f"Checks: {summary['passed']}/{summary['total_checks']} passed")
+
+        if summary["critical_issues"] > 0:
+            logger.error(
+                f"CRITICAL SECURITY ISSUES FOUND: {summary['critical_issues_list']}"
+            )
+            # Note: We don't exit here to allow development/staging with warnings
+            # In production, you might want to exit on critical issues
+
+        if summary["warnings"] > 0:
+            logger.warning(f"Security warnings: {summary['warning_issues_list']}")
+
+        # Log detailed results
+        payment_security_validator.log_results()
+
+    except Exception as e:
+        logger.error(f"Security validation failed: {e}")
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Tirado Chiropractic API"}
+
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for monitoring."""
+    return {"status": "healthy", "environment": settings.ENVIRONMENT}
+
+
+@app.get("/security-status")
+def security_status():
+    """Get current security configuration status."""
+    try:
+        summary = payment_security_validator.get_summary()
+        return {
+            "security_status": summary,
+            "environment": settings.ENVIRONMENT,
+            "timestamp": logging.Formatter().formatTime(
+                logging.LogRecord("", 0, "", 0, "", (), None)
+            ),
+        }
+    except Exception as e:
+        logger.error(f"Failed to get security status: {e}")
+        return {"error": "Failed to retrieve security status"}
+
+
+# Conditional middleware and configurations can also be set based on environment
+# if settings.ENVIRONMENT == "production":
+#     # Additional production-specific middleware or configs
+#     pass
+
+# Old CORS setup
 # from fastapi.middleware.cors import CORSMiddleware
-# origins = [ "*" ] # Configure appropriately for production
+
 # app.add_middleware(
 #     CORSMiddleware,
-#     allow_origins=origins,
+#     allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React & Vite defaults
 #     allow_credentials=True,
 #     allow_methods=["*"],
 #     allow_headers=["*"],
