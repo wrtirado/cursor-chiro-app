@@ -16,9 +16,9 @@ This document outlines the payment and billing structure for the SaaS platform u
 
 - **Core Billing Model:**
   - Offices are billed based on the number of active patient accounts each month.
-  - When a chiropractor creates a patient account, builds a plan, and activates the account (by sending the plan to the patient), a fixed amount (e.g., $2 or $3) is added to the office's invoice for the month.
+  - When a chiropractor creates a patient account, builds a plan, and activates the account (by sending the plan to the patient), a fixed amount of $2 is added to the office's invoice for the month.
 - **Monthly Billing Cycle:**
-  - At the start of each billing cycle, all active patient accounts from the previous cycle are automatically included in the new cycle's invoice.
+  - At the start of each billing cycle, all active patient accounts from the previous cycle are automatically included in the new cycle's invoice at $2 per account.
   - Deactivated accounts that were already billed in a previous cycle do not reduce the invoice for that cycle, but will not be included in future cycles unless reactivated.
   - Reactivated accounts are billed in the current cycle if they had not already been active in that cycle.
 
@@ -28,7 +28,7 @@ This document outlines the payment and billing structure for the SaaS platform u
   - Each office receives a monthly invoice that includes charges for all active patient accounts and any one-off fees (such as setup, if applicable).
   - Invoices are generated and tracked in a dedicated invoices table or via the payment provider's system (e.g., Stripe).
 - **Payments:**
-  - Payments are processed through a payment provider (e.g., Stripe), with each office having a unique customer record in the provider's system.
+  - Payments will be processed through Stripe, with each office having a unique customer record in the provider's system.
   - Payment status, invoice references, and payment method details are stored in the billing/invoice tables, not on the Office table.
 
 ## 4. Data Model Rationale

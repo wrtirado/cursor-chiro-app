@@ -1,6 +1,7 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api.core.logging_config import app_log  # Use the configured app logger
 
@@ -30,6 +31,19 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"detail": exc.detail},  # Return the original detail to the client
         headers=exc.headers,  # Include any custom headers from the exception
+    )
+
+
+async def starlette_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Handles Starlette's HTTPException, logging details and returning standard response."""
+    app_log.warning(
+        f"StarletteHTTPException during request to {request.url.path}: Status={exc.status_code}, Detail='{exc.detail}'"
+    )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail if hasattr(exc, "detail") else "An error occurred"
+        },
     )
 
 

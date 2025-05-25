@@ -92,3 +92,24 @@ def log_audit_event(
         audit_log.warning(message, extra={"props": props})
     else:
         audit_log.info(message, extra={"props": props})
+
+
+def log_application_startup():
+    """Log application startup event for audit purposes."""
+    import os
+
+    props = {
+        "event_type": "APPLICATION_STARTUP",
+        "outcome": "SUCCESS",
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "source_ip": "system",
+        "user_agent": "system",
+        "request_path": "startup",
+        "request_method": "SYSTEM",
+        "resource_type": "application",
+        "resource_id": "api_server",
+        "details": {"startup_time": "system_boot", "api_version": "v1"},
+    }
+
+    message = "Application startup completed successfully"
+    audit_log.info(message, extra={"props": props})
