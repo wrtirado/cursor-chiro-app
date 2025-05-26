@@ -69,13 +69,62 @@ Create a test matrix covering all features and their availability in each plan t
 ### Dependencies: None
 ### Description: Create a Plans table to define available pricing tiers (e.g., Basic, Pro, Enterprise), their prices, billing intervals, and included features. Ensure the table structure supports easy addition or modification of plans.
 ### Details:
+**Database Migration Requirements:**
+Before implementing this subtask, create a database migration:
 
+1. **Create Migration File:**
+   ```bash
+   python migrate.py create add_plans_table
+   ```
+
+2. **Implement UP Script:**
+   - Add CREATE TABLE statement for Plans table:
+     - `id` INTEGER PRIMARY KEY
+     - `name` TEXT NOT NULL (e.g., 'Basic', 'Pro', 'Enterprise')
+     - `description` TEXT
+     - `price_cents` INTEGER NOT NULL (price in cents)
+     - `billing_interval` TEXT NOT NULL (e.g., 'monthly', 'yearly')
+     - `features_json` TEXT (JSON array of included features)
+     - `is_active` BOOLEAN DEFAULT TRUE
+     - `created_at` DATETIME NOT NULL
+     - `updated_at` DATETIME NOT NULL
+   - Add appropriate indexes for performance
+   - Add UNIQUE constraint on (name, billing_interval) combination
+
+3. **Implement DOWN Script:**
+   - Add `DROP TABLE IF EXISTS plans` statement
+
+Follow SQLite type affinity guidelines and ensure all migrations work in both directions.
 
 ## 2. Add current_plan_id Field to Office Table [pending]
 ### Dependencies: None
 ### Description: Add a current_plan_id field to the Office table to reference the selected plan for each office. Ensure this field is properly indexed and supports plan upgrades/downgrades.
 ### Details:
+**Database Migration Requirements:**
+Before implementing this subtask, create a database migration:
 
+1. **Create Migration File:**
+   ```bash
+   python migrate.py create add_current_plan_id_to_office
+   ```
+
+2. **Implement UP Script:**
+   - Add ALTER TABLE statement to add current_plan_id field:
+     - `current_plan_id` INTEGER (foreign key to plans table)
+   - Add FOREIGN KEY constraint to plans table
+   - Add appropriate index for performance
+
+3. **Implement DOWN Script:**
+   - Add ALTER TABLE statement to drop the current_plan_id column
+
+4. **Test Migration:**
+   ```bash
+   python migrate.py up
+   python migrate.py down --step 1
+   python migrate.py up
+   ```
+
+Follow SQLite type affinity guidelines and ensure all migrations work in both directions.
 
 ## 3. Implement Feature Gating Logic Based on Plan [pending]
 ### Dependencies: None

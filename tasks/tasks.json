@@ -389,8 +389,8 @@
           "id": 9,
           "title": "Align Billing API and Data Models with payment-plan.md",
           "description": "Review docs/payment-plan.md and ensure all billing API endpoints, data models, and business logic are consistent with the specifications in this document. Update or add additional fields, endpoints, or logic as needed to fully implement the payment and billing structure described.",
-          "details": "",
-          "status": "pending",
+          "details": "<info added on 2025-05-25T23:47:18.701Z>\n# Billing Implementation Analysis Results\n\n## Current Implementation Strengths\n- Office model includes all required subscription fields (status, customer_id, subscription_id, plan_id, billing_cycle_anchor_date)\n- Security foundation with ePHI isolation, payment encryption, and TLS enforcement is robust\n- Billing audit logging infrastructure is in place\n- Data minimization system for Stripe integration without BAA exists\n\n## Critical Gaps Requiring Implementation\n\n1. **Missing Database Schema** (Tasks 9.10-9.12):\n   - No Invoice table for monthly/one-off billing\n   - No Invoice Line Item table for detailed charges  \n   - User model missing billing status fields (is_active_for_billing, activated_at, deactivated_at, last_billed_cycle)\n\n2. **Missing Business Logic** (Tasks 9.13-9.15):\n   - No patient activation billing workflow\n   - No monthly invoice generation automation\n   - No one-off charge handling (setup fees)\n\n3. **Missing API Integration** (Tasks 9.16-9.17):\n   - No billing endpoints (/api/billing/*)\n   - No Stripe customer/invoice management APIs\n   - No payment status retrieval endpoints\n\n4. **Incomplete Integration** (Tasks 9.18-9.21):\n   - Audit logging not integrated into billing workflows\n   - Data minimization not integrated into payment processing\n   - No comprehensive testing or documentation\n\n## Alignment Summary\nCurrent implementation provides excellent foundation for security and ePHI isolation but lacks the core billing functionality required by payment-plan.md. The 5-phase roadmap in docs/payment-plan-implementation-analysis.md provides clear path forward.\n\n## Next Steps\nBegin Phase 1 with Task 9.10 (Invoice table implementation) to build the missing database schema foundation.\n</info added on 2025-05-25T23:47:18.701Z>",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },
@@ -398,7 +398,7 @@
           "id": 10,
           "title": "Design and Implement Invoice Table",
           "description": "Create a table to store monthly and one-off invoices for each office, including billing period, total, status, and references to line items, as described in docs/payment-plan.md.",
-          "details": "",
+          "details": "<info added on 2025-05-25T23:59:30.301Z>\n**Database Migration Requirements:**\nBefore implementing this task, you must create a database migration to add the Invoice table using the custom migration tool:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_invoice_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for Invoice table with all necessary fields (id, office_id, billing_period_start, billing_period_end, total_amount, status, stripe_invoice_id, created_at, updated_at)\n   - Include proper foreign key constraints to Office table\n   - Add appropriate indexes for performance (office_id, billing_period_start, status)\n   - Ensure field types are SQLite-compatible\n\n3. **Implement DOWN Script:**\n   - Add DROP TABLE IF EXISTS invoice statement\n   - Ensure rollback is clean and removes all created objects\n\n4. **Apply Migration:**\n   ```bash\n   python migrate.py up\n   ```\n\n5. **Test Migration:**\n   - Verify table creation with proper schema\n   - Test rollback functionality: `python migrate.py down --step 1`\n   - Re-apply to confirm: `python migrate.py up`\n\n**Important Notes:**\n- Follow SQLite type affinity guidelines (INTEGER PRIMARY KEY for id, TEXT for string fields, REAL for decimals)\n- Use DATETIME for timestamp fields with ISO 8601 format\n- Include NOT NULL constraints where appropriate\n- Document the migration purpose and schema changes\n- Verify the migration works in both directions before proceeding with implementation\n</info added on 2025-05-25T23:59:30.301Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -407,7 +407,7 @@
           "id": 11,
           "title": "Design and Implement Invoice Line Item Table",
           "description": "Create a table to store detailed line items for each invoice (e.g., patient activations, setup fees), as specified in docs/payment-plan.md.",
-          "details": "<info added on 2025-05-24T22:07:11.624Z>\nThe Invoice Line Item Table design must implement a strict separation between patient information and billing data sent to Stripe. Design requirements:\n\n1. Use anonymous identifiers for all line items (no patient names, IDs, or other identifiers)\n2. Implement aggregate data representation (e.g., \"Patient Activations: 3 @ $5.00 each\") rather than individual patient entries\n3. Create a dual-purpose schema that maintains internal ePHI tracking capabilities while generating sanitized data for external payment processing\n4. Establish a one-way relationship where internal systems can trace payments to patients, but external systems cannot trace payments back to specific individuals\n5. Include data sanitization functions that strip all PHI before transmitting to Stripe\n6. Document the data flow to demonstrate HIPAA compliance in the separation of billing data from patient information\n</info added on 2025-05-24T22:07:11.624Z>",
+          "details": "<info added on 2025-05-24T22:07:11.624Z>\nThe Invoice Line Item Table design must implement a strict separation between patient information and billing data sent to Stripe. Design requirements:\n\n1. Use anonymous identifiers for all line items (no patient names, IDs, or other identifiers)\n2. Implement aggregate data representation (e.g., \"Patient Activations: 3 @ $5.00 each\") rather than individual patient entries\n3. Create a dual-purpose schema that maintains internal ePHI tracking capabilities while generating sanitized data for external payment processing\n4. Establish a one-way relationship where internal systems can trace payments to patients, but external systems cannot trace payments back to specific individuals\n5. Include data sanitization functions that strip all PHI before transmitting to Stripe\n6. Document the data flow to demonstrate HIPAA compliance in the separation of billing data from patient information\n</info added on 2025-05-24T22:07:11.624Z>\n<info added on 2025-05-25T23:59:47.519Z>\n## Database Migration Instructions\n\n**Database Migration Requirements:**\nBefore implementing this task, you must create a database migration to add the Invoice Line Item table using the custom migration tool:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_invoice_line_item_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for InvoiceLineItem table with all necessary fields (id, invoice_id, item_type, description, quantity, unit_price, total_amount, metadata_json, created_at)\n   - Include proper foreign key constraints to Invoice table\n   - Add appropriate indexes for performance (invoice_id, item_type)\n   - Ensure field types are SQLite-compatible\n   - Use TEXT field for metadata_json to store additional ePHI-sanitized data\n\n3. **Implement DOWN Script:**\n   - Add DROP TABLE IF EXISTS invoice_line_item statement\n   - Ensure rollback is clean and removes all created objects\n\n4. **Apply Migration:**\n   ```bash\n   python migrate.py up\n   ```\n\n5. **Test Migration:**\n   - Verify table creation with proper schema\n   - Test foreign key constraints work correctly\n   - Test rollback functionality: `python migrate.py down --step 1`\n   - Re-apply to confirm: `python migrate.py up`\n\n**Important Notes:**\n- Follow SQLite type affinity guidelines (INTEGER PRIMARY KEY for id, TEXT for strings, REAL for decimals)\n- Use DATETIME for timestamp fields with ISO 8601 format\n- The metadata_json field should store aggregate billing data WITHOUT any ePHI\n- Include NOT NULL constraints where appropriate\n- Document the migration purpose and schema changes\n- Verify the migration works in both directions before proceeding with implementation\n- Consider item_type values like 'patient_activation', 'setup_fee', 'monthly_recurring'\n</info added on 2025-05-25T23:59:47.519Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -416,7 +416,7 @@
           "id": 12,
           "title": "Update Patient/User Model for Billing Status",
           "description": "Add fields to the patient/user model to track activation/deactivation dates and billing status for each billing cycle, supporting the per-patient billing logic in docs/payment-plan.md.",
-          "details": "",
+          "details": "<info added on 2025-05-26T00:00:09.938Z>\n# Database Migration Instructions\n\n## Database Migration Requirements\nBefore implementing this task, you must create a database migration to add billing status fields to the User/Patient model using the custom migration tool:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_user_billing_status_fields\n   ```\n\n2. **Implement UP Script:**\n   - Add ALTER TABLE statements to add billing status fields to the users table:\n     - `is_active_for_billing` BOOLEAN DEFAULT FALSE\n     - `activated_at` DATETIME\n     - `deactivated_at` DATETIME  \n     - `last_billed_cycle` DATETIME\n   - Ensure field types are SQLite-compatible\n   - Add appropriate indexes for billing queries (is_active_for_billing, activated_at, last_billed_cycle)\n\n3. **Implement DOWN Script:**\n   - Add ALTER TABLE statements to drop the added columns\n   - Handle SQLite limitations for dropping columns if needed (may require table recreation)\n   - Ensure rollback is clean and removes all created objects\n\n4. **Apply Migration:**\n   ```bash\n   python migrate.py up\n   ```\n\n5. **Test Migration:**\n   - Verify fields are added with correct defaults\n   - Test queries using new billing fields\n   - Test rollback functionality: `python migrate.py down --step 1`\n   - Re-apply to confirm: `python migrate.py up`\n\n## Important Notes\n- Follow SQLite type affinity guidelines (BOOLEAN stored as INTEGER 0/1, DATETIME as TEXT ISO 8601)\n- Use proper DEFAULT values for new fields to avoid breaking existing records\n- Consider adding CHECK constraints for data validation if supported\n- Document the migration purpose and schema changes\n- Verify the migration works in both directions before proceeding with implementation\n- These fields support per-patient billing logic as described in docs/payment-plan.md\n</info added on 2025-05-26T00:00:09.938Z>",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 9
@@ -553,7 +553,31 @@
           "id": 10.2,
           "title": "Set up Branding database table",
           "description": "Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema",
-          "status": "pending"
+          "status": "pending",
+          "migrationInstructions": {
+            "createCommand": "python migrate.py create add_branding_table",
+            "upScript": [
+              "CREATE TABLE branding (",
+              "  id INTEGER PRIMARY KEY,",
+              "  office_id INTEGER NOT NULL,",
+              "  logo_url TEXT,",
+              "  colors_json TEXT,",
+              "  created_at DATETIME NOT NULL,",
+              "  updated_at DATETIME NOT NULL,",
+              "  FOREIGN KEY (office_id) REFERENCES offices(id),",
+              "  UNIQUE (office_id)",
+              ")",
+              "CREATE INDEX idx_branding_office_id ON branding(office_id)"
+            ],
+            "downScript": [
+              "DROP TABLE IF EXISTS branding"
+            ],
+            "testCommands": [
+              "python migrate.py up",
+              "python migrate.py down --step 1",
+              "python migrate.py up"
+            ]
+          }
         },
         {
           "id": 10.3,
@@ -571,7 +595,36 @@
           "id": 10.5,
           "title": "Implement audit logging for branding changes",
           "description": "Add detailed audit trails for all branding-related operations using libSQL/SQLite",
-          "status": "pending"
+          "status": "pending",
+          "migrationInstructions": {
+            "createCommand": "python migrate.py create add_branding_audit_table",
+            "upScript": [
+              "CREATE TABLE branding_audit (",
+              "  id INTEGER PRIMARY KEY,",
+              "  office_id INTEGER NOT NULL,",
+              "  action_type TEXT NOT NULL,",
+              "  changed_fields TEXT,",
+              "  old_values TEXT,",
+              "  new_values TEXT,",
+              "  user_id INTEGER,",
+              "  timestamp DATETIME NOT NULL,",
+              "  FOREIGN KEY (office_id) REFERENCES offices(id),",
+              "  FOREIGN KEY (user_id) REFERENCES users(id)",
+              ")",
+              "CREATE INDEX idx_branding_audit_office_id ON branding_audit(office_id)",
+              "CREATE INDEX idx_branding_audit_timestamp ON branding_audit(timestamp)",
+              "CREATE INDEX idx_branding_audit_action_type ON branding_audit(action_type)"
+            ],
+            "downScript": [
+              "DROP TABLE IF EXISTS branding_audit"
+            ],
+            "testCommands": [
+              "python migrate.py up",
+              "python migrate.py down --step 1",
+              "python migrate.py up"
+            ],
+            "note": "If using the existing general audit system, this dedicated branding audit table migration is not needed."
+          }
         },
         {
           "id": 10.6,
@@ -603,37 +656,43 @@
           "id": 11.1,
           "title": "Create notification schedule endpoints",
           "description": "Implement endpoints for creating and managing notification schedules using libSQL/SQLite for data storage",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nBefore implementing this subtask, create a database migration for notification schedules:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_schedule_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationSchedule table:\n     - `id` INTEGER PRIMARY KEY\n     - `office_id` INTEGER NOT NULL (foreign key to offices table)\n     - `schedule_name` TEXT NOT NULL\n     - `schedule_type` TEXT NOT NULL (e.g., 'reminder', 'appointment', 'progress')\n     - `frequency` TEXT NOT NULL (e.g., 'daily', 'weekly', 'monthly')\n     - `time_of_day` TEXT (HH:MM format)\n     - `days_of_week` TEXT (JSON array of day numbers)\n     - `is_active` BOOLEAN DEFAULT TRUE\n     - `template_message` TEXT NOT NULL (HIPAA-compliant template)\n     - `created_at` DATETIME NOT NULL\n     - `updated_at` DATETIME NOT NULL\n   - Include FOREIGN KEY constraint to Office table\n   - Add appropriate indexes for performance (office_id, schedule_type, is_active)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_schedule` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions. The template_message field should contain only HIPAA-compliant content without any ePHI."
         },
         {
           "id": 11.2,
           "title": "Implement HIPAA-compliant notification content",
           "description": "Ensure notification templates do not contain ePHI",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask as it utilizes the notification_schedule table created in subtask 11.1."
         },
         {
           "id": 11.3,
           "title": "Add RBAC for notification configuration",
           "description": "Implement role-based access controls for notification management",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask if using the existing RBAC system. If notification-specific permissions are required, update the permissions table using the existing migration pattern."
         },
         {
           "id": 11.4,
           "title": "Implement audit logging",
           "description": "Add detailed audit trails for all notification configuration operations using libSQL/SQLite",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nIf this implementation requires a dedicated notification audit table (separate from general audit logs), follow these migration requirements:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_audit_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationAudit table:\n     - `id` INTEGER PRIMARY KEY\n     - `notification_schedule_id` INTEGER NOT NULL (foreign key to notification_schedule table)\n     - `office_id` INTEGER NOT NULL (foreign key to offices table)\n     - `action_type` TEXT NOT NULL (e.g., 'create', 'update', 'delete', 'activate', 'deactivate')\n     - `changed_fields` TEXT (JSON of changed field names)\n     - `old_values` TEXT (JSON of previous values, encrypted if needed)\n     - `new_values` TEXT (JSON of new values, encrypted if needed)\n     - `user_id` INTEGER (foreign key to users table)\n     - `timestamp` DATETIME NOT NULL\n     - `compliance_notes` TEXT (any HIPAA compliance notes)\n   - Include FOREIGN KEY constraints to notification_schedule, offices, and users tables\n   - Add appropriate indexes for performance (notification_schedule_id, office_id, timestamp, action_type)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_audit` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\n**Alternative:** If using the existing general audit system, no additional migration is needed.\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions."
         },
         {
           "id": 11.5,
           "title": "Add data encryption",
           "description": "Implement encryption for notification data at rest and in transit, adapting methods for libSQL/SQLite",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask as it involves implementing encryption on existing tables. If encryption requires schema changes, create a migration following the established pattern."
         },
         {
           "id": 11.6,
           "title": "Verify HIPAA compliance for delivery mechanisms",
           "description": "Ensure notification delivery methods comply with HIPAA requirements",
-          "status": "pending"
+          "status": "pending",
+          "details": "**Database Migration Requirements:**\nIf this implementation requires a notification delivery tracking table, follow these migration requirements:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_delivery_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationDelivery table:\n     - `id` INTEGER PRIMARY KEY\n     - `notification_schedule_id` INTEGER NOT NULL (foreign key to notification_schedule table)\n     - `recipient_id` INTEGER NOT NULL (foreign key to users or patients table)\n     - `delivery_status` TEXT NOT NULL (e.g., 'pending', 'sent', 'delivered', 'failed')\n     - `delivery_method` TEXT NOT NULL (e.g., 'sms', 'email', 'app')\n     - `sent_at` DATETIME\n     - `delivered_at` DATETIME\n     - `error_message` TEXT\n     - `compliance_verified` BOOLEAN DEFAULT FALSE\n     - `created_at` DATETIME NOT NULL\n     - `updated_at` DATETIME NOT NULL\n   - Include FOREIGN KEY constraints to notification_schedule table\n   - Add appropriate indexes for performance (notification_schedule_id, recipient_id, delivery_status)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_delivery` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions."
         }
       ]
     },
@@ -2065,19 +2124,19 @@
       "id": 32,
       "title": "Implement Subscription Pricing Plans with Feature Gating",
       "description": "Create a tiered pricing structure with feature access control based on subscription plans. Integrate with the existing Stripe payment processing system to handle plan selection, upgrades, and downgrades.",
-      "details": "This task requires implementing a comprehensive subscription plan system:\n\n1. Database Changes:\n   - Create a new `Plans` table with fields: `id`, `name` (Basic, Pro, Enterprise), `price`, `billing_frequency` (monthly/annual), `features` (JSON field storing allowed features), `stripe_price_id`, `created_at`, `updated_at`\n   - Add `current_plan_id` (foreign key to Plans table) and `subscription_status` fields to the `Office` table\n\n2. Feature Gating Implementation:\n   - Create a centralized FeatureAccess service class that handles all permission checks\n   - Implement methods like `canAccessFeature(officeId, featureName)` that check if an office's plan includes specific features\n   - Create middleware for protecting routes based on subscription level\n   - Add UI indicators for premium features\n\n3. Stripe Integration:\n   - Map internal plan IDs to Stripe product/price IDs\n   - Implement plan change functionality (upgrades/downgrades)\n   - Handle prorated billing for mid-cycle changes\n   - Update webhook handlers to process subscription events\n\n4. Admin Interface:\n   - Create admin tools to manage plans and their features\n   - Add ability to view and modify customer subscriptions\n\n5. User Experience:\n   - Implement plan selection during signup\n   - Create plan comparison page\n   - Add upgrade prompts when users attempt to access premium features\n\nRefer to docs/payment-plan.md for the specific billing structure and feature sets for each plan tier. Ensure all plan-related logic is centralized for easy updates to pricing or feature sets.",
-      "testStrategy": "Testing should cover all aspects of the subscription system:\n\n1. Unit Tests:\n   - Test FeatureAccess service with various plan/feature combinations\n   - Verify plan upgrade/downgrade logic handles all edge cases\n   - Test proration calculations\n\n2. Integration Tests:\n   - Verify Stripe API interactions for subscription creation, updates, and cancellations\n   - Test webhook handling for subscription events\n   - Ensure database updates correctly when plan changes occur\n\n3. End-to-End Tests:\n   - Complete user journeys: signup with plan selection, upgrade flow, downgrade flow\n   - Verify feature access is properly restricted based on plan\n   - Test plan change with billing implications\n\n4. Manual Testing:\n   - Use Stripe test mode to verify complete subscription lifecycle\n   - Verify UI elements correctly show/hide based on subscription status\n   - Test upgrade prompts when accessing gated features\n\n5. Edge Cases:\n   - Test subscription cancellation and reinstatement\n   - Verify handling of failed payments\n   - Test plan changes near billing cycle boundaries\n\nCreate a test matrix covering all features and their availability in each plan tier to ensure comprehensive coverage.",
       "status": "pending",
       "dependencies": [
         9
       ],
       "priority": "medium",
+      "details": "This task requires implementing a comprehensive subscription plan system:\n\n1. Database Changes:\n   - Create a new `Plans` table with fields: `id`, `name` (Basic, Pro, Enterprise), `price`, `billing_frequency` (monthly/annual), `features` (JSON field storing allowed features), `stripe_price_id`, `created_at`, `updated_at`\n   - Add `current_plan_id` (foreign key to Plans table) and `subscription_status` fields to the `Office` table\n\n2. Feature Gating Implementation:\n   - Create a centralized FeatureAccess service class that handles all permission checks\n   - Implement methods like `canAccessFeature(officeId, featureName)` that check if an office's plan includes specific features\n   - Create middleware for protecting routes based on subscription level\n   - Add UI indicators for premium features\n\n3. Stripe Integration:\n   - Map internal plan IDs to Stripe product/price IDs\n   - Implement plan change functionality (upgrades/downgrades)\n   - Handle prorated billing for mid-cycle changes\n   - Update webhook handlers to process subscription events\n\n4. Admin Interface:\n   - Create admin tools to manage plans and their features\n   - Add ability to view and modify customer subscriptions\n\n5. User Experience:\n   - Implement plan selection during signup\n   - Create plan comparison page\n   - Add upgrade prompts when users attempt to access premium features\n\nRefer to docs/payment-plan.md for the specific billing structure and feature sets for each plan tier. Ensure all plan-related logic is centralized for easy updates to pricing or feature sets.",
+      "testStrategy": "Testing should cover all aspects of the subscription system:\n\n1. Unit Tests:\n   - Test FeatureAccess service with various plan/feature combinations\n   - Verify plan upgrade/downgrade logic handles all edge cases\n   - Test proration calculations\n\n2. Integration Tests:\n   - Verify Stripe API interactions for subscription creation, updates, and cancellations\n   - Test webhook handling for subscription events\n   - Ensure database updates correctly when plan changes occur\n\n3. End-to-End Tests:\n   - Complete user journeys: signup with plan selection, upgrade flow, downgrade flow\n   - Verify feature access is properly restricted based on plan\n   - Test plan change with billing implications\n\n4. Manual Testing:\n   - Use Stripe test mode to verify complete subscription lifecycle\n   - Verify UI elements correctly show/hide based on subscription status\n   - Test upgrade prompts when accessing gated features\n\n5. Edge Cases:\n   - Test subscription cancellation and reinstatement\n   - Verify handling of failed payments\n   - Test plan changes near billing cycle boundaries\n\nCreate a test matrix covering all features and their availability in each plan tier to ensure comprehensive coverage.",
       "subtasks": [
         {
           "id": 1,
           "title": "Design and Implement Plans Table",
           "description": "Create a Plans table to define available pricing tiers (e.g., Basic, Pro, Enterprise), their prices, billing intervals, and included features. Ensure the table structure supports easy addition or modification of plans.",
-          "details": "",
+          "details": "**Database Migration Requirements:**\nBefore implementing this subtask, create a database migration:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_plans_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for Plans table:\n     - `id` INTEGER PRIMARY KEY\n     - `name` TEXT NOT NULL (e.g., 'Basic', 'Pro', 'Enterprise')\n     - `description` TEXT\n     - `price_cents` INTEGER NOT NULL (price in cents)\n     - `billing_interval` TEXT NOT NULL (e.g., 'monthly', 'yearly')\n     - `features_json` TEXT (JSON array of included features)\n     - `is_active` BOOLEAN DEFAULT TRUE\n     - `created_at` DATETIME NOT NULL\n     - `updated_at` DATETIME NOT NULL\n   - Add appropriate indexes for performance\n   - Add UNIQUE constraint on (name, billing_interval) combination\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS plans` statement\n\nFollow SQLite type affinity guidelines and ensure all migrations work in both directions.",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 32
@@ -2086,7 +2145,7 @@
           "id": 2,
           "title": "Add current_plan_id Field to Office Table",
           "description": "Add a current_plan_id field to the Office table to reference the selected plan for each office. Ensure this field is properly indexed and supports plan upgrades/downgrades.",
-          "details": "",
+          "details": "**Database Migration Requirements:**\nBefore implementing this subtask, create a database migration:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_current_plan_id_to_office\n   ```\n\n2. **Implement UP Script:**\n   - Add ALTER TABLE statement to add current_plan_id field:\n     - `current_plan_id` INTEGER (foreign key to plans table)\n   - Add FOREIGN KEY constraint to plans table\n   - Add appropriate index for performance\n\n3. **Implement DOWN Script:**\n   - Add ALTER TABLE statement to drop the current_plan_id column\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\nFollow SQLite type affinity guidelines and ensure all migrations work in both directions.",
           "status": "pending",
           "dependencies": [],
           "parentTaskId": 32
