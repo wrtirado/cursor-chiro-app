@@ -232,7 +232,7 @@ Current implementation provides excellent foundation for security and ePHI isola
 Begin Phase 1 with Task 9.10 (Invoice table implementation) to build the missing database schema foundation.
 </info added on 2025-05-25T23:47:18.701Z>
 
-## 10. Design and Implement Invoice Table [pending]
+## 10. Design and Implement Invoice Table [done]
 ### Dependencies: None
 ### Description: Create a table to store monthly and one-off invoices for each office, including billing period, total, status, and references to line items, as described in docs/payment-plan.md.
 ### Details:

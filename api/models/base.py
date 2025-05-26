@@ -38,6 +38,7 @@ class Office(Base):
     company = relationship("Company", back_populates="offices")
     users = relationship("User", back_populates="office")
     branding = relationship("Branding", back_populates="office", uselist=False)
+    invoices = relationship("Invoice", back_populates="office")
     # Subscription and billing fields for SaaS billing
     subscription_status = Column(
         String,  # Use string for hybrid enum approach
@@ -204,3 +205,40 @@ class Branding(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     office = relationship("Office", back_populates="branding")
+
+
+class Invoice(Base):
+    __tablename__ = "invoice"
+    id = Column(Integer, primary_key=True, index=True)
+    office_id = Column(
+        Integer,
+        ForeignKey("offices.office_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    billing_period_start = Column(DateTime, nullable=True, index=True)
+    billing_period_end = Column(DateTime, nullable=True)
+    total_amount_cents = Column(Integer, nullable=False, default=0)
+    status = Column(
+        Text,
+        nullable=False,
+        default="pending",
+        index=True,
+        doc="Invoice status: pending, sent, paid, failed, cancelled",
+    )
+    stripe_invoice_id = Column(Text, nullable=True, index=True, unique=True)
+    invoice_type = Column(
+        Text,
+        nullable=False,
+        default="monthly",
+        index=True,
+        doc="Invoice type: monthly, one_off, setup_fee",
+    )
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime, nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    # Relationships
+    office = relationship("Office", back_populates="invoices")
