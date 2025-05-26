@@ -1,0 +1,9 @@
+---
+description: 
+globs: .env
+alwaysApply: false
+---
+Anytime you're trying to do anything with the .env file, remember that the Cursor Ignore rules prevent you from finding it in my project structure. That said, you should remember the following information:
+
+- I have a DATABASE_URL environment variable set.
+- If you want to make changes to my .env file, instruct me to do it for you manually.
