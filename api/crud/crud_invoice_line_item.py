@@ -36,7 +36,6 @@ class CRUDInvoiceLineItem:
 
         # Log the creation for audit
         log_billing_event(
-            db=db,
             action="line_item_created",
             office_id=invoice.office_id,
             user_id=user_id,
@@ -164,7 +163,6 @@ class CRUDInvoiceLineItem:
 
         # Log the update for audit
         log_billing_event(
-            db=db,
             action="line_item_updated",
             office_id=invoice.office_id,
             user_id=user_id,
@@ -197,7 +195,6 @@ class CRUDInvoiceLineItem:
 
         # Log the deletion for audit
         log_billing_event(
-            db=db,
             action="line_item_deleted",
             office_id=invoice.office_id,
             user_id=user_id,

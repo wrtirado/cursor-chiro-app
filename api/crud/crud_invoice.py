@@ -25,8 +25,7 @@ class CRUDInvoice:
 
         # Log invoice creation
         log_billing_event(
-            session=db,
-            event_type="invoice_created",
+            action="invoice_created",
             invoice_id=db_obj.id,
             office_id=db_obj.office_id,
             user_id=user_id,
@@ -171,8 +170,7 @@ class CRUDInvoice:
 
             # Log the update
             log_billing_event(
-                session=db,
-                event_type="invoice_updated",
+                action="invoice_updated",
                 invoice_id=db_obj.id,
                 office_id=db_obj.office_id,
                 user_id=user_id,
@@ -194,8 +192,7 @@ class CRUDInvoice:
 
         # Log status change
         log_billing_event(
-            session=db,
-            event_type="invoice_status_changed",
+            action="invoice_status_changed",
             invoice_id=db_obj.id,
             office_id=db_obj.office_id,
             user_id=user_id,

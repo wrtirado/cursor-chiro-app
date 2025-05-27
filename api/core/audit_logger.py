@@ -34,6 +34,17 @@ class AuditEvent:
     OFFICE_CREATE = "OFFICE_CREATE"
     OFFICE_UPDATE = "OFFICE_UPDATE"
     AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE"
+    # Billing events
+    BILLING_USER_ACTIVATED = "BILLING_USER_ACTIVATED"
+    BILLING_USER_DEACTIVATED = "BILLING_USER_DEACTIVATED"
+    BILLING_STATUS_UPDATED = "BILLING_STATUS_UPDATED"
+    BILLING_CYCLE_UPDATED = "BILLING_CYCLE_UPDATED"
+    INVOICE_CREATED = "INVOICE_CREATED"
+    INVOICE_UPDATED = "INVOICE_UPDATED"
+    INVOICE_DELETED = "INVOICE_DELETED"
+    LINE_ITEM_CREATED = "LINE_ITEM_CREATED"
+    LINE_ITEM_UPDATED = "LINE_ITEM_UPDATED"
+    LINE_ITEM_DELETED = "LINE_ITEM_DELETED"
 
 
 def log_audit_event(
@@ -113,3 +124,79 @@ def log_application_startup():
 
     message = "Application startup completed successfully"
     audit_log.info(message, extra={"props": props})
+
+
+def log_billing_event(
+    action: str,
+    office_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    patient_id: Optional[int] = None,
+    invoice_id: Optional[int] = None,
+    line_item_id: Optional[int] = None,
+    details: Optional[Dict[str, Any]] = None,
+    outcome: str = "SUCCESS",
+):
+    """Helper function to log billing-related audit events with appropriate structure."""
+
+    # Map common billing actions to audit event types
+    action_event_map = {
+        "user_billing_status_updated": AuditEvent.BILLING_STATUS_UPDATED,
+        "user_activated_for_billing": AuditEvent.BILLING_USER_ACTIVATED,
+        "user_deactivated_for_billing": AuditEvent.BILLING_USER_DEACTIVATED,
+        "user_billed_cycle_updated": AuditEvent.BILLING_CYCLE_UPDATED,
+        "invoice_created": AuditEvent.INVOICE_CREATED,
+        "invoice_updated": AuditEvent.INVOICE_UPDATED,
+        "invoice_deleted": AuditEvent.INVOICE_DELETED,
+        "line_item_created": AuditEvent.LINE_ITEM_CREATED,
+        "line_item_updated": AuditEvent.LINE_ITEM_UPDATED,
+        "line_item_deleted": AuditEvent.LINE_ITEM_DELETED,
+    }
+
+    event_type = action_event_map.get(action, action.upper())
+
+    # Build structured props
+    props: Dict[str, Any] = {
+        "event_type": event_type,
+        "outcome": outcome,
+        "source_ip": "system",  # Billing events are typically system-initiated
+        "user_agent": "billing_system",
+        "request_path": "billing_operation",
+        "request_method": "SYSTEM",
+    }
+
+    # Add IDs if provided
+    if user_id:
+        props["user_id"] = user_id
+    if office_id:
+        props["office_id"] = office_id
+    if patient_id:
+        props["patient_id"] = patient_id
+    if invoice_id:
+        props["resource_type"] = "invoice"
+        props["resource_id"] = str(invoice_id)
+    elif line_item_id:
+        props["resource_type"] = "line_item"
+        props["resource_id"] = str(line_item_id)
+    elif patient_id:
+        props["resource_type"] = "user_billing"
+        props["resource_id"] = str(patient_id)
+
+    # Add details
+    if details:
+        props["details"] = details
+
+    # Construct message
+    message = f"Billing audit: {action}"
+    if office_id:
+        message += f" for office {office_id}"
+    if patient_id and patient_id != user_id:
+        message += f" affecting patient {patient_id}"
+    if user_id:
+        message += f" by user {user_id}"
+    message += f" - {outcome}"
+
+    # Log the event
+    if outcome == "FAILURE":
+        audit_log.warning(message, extra={"props": props})
+    else:
+        audit_log.info(message, extra={"props": props})

@@ -330,7 +330,7 @@ Before implementing this task, you must create a database migration to add the I
 - Consider item_type values like 'patient_activation', 'setup_fee', 'monthly_recurring'
 </info added on 2025-05-25T23:59:47.519Z>
 
-## 12. Update Patient/User Model for Billing Status [pending]
+## 12. Update Patient/User Model for Billing Status [done]
 ### Dependencies: None
 ### Description: Add fields to the patient/user model to track activation/deactivation dates and billing status for each billing cycle, supporting the per-patient billing logic in docs/payment-plan.md.
 ### Details:

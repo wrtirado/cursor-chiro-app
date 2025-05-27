@@ -100,6 +100,33 @@ class User(Base):
     join_code = Column(Text, unique=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # Billing status fields for patient activation billing
+    is_active_for_billing = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        index=True,
+        doc="Whether this user/patient is currently active for billing purposes",
+    )
+    activated_at = Column(
+        DateTime,
+        nullable=True,
+        index=True,
+        doc="Datetime when the user/patient was first activated for billing",
+    )
+    deactivated_at = Column(
+        DateTime,
+        nullable=True,
+        doc="Datetime when the user/patient was deactivated (if applicable)",
+    )
+    last_billed_cycle = Column(
+        DateTime,
+        nullable=True,
+        index=True,
+        doc="Datetime of the last billing cycle this user/patient was included in",
+    )
+
     office = relationship("Office", back_populates="users")
     role = relationship("Role", back_populates="users")
     # Relationships for TherapyPlans, PlanAssignments, Progress if needed
