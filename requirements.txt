@@ -7,6 +7,7 @@ bcrypt>=4.0.1
 SQLAlchemy
 libsql-client # Added for libSQL
 sqlalchemy-libsql # Correct package for SQLAlchemy libSQL dialect
+python-dateutil
 python-dotenv
 pydantic-settings 
 pydantic[email]

@@ -426,7 +426,7 @@
           "title": "Implement Patient Activation Billing Logic",
           "description": "Ensure that activating a patient account adds a line item to the current invoice for the office. Handle reactivation and deactivation logic as described in docs/payment-plan.md.",
           "details": "<info added on 2025-05-24T22:07:22.887Z>\nImplement billing logic that maintains strict ePHI separation by creating a two-tier data architecture. Design an internal tracking system that records patient activations with full ePHI data while generating anonymous aggregate billing entries for Stripe integration. Develop a mapping system to count activations per medical office without exposing individual patient identities. Create comprehensive internal audit trails that document all billing-related activities while ensuring only sanitized summary data is transmitted to external payment processors. Implement data validation to verify that no ePHI is included in outbound payment processing requests. Add unit tests to confirm proper data separation and HIPAA compliance throughout the billing workflow.\n</info added on 2025-05-24T22:07:22.887Z>",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },

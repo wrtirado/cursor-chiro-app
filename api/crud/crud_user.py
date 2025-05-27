@@ -10,6 +10,15 @@ from api.core.utils import generate_random_code
 from api.core.config import RoleType
 from api.core.audit_logger import log_billing_event
 
+# Import billing service for automatic billing integration
+try:
+    from api.services.billing_service import billing_service
+
+    BILLING_SERVICE_AVAILABLE = True
+except ImportError:
+    BILLING_SERVICE_AVAILABLE = False
+    billing_service = None
+
 
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email).first()
@@ -168,7 +177,33 @@ def update_user_billing_status(
 
 
 def activate_user_for_billing(db: Session, user_id: int, admin_user_id: int) -> User:
-    """Activate a user for billing"""
+    """Activate a user for billing with automatic billing logic integration"""
+    if BILLING_SERVICE_AVAILABLE and billing_service:
+        # Use the comprehensive billing service
+        try:
+            billing_result = billing_service.activate_patient_for_billing(
+                db=db,
+                patient_id=user_id,
+                admin_user_id=admin_user_id,
+            )
+
+            # Return the updated user
+            return db.query(User).filter(User.user_id == user_id).first()
+
+        except Exception as e:
+            # Fall back to basic activation if billing service fails
+            log_billing_event(
+                action="billing_service_fallback",
+                user_id=admin_user_id,
+                patient_id=user_id,
+                details={
+                    "error": str(e),
+                    "fallback_reason": "billing_service_activation_failed",
+                },
+            )
+            # Continue with basic activation below
+
+    # Basic activation without billing service (fallback)
     billing_status = UserBillingStatusUpdate(
         is_active_for_billing=True, activated_at=datetime.utcnow()
     )
@@ -176,7 +211,34 @@ def activate_user_for_billing(db: Session, user_id: int, admin_user_id: int) -> 
 
 
 def deactivate_user_for_billing(db: Session, user_id: int, admin_user_id: int) -> User:
-    """Deactivate a user for billing"""
+    """Deactivate a user for billing with automatic billing logic integration"""
+    if BILLING_SERVICE_AVAILABLE and billing_service:
+        # Use the comprehensive billing service
+        try:
+            billing_result = billing_service.deactivate_patient_for_billing(
+                db=db,
+                patient_id=user_id,
+                admin_user_id=admin_user_id,
+                reason="manual_deactivation",
+            )
+
+            # Return the updated user
+            return db.query(User).filter(User.user_id == user_id).first()
+
+        except Exception as e:
+            # Fall back to basic deactivation if billing service fails
+            log_billing_event(
+                action="billing_service_fallback",
+                user_id=admin_user_id,
+                patient_id=user_id,
+                details={
+                    "error": str(e),
+                    "fallback_reason": "billing_service_deactivation_failed",
+                },
+            )
+            # Continue with basic deactivation below
+
+    # Basic deactivation without billing service (fallback)
     billing_status = UserBillingStatusUpdate(
         is_active_for_billing=False, deactivated_at=datetime.utcnow()
     )

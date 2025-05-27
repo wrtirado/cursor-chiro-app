@@ -379,7 +379,7 @@ Before implementing this task, you must create a database migration to add billi
 - These fields support per-patient billing logic as described in docs/payment-plan.md
 </info added on 2025-05-26T00:00:09.938Z>
 
-## 13. Implement Patient Activation Billing Logic [pending]
+## 13. Implement Patient Activation Billing Logic [done]
 ### Dependencies: None
 ### Description: Ensure that activating a patient account adds a line item to the current invoice for the office. Handle reactivation and deactivation logic as described in docs/payment-plan.md.
 ### Details:
