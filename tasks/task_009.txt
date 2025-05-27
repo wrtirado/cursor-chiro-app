@@ -273,7 +273,7 @@ Before implementing this task, you must create a database migration to add the I
 - Verify the migration works in both directions before proceeding with implementation
 </info added on 2025-05-25T23:59:30.301Z>
 
-## 11. Design and Implement Invoice Line Item Table [pending]
+## 11. Design and Implement Invoice Line Item Table [done]
 ### Dependencies: None
 ### Description: Create a table to store detailed line items for each invoice (e.g., patient activations, setup fees), as specified in docs/payment-plan.md.
 ### Details:

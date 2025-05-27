@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 
@@ -34,7 +34,9 @@ class InvoiceBase(BaseModel):
     )
     total_amount_cents: int = Field(0, ge=0, description="Total amount in cents")
     status: InvoiceStatus = Field(InvoiceStatus.PENDING, description="Invoice status")
-    stripe_invoice_id: Optional[str] = Field(None, description="Stripe invoice ID")
+    stripe_invoice_id: Optional[str] = Field(
+        None, description="Stripe invoice ID for external reference"
+    )
     invoice_type: InvoiceType = Field(
         InvoiceType.MONTHLY, description="Type of invoice"
     )
@@ -42,12 +44,10 @@ class InvoiceBase(BaseModel):
 
     @validator("billing_period_end")
     def validate_billing_period(cls, v, values):
-        """Ensure billing period end is after start if both are provided"""
+        """Ensure billing period end is after start"""
         if v and "billing_period_start" in values and values["billing_period_start"]:
             if v <= values["billing_period_start"]:
-                raise ValueError(
-                    "billing_period_end must be after billing_period_start"
-                )
+                raise ValueError("Billing period end must be after start")
         return v
 
 
@@ -70,12 +70,10 @@ class InvoiceUpdate(BaseModel):
 
     @validator("billing_period_end")
     def validate_billing_period(cls, v, values):
-        """Ensure billing period end is after start if both are provided"""
+        """Ensure billing period end is after start"""
         if v and "billing_period_start" in values and values["billing_period_start"]:
             if v <= values["billing_period_start"]:
-                raise ValueError(
-                    "billing_period_end must be after billing_period_start"
-                )
+                raise ValueError("Billing period end must be after start")
         return v
 
 
@@ -90,15 +88,13 @@ class InvoiceResponse(InvoiceBase):
         from_attributes = True
 
 
-class InvoiceListResponse(BaseModel):
-    """Schema for paginated invoice list responses"""
+class InvoiceWithLineItemsResponse(InvoiceResponse):
+    """Schema for invoice API responses with line items included"""
 
-    invoices: list[InvoiceResponse]
-    total: int = Field(..., description="Total number of invoices")
-    page: int = Field(..., description="Current page number")
-    per_page: int = Field(..., description="Items per page")
-    has_next: bool = Field(..., description="Whether there are more pages")
-    has_prev: bool = Field(..., description="Whether there are previous pages")
+    # Import here to avoid circular import
+    line_items: Optional[List["InvoiceLineItemResponse"]] = Field(
+        default_factory=list, description="Invoice line items"
+    )
 
 
 class InvoiceFilters(BaseModel):
@@ -107,6 +103,30 @@ class InvoiceFilters(BaseModel):
     office_id: Optional[int] = None
     status: Optional[InvoiceStatus] = None
     invoice_type: Optional[InvoiceType] = None
-    billing_period_start_after: Optional[datetime] = None
-    billing_period_start_before: Optional[datetime] = None
+    billing_period_start: Optional[datetime] = None
+    billing_period_end: Optional[datetime] = None
+    min_amount_cents: Optional[int] = Field(None, ge=0)
+    max_amount_cents: Optional[int] = Field(None, ge=0)
     stripe_invoice_id: Optional[str] = None
+
+
+class InvoiceListResponse(BaseModel):
+    """Schema for paginated invoice list responses"""
+
+    invoices: List[InvoiceResponse]
+    total: int = Field(..., description="Total number of invoices")
+    page: int = Field(..., description="Current page number")
+    per_page: int = Field(..., description="Items per page")
+    has_next: bool = Field(..., description="Whether there are more pages")
+    has_prev: bool = Field(..., description="Whether there are previous pages")
+
+
+# Import at the end to avoid circular imports
+try:
+    from api.schemas.invoice_line_item import InvoiceLineItemResponse
+
+    # Update forward reference
+    InvoiceWithLineItemsResponse.model_rebuild()
+except ImportError:
+    # Handle the case where invoice_line_item module doesn't exist yet
+    pass

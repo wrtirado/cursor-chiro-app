@@ -242,3 +242,40 @@ class Invoice(Base):
 
     # Relationships
     office = relationship("Office", back_populates="invoices")
+    line_items = relationship(
+        "InvoiceLineItem", back_populates="invoice", cascade="all, delete-orphan"
+    )
+
+
+class InvoiceLineItem(Base):
+    __tablename__ = "invoice_line_item"
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(
+        Integer,
+        ForeignKey("invoice.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    item_type = Column(
+        Text,
+        nullable=False,
+        index=True,
+        doc="Type of line item: patient_activation, setup_fee, monthly_recurring, one_off",
+    )
+    description = Column(
+        Text,
+        nullable=False,
+        doc="Human-readable description (ePHI-sanitized for external use)",
+    )
+    quantity = Column(Integer, nullable=False, default=1)
+    unit_price_cents = Column(Integer, nullable=False, default=0)
+    total_amount_cents = Column(Integer, nullable=False, default=0)
+    metadata_json = Column(
+        Text,
+        nullable=True,
+        doc="JSON metadata for aggregate billing data (NO ePHI allowed)",
+    )
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+
+    # Relationships
+    invoice = relationship("Invoice", back_populates="line_items")
