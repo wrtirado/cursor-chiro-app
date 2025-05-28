@@ -31,7 +31,7 @@ class PatientActivationBillingService:
     """
 
     # Billing configuration (should eventually come from settings/config)
-    PATIENT_ACTIVATION_FEE_CENTS = 500  # $5.00 per patient activation
+    PATIENT_ACTIVATION_FEE_CENTS = 200  # $2.00 per patient activation
     MONTHLY_BILLING_DAY = 1  # First day of month for billing cycle start
 
     def __init__(self):
