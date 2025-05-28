@@ -344,6 +344,46 @@ class CRUDInvoiceLineItem:
 
         return self.create(db, obj_in=line_item_data, user_id=user_id)
 
+    def create_monthly_patient_billing_line_item(
+        self,
+        db: Session,
+        *,
+        invoice_id: int,
+        patient_count: int,
+        unit_price_cents: int,
+        billing_period_start: datetime,
+        billing_period_end: datetime,
+        user_id: int,
+        patient_reference_ids: List[str] = None,
+    ) -> InvoiceLineItem:
+        """Create a monthly patient billing line item with ePHI sanitization
+
+        This is used for monthly billing cycles where multiple patients are billed
+        together in a single line item for the billing period.
+        """
+        # Create sanitized description for monthly billing
+        description = f"Monthly Patient Billing: {patient_count} active patients @ ${unit_price_cents/100:.2f} each for {billing_period_start.strftime('%B %Y')}"
+
+        # Create aggregate metadata without ePHI but with billing period info
+        metadata_json = ePHISanitizationHelper.create_aggregate_metadata(
+            internal_reference_ids=patient_reference_ids,
+            item_type="monthly_patient_billing",
+            patient_count=patient_count,
+            billing_period=f"{billing_period_start.date()} to {billing_period_end.date()}",
+        )
+
+        line_item_data = InvoiceLineItemCreate(
+            invoice_id=invoice_id,
+            item_type=LineItemType.MONTHLY_RECURRING,
+            description=description,
+            quantity=patient_count,
+            unit_price_cents=unit_price_cents,
+            total_amount_cents=patient_count * unit_price_cents,
+            metadata_json=metadata_json,
+        )
+
+        return self.create(db, obj_in=line_item_data, user_id=user_id)
+
     def _update_invoice_total(self, db: Session, *, invoice_id: int) -> None:
         """Update the total amount for an invoice based on its line items"""
         total_cents = (

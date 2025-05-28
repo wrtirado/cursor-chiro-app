@@ -387,7 +387,7 @@ Before implementing this task, you must create a database migration to add billi
 Implement billing logic that maintains strict ePHI separation by creating a two-tier data architecture. Design an internal tracking system that records patient activations with full ePHI data while generating anonymous aggregate billing entries for Stripe integration. Develop a mapping system to count activations per medical office without exposing individual patient identities. Create comprehensive internal audit trails that document all billing-related activities while ensuring only sanitized summary data is transmitted to external payment processors. Implement data validation to verify that no ePHI is included in outbound payment processing requests. Add unit tests to confirm proper data separation and HIPAA compliance throughout the billing workflow.
 </info added on 2025-05-24T22:07:22.887Z>
 
-## 14. Implement Monthly Invoice Generation Logic [pending]
+## 14. Implement Monthly Invoice Generation Logic [done]
 ### Dependencies: None
 ### Description: At the start of each billing cycle, generate invoices for all offices, including all active patients and any reactivations. Ensure deactivated accounts are not billed in future cycles unless reactivated, per docs/payment-plan.md.
 ### Details:

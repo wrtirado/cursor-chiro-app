@@ -45,6 +45,11 @@ class AuditEvent:
     LINE_ITEM_CREATED = "LINE_ITEM_CREATED"
     LINE_ITEM_UPDATED = "LINE_ITEM_UPDATED"
     LINE_ITEM_DELETED = "LINE_ITEM_DELETED"
+    # Monthly billing events
+    MONTHLY_INVOICES_GENERATED = "MONTHLY_INVOICES_GENERATED"
+    MONTHLY_INVOICE_GENERATED_FOR_OFFICE = "MONTHLY_INVOICE_GENERATED_FOR_OFFICE"
+    MONTHLY_BILLING_CYCLE_COMPLETED = "MONTHLY_BILLING_CYCLE_COMPLETED"
+    BILLING_CYCLE_UPDATED_FOR_OFFICE = "BILLING_CYCLE_UPDATED_FOR_OFFICE"
 
 
 def log_audit_event(
@@ -150,6 +155,11 @@ def log_billing_event(
         "line_item_created": AuditEvent.LINE_ITEM_CREATED,
         "line_item_updated": AuditEvent.LINE_ITEM_UPDATED,
         "line_item_deleted": AuditEvent.LINE_ITEM_DELETED,
+        # Monthly billing actions
+        "monthly_invoices_generated": AuditEvent.MONTHLY_INVOICES_GENERATED,
+        "monthly_invoice_generated_for_office": AuditEvent.MONTHLY_INVOICE_GENERATED_FOR_OFFICE,
+        "monthly_billing_cycle_completed": AuditEvent.MONTHLY_BILLING_CYCLE_COMPLETED,
+        "billing_cycle_updated_for_office": AuditEvent.BILLING_CYCLE_UPDATED_FOR_OFFICE,
     }
 
     event_type = action_event_map.get(action, action.upper())

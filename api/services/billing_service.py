@@ -742,6 +742,432 @@ class PatientActivationBillingService:
             "office_id": office_id,
         }
 
+    def generate_monthly_invoices_for_all_offices(
+        self,
+        db: Session,
+        billing_period_start: Optional[datetime] = None,
+        admin_user_id: int = 1,  # Default system user
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Generate monthly invoices for all offices with active patients.
+
+        This is the main method for monthly billing cycle processing.
+        Can be called manually or scheduled to run at the start of each billing cycle.
+
+        Args:
+            db: Database session
+            billing_period_start: Optional specific billing period start (defaults to current period)
+            admin_user_id: ID of admin user triggering the billing
+            dry_run: If True, only simulate invoice generation without creating records
+
+        Returns:
+            Comprehensive summary of invoice generation process
+        """
+        if billing_period_start is None:
+            billing_period_start = self._get_current_billing_period_start()
+
+        billing_period_end = self._get_current_billing_period_end(billing_period_start)
+
+        # Get all offices that have active patients
+        from api.crud.crud_user import get_active_patients_for_billing
+
+        # Get all unique office IDs with active patients
+        active_patients = get_active_patients_for_billing(db, office_id=None)
+        office_ids = list(
+            set(patient.office_id for patient in active_patients if patient.office_id)
+        )
+
+        if not office_ids:
+            return {
+                "success": True,
+                "billing_period_start": billing_period_start,
+                "billing_period_end": billing_period_end,
+                "offices_processed": 0,
+                "total_invoices_created": 0,
+                "total_patients_billed": 0,
+                "total_amount_cents": 0,
+                "message": "No offices with active patients found",
+                "dry_run": dry_run,
+            }
+
+        office_results = []
+        total_invoices_created = 0
+        total_patients_billed = 0
+        total_amount_cents = 0
+
+        # Process each office
+        for office_id in office_ids:
+            try:
+                office_result = self.generate_monthly_invoice_for_office(
+                    db,
+                    office_id=office_id,
+                    billing_period_start=billing_period_start,
+                    billing_period_end=billing_period_end,
+                    admin_user_id=admin_user_id,
+                    dry_run=dry_run,
+                )
+
+                office_results.append(office_result)
+
+                if office_result["invoice_created"]:
+                    total_invoices_created += 1
+
+                total_patients_billed += office_result["patients_billed"]
+                total_amount_cents += office_result["total_amount_cents"]
+
+            except Exception as e:
+                office_results.append(
+                    {
+                        "office_id": office_id,
+                        "success": False,
+                        "error": str(e),
+                        "invoice_created": False,
+                        "patients_billed": 0,
+                        "total_amount_cents": 0,
+                    }
+                )
+
+        # Log the overall monthly billing process
+        log_billing_event(
+            action="monthly_invoices_generated",
+            user_id=admin_user_id,
+            details={
+                "billing_period_start": billing_period_start.isoformat(),
+                "billing_period_end": billing_period_end.isoformat(),
+                "offices_processed": len(office_ids),
+                "invoices_created": total_invoices_created,
+                "patients_billed": total_patients_billed,
+                "total_amount_cents": total_amount_cents,
+                "dry_run": dry_run,
+            },
+        )
+
+        # Only commit if not a dry run
+        if not dry_run:
+            db.commit()
+
+        return {
+            "success": True,
+            "billing_period_start": billing_period_start,
+            "billing_period_end": billing_period_end,
+            "offices_processed": len(office_ids),
+            "total_invoices_created": total_invoices_created,
+            "total_patients_billed": total_patients_billed,
+            "total_amount_cents": total_amount_cents,
+            "office_results": office_results,
+            "dry_run": dry_run,
+        }
+
+    def generate_monthly_invoice_for_office(
+        self,
+        db: Session,
+        office_id: int,
+        billing_period_start: datetime,
+        billing_period_end: datetime,
+        admin_user_id: int,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Generate monthly invoice for a specific office.
+
+        This includes all patients who are active for billing in the office,
+        excluding patients who were deactivated and not reactivated.
+        """
+        from api.crud.crud_user import get_active_patients_for_billing
+
+        # Get all active patients for this office
+        active_patients = get_active_patients_for_billing(db, office_id)
+
+        if not active_patients:
+            return {
+                "office_id": office_id,
+                "success": True,
+                "invoice_created": False,
+                "patients_billed": 0,
+                "total_amount_cents": 0,
+                "message": "No active patients found for office",
+                "dry_run": dry_run,
+            }
+
+        # Check if invoice already exists for this period
+        existing_invoices = crud_invoice.get_monthly_invoices_for_period(
+            db, billing_period_start, office_id
+        )
+
+        if existing_invoices and not dry_run:
+            existing_invoice = existing_invoices[0]
+            return {
+                "office_id": office_id,
+                "success": True,
+                "invoice_created": False,
+                "invoice_id": existing_invoice.id,
+                "patients_billed": 0,
+                "total_amount_cents": existing_invoice.total_amount_cents,
+                "message": "Invoice already exists for this billing period",
+                "dry_run": dry_run,
+            }
+
+        if dry_run:
+            # For dry run, just calculate what would be billed
+            patients_to_bill = len(active_patients)
+            total_amount = patients_to_bill * self.PATIENT_ACTIVATION_FEE_CENTS
+
+            return {
+                "office_id": office_id,
+                "success": True,
+                "invoice_created": False,  # Not actually created in dry run
+                "patients_billed": patients_to_bill,
+                "total_amount_cents": total_amount,
+                "message": f"Dry run: Would bill {patients_to_bill} patients for ${total_amount/100:.2f}",
+                "dry_run": True,
+                "patients": [
+                    {
+                        "patient_id": p.user_id,
+                        "patient_name": p.name,  # ePHI for internal reporting only
+                        "activated_at": (
+                            p.activated_at.isoformat() if p.activated_at else None
+                        ),
+                    }
+                    for p in active_patients
+                ],
+            }
+
+        # Create or get the monthly invoice
+        invoice = self._get_or_create_monthly_invoice(
+            db, office_id, billing_period_start, billing_period_end, admin_user_id
+        )
+
+        # Check if we've already billed these patients this cycle
+        # (to avoid double-billing if this method is called multiple times)
+        patients_to_bill = []
+        for patient in active_patients:
+            if (
+                patient.last_billed_cycle is None
+                or patient.last_billed_cycle < billing_period_start
+            ):
+                patients_to_bill.append(patient)
+
+        if not patients_to_bill:
+            return {
+                "office_id": office_id,
+                "success": True,
+                "invoice_created": False,
+                "invoice_id": invoice.id,
+                "patients_billed": 0,
+                "total_amount_cents": invoice.total_amount_cents,
+                "message": "All active patients already billed for this cycle",
+                "dry_run": dry_run,
+            }
+
+        # Create internal tracking records for all patients
+        internal_references = []
+        for patient in patients_to_bill:
+            internal_tracking = self._create_internal_activation_record(
+                patient_id=patient.user_id,
+                office_id=office_id,
+                invoice_id=invoice.id,
+                activation_time=billing_period_start,  # Use billing period start as activation time for monthly billing
+                admin_user_id=admin_user_id,
+                is_reactivation=False,
+            )
+            internal_references.append(internal_tracking["reference_id"])
+
+        # Create aggregated line item for monthly billing
+        line_item = crud_invoice_line_item.create_monthly_patient_billing_line_item(
+            db,
+            invoice_id=invoice.id,
+            patient_count=len(patients_to_bill),
+            unit_price_cents=self.PATIENT_ACTIVATION_FEE_CENTS,
+            billing_period_start=billing_period_start,
+            billing_period_end=billing_period_end,
+            user_id=admin_user_id,
+            patient_reference_ids=internal_references,
+        )
+
+        # Update last billed cycle for all patients
+        patient_ids = [patient.user_id for patient in patients_to_bill]
+        from api.crud.crud_user import update_last_billed_cycle
+
+        update_last_billed_cycle(db, patient_ids, billing_period_start, admin_user_id)
+
+        # Log the monthly billing for this office
+        log_billing_event(
+            action="monthly_invoice_generated_for_office",
+            office_id=office_id,
+            user_id=admin_user_id,
+            invoice_id=invoice.id,
+            line_item_id=line_item.id,
+            details={
+                "billing_period_start": billing_period_start.isoformat(),
+                "billing_period_end": billing_period_end.isoformat(),
+                "patients_billed": len(patients_to_bill),
+                "total_amount_cents": len(patients_to_bill)
+                * self.PATIENT_ACTIVATION_FEE_CENTS,
+                "internal_tracking_ids": internal_references,
+                "patient_names": [
+                    p.name for p in patients_to_bill
+                ],  # ePHI for internal audit only
+            },
+        )
+
+        return {
+            "office_id": office_id,
+            "success": True,
+            "invoice_created": True,
+            "invoice_id": invoice.id,
+            "line_item_id": line_item.id,
+            "patients_billed": len(patients_to_bill),
+            "total_amount_cents": len(patients_to_bill)
+            * self.PATIENT_ACTIVATION_FEE_CENTS,
+            "billing_period_start": billing_period_start,
+            "billing_period_end": billing_period_end,
+            "dry_run": dry_run,
+        }
+
+    def get_monthly_billing_summary(
+        self,
+        db: Session,
+        billing_period_start: Optional[datetime] = None,
+        office_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Get comprehensive summary of monthly billing for a specific period.
+
+        This provides reporting and analytics for monthly billing cycles.
+        """
+        if billing_period_start is None:
+            billing_period_start = self._get_current_billing_period_start()
+
+        billing_period_end = self._get_current_billing_period_end(billing_period_start)
+
+        # Get invoices for the period
+        invoices = crud_invoice.get_monthly_invoices_for_period(
+            db, billing_period_start, office_id
+        )
+
+        summary = {
+            "billing_period_start": billing_period_start,
+            "billing_period_end": billing_period_end,
+            "office_id": office_id,
+            "total_offices": 0,
+            "total_invoices": len(invoices),
+            "total_patients_billed": 0,
+            "total_amount_cents": 0,
+            "office_summaries": [],
+        }
+
+        office_data = {}
+
+        for invoice in invoices:
+            office_id_key = invoice.office_id
+
+            if office_id_key not in office_data:
+                office_data[office_id_key] = {
+                    "office_id": office_id_key,
+                    "invoices": [],
+                    "total_patients": 0,
+                    "total_amount_cents": 0,
+                }
+
+            # Get line items for this invoice
+            line_items = crud_invoice_line_item.get_by_invoice(
+                db, invoice_id=invoice.id
+            )
+
+            # Count patients billed (from line item quantities)
+            invoice_patients = sum(
+                item.quantity
+                for item in line_items
+                if item.item_type
+                in [
+                    LineItemType.PATIENT_ACTIVATION.value,
+                    LineItemType.MONTHLY_RECURRING.value,
+                ]
+            )
+
+            office_data[office_id_key]["invoices"].append(
+                {
+                    "invoice_id": invoice.id,
+                    "patients_billed": invoice_patients,
+                    "amount_cents": invoice.total_amount_cents,
+                    "status": invoice.status,
+                }
+            )
+
+            office_data[office_id_key]["total_patients"] += invoice_patients
+            office_data[office_id_key][
+                "total_amount_cents"
+            ] += invoice.total_amount_cents
+
+            summary["total_patients_billed"] += invoice_patients
+            summary["total_amount_cents"] += invoice.total_amount_cents
+
+        summary["total_offices"] = len(office_data)
+        summary["office_summaries"] = list(office_data.values())
+
+        return summary
+
+    def process_monthly_billing_cycle(
+        self,
+        db: Session,
+        billing_period_start: Optional[datetime] = None,
+        admin_user_id: int = 1,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Complete monthly billing cycle processing.
+
+        This is the main entry point for automated monthly billing.
+        It generates invoices and updates billing cycles for all offices.
+        """
+        # Generate invoices for all offices
+        invoice_results = self.generate_monthly_invoices_for_all_offices(
+            db,
+            billing_period_start=billing_period_start,
+            admin_user_id=admin_user_id,
+            dry_run=dry_run,
+        )
+
+        if not invoice_results["success"] or dry_run:
+            return invoice_results
+
+        # Update billing cycles for all offices
+        billing_period_start = invoice_results["billing_period_start"]
+        cycle_update_results = self.update_billing_cycle_for_activated_patients(
+            db,
+            billing_cycle_date=billing_period_start,
+            office_id=None,  # Update for all offices
+            admin_user_id=admin_user_id,
+        )
+
+        # Get final summary
+        final_summary = self.get_monthly_billing_summary(
+            db, billing_period_start=billing_period_start
+        )
+
+        # Log the complete billing cycle
+        log_billing_event(
+            action="monthly_billing_cycle_completed",
+            user_id=admin_user_id,
+            details={
+                "billing_period_start": billing_period_start.isoformat(),
+                "invoices_generated": invoice_results["total_invoices_created"],
+                "patients_billed": invoice_results["total_patients_billed"],
+                "total_amount_cents": invoice_results["total_amount_cents"],
+                "offices_processed": invoice_results["offices_processed"],
+                "patients_cycle_updated": cycle_update_results["patients_updated"],
+            },
+        )
+
+        return {
+            "success": True,
+            "billing_cycle_completed": True,
+            "invoice_generation": invoice_results,
+            "cycle_updates": cycle_update_results,
+            "final_summary": final_summary,
+        }
+
 
 # Create a global service instance
 billing_service = PatientActivationBillingService()

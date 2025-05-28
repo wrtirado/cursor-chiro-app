@@ -435,7 +435,7 @@
           "title": "Implement Monthly Invoice Generation Logic",
           "description": "At the start of each billing cycle, generate invoices for all offices, including all active patients and any reactivations. Ensure deactivated accounts are not billed in future cycles unless reactivated, per docs/payment-plan.md.",
           "details": "",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 9
         },
