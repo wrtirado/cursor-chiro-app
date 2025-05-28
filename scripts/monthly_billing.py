@@ -16,14 +16,36 @@ Usage:
 import argparse
 import sys
 import os
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import Optional, List
+import json
 
-# Add the project root to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Add the parent directory to the path to import from api
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.database.session import get_db
 from api.services.billing_service import billing_service
+from api.database.session import get_db
+from api.core.audit_logger import log_billing_event
+
+
+class DatabaseSession:
+    """Context manager for database sessions"""
+
+    def __init__(self):
+        self.db = None
+
+    def __enter__(self):
+        self.db = next(get_db())
+        return self.db
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.db:
+            self.db.close()
+
+
+def get_db_session():
+    """Get database session context manager"""
+    return DatabaseSession()
 
 
 def generate_monthly_invoices(
@@ -38,7 +60,7 @@ def generate_monthly_invoices(
     else:
         print("📅 Using current billing period")
 
-    db = next(get_db())
+    db = next(get_db_session())
     try:
         result = billing_service.generate_monthly_invoices_for_all_offices(
             db=db,
@@ -90,7 +112,7 @@ def process_billing_cycle(
         f"🔄 {'[DRY RUN] ' if dry_run else ''}Processing complete monthly billing cycle..."
     )
 
-    db = next(get_db())
+    db = next(get_db_session())
     try:
         result = billing_service.process_monthly_billing_cycle(
             db=db,
@@ -152,7 +174,7 @@ def get_billing_summary(
     if office_id:
         print(f"🏢 Office: {office_id}")
 
-    db = next(get_db())
+    db = next(get_db_session())
     try:
         summary = billing_service.get_monthly_billing_summary(
             db=db,
@@ -199,26 +221,208 @@ def parse_date(date_string: str) -> datetime:
         )
 
 
+def summary_command(args):
+    """Generate billing summary report"""
+    try:
+        billing_period = None
+        if args.period:
+            billing_period = datetime.strptime(args.period, "%Y-%m-%d")
+
+        with get_db_session() as db:
+            summary = billing_service.get_billing_period_activations_summary(
+                db=db,
+                start_date=billing_period,
+                end_date=(
+                    billing_period + timedelta(days=30) if billing_period else None
+                ),
+                office_id=args.office_id,
+            )
+
+        if args.output == "json":
+            print(json.dumps(summary, indent=2, default=str))
+        else:
+            print_formatted_summary(summary)
+
+    except Exception as e:
+        print(f"❌ Error generating summary: {e}")
+        sys.exit(1)
+
+
+def one_off_charge_command(args):
+    """Create one-off charge invoice"""
+    try:
+        with get_db_session() as db:
+            result = billing_service.create_one_off_invoice_for_office(
+                db=db,
+                office_id=args.office_id,
+                charge_description=args.description,
+                amount_cents=args.amount_cents,
+                admin_user_id=args.admin_user or 1,
+                charge_type=args.charge_type,
+                metadata={"notes": args.notes} if args.notes else None,
+                dry_run=args.dry_run,
+            )
+
+        if result["success"]:
+            print(f"✅ {result['message']}")
+            if not args.dry_run:
+                print(f"   Invoice ID: {result['invoice']['id']}")
+                print(f"   Amount: ${result['invoice']['total_amount_cents']/100:.2f}")
+                print(f"   Status: {result['invoice']['status']}")
+            else:
+                print(f"   [DRY RUN] Amount: ${args.amount_cents/100:.2f}")
+        else:
+            print(f"❌ {result['message']}")
+            print(f"   Error: {result.get('error', 'Unknown error')}")
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"❌ Error creating one-off charge: {e}")
+        sys.exit(1)
+
+
+def setup_fee_command(args):
+    """Create setup fee invoice"""
+    try:
+        with get_db_session() as db:
+            result = billing_service.create_setup_fee_invoice(
+                db=db,
+                office_id=args.office_id,
+                setup_fee_cents=args.amount_cents,
+                admin_user_id=args.admin_user or 1,
+                dry_run=args.dry_run,
+            )
+
+        if result["success"]:
+            print(f"✅ {result['message']}")
+            if not args.dry_run:
+                print(f"   Invoice ID: {result['invoice']['id']}")
+                print(f"   Amount: ${result['invoice']['total_amount_cents']/100:.2f}")
+                print(f"   Status: {result['invoice']['status']}")
+            else:
+                print(f"   [DRY RUN] Amount: ${args.amount_cents/100:.2f}")
+        else:
+            print(f"❌ {result['message']}")
+            print(f"   Error: {result.get('error', 'Unknown error')}")
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"❌ Error creating setup fee: {e}")
+        sys.exit(1)
+
+
+def bulk_setup_fee_command(args):
+    """Create setup fees for multiple offices"""
+    try:
+        office_ids = [int(id.strip()) for id in args.office_ids.split(",")]
+
+        with get_db_session() as db:
+            result = billing_service.bulk_create_setup_fees(
+                db=db,
+                office_ids=office_ids,
+                setup_fee_cents=args.amount_cents,
+                admin_user_id=args.admin_user or 1,
+                dry_run=args.dry_run,
+            )
+
+        print(f"📊 Bulk Setup Fee Results:")
+        print(f"   Total Offices: {result['total_offices']}")
+        print(f"   Successful: {result['successful_count']}")
+        print(f"   Failed: {result['failed_count']}")
+        print(f"   Amount per office: ${result['setup_fee_cents']/100:.2f}")
+
+        if args.verbose:
+            print("\n📋 Individual Results:")
+            for office_result in result["office_results"]:
+                status = "✅" if office_result["success"] else "❌"
+                print(
+                    f"   {status} Office {office_result['office_id']}: {office_result.get('message', 'Unknown')}"
+                )
+
+    except Exception as e:
+        print(f"❌ Error creating bulk setup fees: {e}")
+        sys.exit(1)
+
+
+def one_off_summary_command(args):
+    """Generate one-off charges summary report"""
+    try:
+        start_date = None
+        end_date = None
+
+        if args.start_date:
+            start_date = datetime.strptime(args.start_date, "%Y-%m-%d")
+        if args.end_date:
+            end_date = datetime.strptime(args.end_date, "%Y-%m-%d")
+
+        with get_db_session() as db:
+            summary = billing_service.get_one_off_charges_summary(
+                db=db,
+                office_id=args.office_id,
+                start_date=start_date,
+                end_date=end_date,
+                charge_type=args.charge_type,
+            )
+
+        if args.output == "json":
+            print(json.dumps(summary, indent=2, default=str))
+        else:
+            print_one_off_charges_summary(summary)
+
+    except Exception as e:
+        print(f"❌ Error generating one-off charges summary: {e}")
+        sys.exit(1)
+
+
+def print_one_off_charges_summary(summary):
+    """Print formatted one-off charges summary"""
+    if not summary["success"]:
+        print(f"❌ Error: {summary.get('message', 'Failed to retrieve summary')}")
+        return
+
+    s = summary["summary"]
+    print("📊 One-Off Charges Summary")
+    print("=" * 50)
+    print(f"Total Charges: {s['total_charges']}")
+    print(f"Total Amount: ${s['total_amount_cents']/100:.2f}")
+    print(f"Unique Offices: {s['unique_offices']}")
+
+    if s["date_range"]["start_date"] or s["date_range"]["end_date"]:
+        print(
+            f"Date Range: {s['date_range']['start_date'] or 'N/A'} to {s['date_range']['end_date'] or 'N/A'}"
+        )
+
+    print("\n📋 Charges by Type:")
+    for charge_type, data in summary["charges_by_type"].items():
+        print(
+            f"  {charge_type}: {data['count']} charges, ${data['total_amount_cents']/100:.2f}"
+        )
+
+    print(f"\n📄 Invoices: {len(summary['invoices'])}")
+    for invoice in summary["invoices"][:10]:  # Show first 10
+        print(
+            f"  Invoice {invoice['id']} (Office {invoice['office_id']}): ${invoice['total_amount_cents']/100:.2f} - {invoice['status']}"
+        )
+
+    if len(summary["invoices"]) > 10:
+        print(f"  ... and {len(summary['invoices']) - 10} more invoices")
+
+
 def main():
+    """Main CLI entry point"""
     parser = argparse.ArgumentParser(
-        description="Monthly Billing Management Script",
+        description="Monthly Billing Management Tool",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    # Generate invoices for current period (dry run)
-    python scripts/monthly_billing.py generate --dry-run
-    
-    # Generate invoices for specific period
-    python scripts/monthly_billing.py generate --period 2024-01-01
-    
-    # Process complete billing cycle
-    python scripts/monthly_billing.py process --admin-user 1
-    
-    # Get billing summary for current period
-    python scripts/monthly_billing.py summary
-    
-    # Get billing summary for specific period and office
-    python scripts/monthly_billing.py summary --period 2024-01-01 --office 1
+  python scripts/monthly_billing.py generate --dry-run
+  python scripts/monthly_billing.py generate --period 2024-01-01
+  python scripts/monthly_billing.py process --admin-user 1
+  python scripts/monthly_billing.py summary --period 2024-01-01 --office-id 5
+  python scripts/monthly_billing.py one-off --office-id 5 --amount 5000 --description "Setup Fee"
+  python scripts/monthly_billing.py setup-fee --office-id 5 --amount 5000
+  python scripts/monthly_billing.py bulk-setup --office-ids "1,2,3,4,5" --amount 5000
+  python scripts/monthly_billing.py one-off-summary --charge-type setup_fee
         """,
     )
 
@@ -229,46 +433,136 @@ Examples:
         "generate", help="Generate monthly invoices"
     )
     generate_parser.add_argument(
-        "--period", type=parse_date, help="Billing period start date (YYYY-MM-DD)"
+        "--period", help="Billing period start date (YYYY-MM-DD)"
     )
     generate_parser.add_argument(
-        "--admin-user", type=int, default=1, help="Admin user ID (default: 1)"
+        "--office-id", type=int, help="Generate for specific office only"
     )
     generate_parser.add_argument(
-        "--dry-run", action="store_true", help="Simulate without creating data"
+        "--admin-user", type=int, help="Admin user ID (default: 1)"
+    )
+    generate_parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate without creating records"
     )
 
     # Process command
     process_parser = subparsers.add_parser(
-        "process", help="Process complete billing cycle"
+        "process", help="Process complete monthly billing cycle"
     )
     process_parser.add_argument(
-        "--period", type=parse_date, help="Billing period start date (YYYY-MM-DD)"
+        "--period", help="Billing period start date (YYYY-MM-DD)"
     )
     process_parser.add_argument(
-        "--admin-user", type=int, default=1, help="Admin user ID (default: 1)"
+        "--admin-user", type=int, help="Admin user ID (default: 1)"
     )
     process_parser.add_argument(
-        "--dry-run", action="store_true", help="Simulate without creating data"
+        "--dry-run", action="store_true", help="Simulate without creating records"
     )
 
     # Summary command
-    summary_parser = subparsers.add_parser("summary", help="Get billing summary")
+    summary_parser = subparsers.add_parser("summary", help="Generate billing summary")
+    summary_parser.add_argument("--period", help="Billing period date (YYYY-MM-DD)")
+    summary_parser.add_argument("--office-id", type=int, help="Filter by office ID")
     summary_parser.add_argument(
-        "--period", type=parse_date, help="Billing period start date (YYYY-MM-DD)"
+        "--output", choices=["text", "json"], default="text", help="Output format"
     )
-    summary_parser.add_argument("--office", type=int, help="Office ID to filter by")
+
+    # One-off charge command
+    one_off_parser = subparsers.add_parser("one-off", help="Create one-off charge")
+    one_off_parser.add_argument(
+        "--office-id", type=int, required=True, help="Office ID to charge"
+    )
+    one_off_parser.add_argument(
+        "--amount",
+        type=int,
+        dest="amount_cents",
+        required=True,
+        help="Amount in cents (e.g., 5000 for $50.00)",
+    )
+    one_off_parser.add_argument(
+        "--description", required=True, help="Charge description"
+    )
+    one_off_parser.add_argument(
+        "--charge-type", default="custom", help="Charge type (default: custom)"
+    )
+    one_off_parser.add_argument("--notes", help="Additional notes for metadata")
+    one_off_parser.add_argument(
+        "--admin-user", type=int, help="Admin user ID (default: 1)"
+    )
+    one_off_parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate without creating records"
+    )
+
+    # Setup fee command
+    setup_fee_parser = subparsers.add_parser(
+        "setup-fee", help="Create setup fee invoice"
+    )
+    setup_fee_parser.add_argument(
+        "--office-id", type=int, required=True, help="Office ID to charge"
+    )
+    setup_fee_parser.add_argument(
+        "--amount",
+        type=int,
+        dest="amount_cents",
+        default=5000,
+        help="Setup fee amount in cents (default: 5000 = $50.00)",
+    )
+    setup_fee_parser.add_argument(
+        "--admin-user", type=int, help="Admin user ID (default: 1)"
+    )
+    setup_fee_parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate without creating records"
+    )
+
+    # Bulk setup fee command
+    bulk_setup_parser = subparsers.add_parser(
+        "bulk-setup", help="Create setup fees for multiple offices"
+    )
+    bulk_setup_parser.add_argument(
+        "--office-ids",
+        required=True,
+        help="Comma-separated office IDs (e.g., '1,2,3,4,5')",
+    )
+    bulk_setup_parser.add_argument(
+        "--amount",
+        type=int,
+        dest="amount_cents",
+        default=5000,
+        help="Setup fee amount in cents (default: 5000 = $50.00)",
+    )
+    bulk_setup_parser.add_argument(
+        "--admin-user", type=int, help="Admin user ID (default: 1)"
+    )
+    bulk_setup_parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate without creating records"
+    )
+    bulk_setup_parser.add_argument(
+        "--verbose", action="store_true", help="Show individual office results"
+    )
+
+    # One-off summary command
+    one_off_summary_parser = subparsers.add_parser(
+        "one-off-summary", help="Generate one-off charges summary"
+    )
+    one_off_summary_parser.add_argument(
+        "--office-id", type=int, help="Filter by office ID"
+    )
+    one_off_summary_parser.add_argument("--start-date", help="Start date (YYYY-MM-DD)")
+    one_off_summary_parser.add_argument("--end-date", help="End date (YYYY-MM-DD)")
+    one_off_summary_parser.add_argument(
+        "--charge-type", help="Filter by charge type (e.g., setup_fee, consulting)"
+    )
+    one_off_summary_parser.add_argument(
+        "--output", choices=["text", "json"], default="text", help="Output format"
+    )
 
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
-        return
+        sys.exit(1)
 
-    print(f"🚀 Monthly Billing Management")
-    print(f"📅 Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("")
-
+    # Dispatch to appropriate command handler
     if args.command == "generate":
         generate_monthly_invoices(
             period_start=args.period,
@@ -282,10 +576,19 @@ Examples:
             dry_run=args.dry_run,
         )
     elif args.command == "summary":
-        get_billing_summary(
-            period_start=args.period,
-            office_id=args.office,
-        )
+        summary_command(args)
+    elif args.command == "one-off":
+        one_off_charge_command(args)
+    elif args.command == "setup-fee":
+        setup_fee_command(args)
+    elif args.command == "bulk-setup":
+        bulk_setup_fee_command(args)
+    elif args.command == "one-off-summary":
+        one_off_summary_command(args)
+    else:
+        print(f"❌ Unknown command: {args.command}")
+        parser.print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":

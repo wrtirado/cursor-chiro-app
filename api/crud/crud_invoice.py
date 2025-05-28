@@ -231,17 +231,95 @@ class CRUDInvoice:
         office_id: Optional[int] = None,
     ) -> List[Invoice]:
         """Get monthly invoices for a specific billing period"""
-        query = db.query(Invoice).filter(
-            and_(
-                Invoice.invoice_type == InvoiceType.MONTHLY,
-                Invoice.billing_period_start == billing_period_start,
-            )
+        query = (
+            db.query(Invoice)
+            .filter(Invoice.billing_period_start == billing_period_start)
+            .filter(Invoice.invoice_type == InvoiceType.MONTHLY)
         )
 
         if office_id is not None:
             query = query.filter(Invoice.office_id == office_id)
 
-        return query.all()
+        return query.order_by(desc(Invoice.created_at)).all()
+
+    def create_one_off_invoice(
+        self, db: Session, *, obj_in: Dict[str, Any], user_id: int
+    ) -> Invoice:
+        """Create a one-off invoice (setup fees, special charges, etc.)"""
+        # Ensure the invoice type is set correctly
+        obj_in["invoice_type"] = InvoiceType.ONE_OFF.value
+
+        # Create invoice
+        invoice_create = InvoiceCreate(**obj_in)
+        return self.create(db, obj_in=invoice_create, user_id=user_id)
+
+    def get_invoices_by_type(
+        self,
+        db: Session,
+        invoice_type: str,
+        office_id: Optional[int] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Invoice]:
+        """Get invoices filtered by type and optional date range"""
+        query = db.query(Invoice).filter(Invoice.invoice_type == invoice_type)
+
+        if office_id is not None:
+            query = query.filter(Invoice.office_id == office_id)
+
+        if start_date is not None:
+            query = query.filter(Invoice.created_at >= start_date)
+
+        if end_date is not None:
+            query = query.filter(Invoice.created_at <= end_date)
+
+        return query.order_by(desc(Invoice.created_at)).offset(skip).limit(limit).all()
+
+    def get_one_off_invoices_for_office(
+        self,
+        db: Session,
+        office_id: int,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Invoice]:
+        """Get one-off invoices for a specific office"""
+        return self.get_invoices_by_type(
+            db=db,
+            invoice_type=InvoiceType.ONE_OFF.value,
+            office_id=office_id,
+            start_date=start_date,
+            end_date=end_date,
+            skip=skip,
+            limit=limit,
+        )
+
+    def get_setup_fee_invoices(
+        self,
+        db: Session,
+        office_id: Optional[int] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Invoice]:
+        """Get all setup fee invoices across offices"""
+        query = db.query(Invoice).filter(
+            Invoice.invoice_type == InvoiceType.ONE_OFF.value
+        )
+
+        if office_id is not None:
+            query = query.filter(Invoice.office_id == office_id)
+
+        # Join with line items to filter for setup fees
+        from api.models.base import InvoiceLineItem
+
+        query = query.join(InvoiceLineItem).filter(
+            InvoiceLineItem.item_type == "setup_fee"
+        )
+
+        return query.order_by(desc(Invoice.created_at)).offset(skip).limit(limit).all()
 
     def search(
         self,
@@ -252,10 +330,12 @@ class CRUDInvoice:
         skip: int = 0,
         limit: int = 100,
     ) -> List[Invoice]:
-        """Search invoices by notes or Stripe invoice ID"""
+        """Search invoices by various text fields"""
+        # Create search filters
         search_filter = or_(
-            Invoice.notes.ilike(f"%{query}%"),
             Invoice.stripe_invoice_id.ilike(f"%{query}%"),
+            Invoice.status.ilike(f"%{query}%"),
+            Invoice.invoice_type.ilike(f"%{query}%"),
         )
 
         db_query = db.query(Invoice).filter(search_filter)

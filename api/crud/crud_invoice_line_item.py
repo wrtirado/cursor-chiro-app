@@ -354,35 +354,121 @@ class CRUDInvoiceLineItem:
         billing_period_start: datetime,
         billing_period_end: datetime,
         user_id: int,
-        patient_reference_ids: List[str] = None,
+        patient_reference_ids: List[str],
     ) -> InvoiceLineItem:
-        """Create a monthly patient billing line item with ePHI sanitization
-
-        This is used for monthly billing cycles where multiple patients are billed
-        together in a single line item for the billing period.
-        """
-        # Create sanitized description for monthly billing
-        description = f"Monthly Patient Billing: {patient_count} active patients @ ${unit_price_cents/100:.2f} each for {billing_period_start.strftime('%B %Y')}"
-
-        # Create aggregate metadata without ePHI but with billing period info
-        metadata_json = ePHISanitizationHelper.create_aggregate_metadata(
-            internal_reference_ids=patient_reference_ids,
-            item_type="monthly_patient_billing",
+        """Create a monthly billing line item for multiple patients with ePHI sanitization"""
+        description = ePHISanitizationHelper.create_monthly_patient_billing_description(
             patient_count=patient_count,
-            billing_period=f"{billing_period_start.date()} to {billing_period_end.date()}",
+            billing_period_start=billing_period_start,
+            billing_period_end=billing_period_end,
         )
+
+        metadata_json = ePHISanitizationHelper.create_aggregate_metadata(
+            item_type="monthly_patient_billing",
+            billing_period_start=billing_period_start,
+            billing_period_end=billing_period_end,
+            patient_count=patient_count,
+            internal_tracking_ids=patient_reference_ids,
+        )
+
+        # Validate ePHI isolation
+        validation_result = ePHISanitizationHelper.validate_stripe_payload(
+            metadata_json
+        )
+        if not validation_result["is_safe_for_external_use"]:
+            raise ValueError(
+                f"ePHI detected in monthly billing line item: {validation_result['errors']}"
+            )
+
+        total_amount_cents = patient_count * unit_price_cents
 
         line_item_data = InvoiceLineItemCreate(
             invoice_id=invoice_id,
-            item_type=LineItemType.MONTHLY_RECURRING,
+            item_type=LineItemType.MONTHLY_RECURRING.value,
             description=description,
             quantity=patient_count,
             unit_price_cents=unit_price_cents,
-            total_amount_cents=patient_count * unit_price_cents,
+            total_amount_cents=total_amount_cents,
             metadata_json=metadata_json,
         )
 
         return self.create(db, obj_in=line_item_data, user_id=user_id)
+
+    def create_one_off_charge_line_item(
+        self,
+        db: Session,
+        *,
+        obj_in: Dict[str, Any],
+        user_id: int,
+    ) -> InvoiceLineItem:
+        """Create a line item for one-off charges (setup fees, special charges, etc.)"""
+
+        # Ensure ePHI isolation for the metadata
+        metadata_json = obj_in.get("metadata_json", {})
+        if metadata_json:
+            validation_result = ePHISanitizationHelper.validate_stripe_payload(
+                metadata_json
+            )
+            if not validation_result["is_safe_for_external_use"]:
+                raise ValueError(
+                    f"ePHI detected in one-off charge metadata: {validation_result['errors']}"
+                )
+
+        # Set default values for one-off charges
+        obj_in.setdefault("quantity", 1)
+
+        # Calculate total if not provided
+        if "total_amount_cents" not in obj_in:
+            obj_in["total_amount_cents"] = (
+                obj_in["quantity"] * obj_in["unit_price_cents"]
+            )
+
+        # Create the line item
+        line_item_data = InvoiceLineItemCreate(**obj_in)
+
+        # Log the one-off charge line item creation
+        line_item = self.create(db, obj_in=line_item_data, user_id=user_id)
+
+        # Additional logging for one-off charges
+        log_billing_event(
+            action="one_off_line_item_created",
+            invoice_id=obj_in["invoice_id"],
+            line_item_id=line_item.id,
+            user_id=user_id,
+            details={
+                "item_type": obj_in["item_type"],
+                "description": obj_in["description"],
+                "unit_price_cents": obj_in["unit_price_cents"],
+                "quantity": obj_in["quantity"],
+                "total_amount_cents": obj_in["total_amount_cents"],
+                "is_one_off_charge": True,
+            },
+        )
+
+        return line_item
+
+    def get_line_items_by_invoices(
+        self,
+        db: Session,
+        invoice_ids: List[int],
+        item_type: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 1000,
+    ) -> List[InvoiceLineItem]:
+        """Get line items for multiple invoices, optionally filtered by item type"""
+        query = db.query(InvoiceLineItem).filter(
+            InvoiceLineItem.invoice_id.in_(invoice_ids)
+        )
+
+        if item_type is not None:
+            query = query.filter(InvoiceLineItem.item_type == item_type)
+
+        return (
+            query.order_by(InvoiceLineItem.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def _update_invoice_total(self, db: Session, *, invoice_id: int) -> None:
         """Update the total amount for an invoice based on its line items"""

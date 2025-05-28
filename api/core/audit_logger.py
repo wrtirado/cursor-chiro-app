@@ -50,6 +50,12 @@ class AuditEvent:
     MONTHLY_INVOICE_GENERATED_FOR_OFFICE = "MONTHLY_INVOICE_GENERATED_FOR_OFFICE"
     MONTHLY_BILLING_CYCLE_COMPLETED = "MONTHLY_BILLING_CYCLE_COMPLETED"
     BILLING_CYCLE_UPDATED_FOR_OFFICE = "BILLING_CYCLE_UPDATED_FOR_OFFICE"
+    # One-off billing events
+    ONE_OFF_CHARGE_CREATED = "ONE_OFF_CHARGE_CREATED"
+    ONE_OFF_CHARGE_FAILED = "ONE_OFF_CHARGE_FAILED"
+    ONE_OFF_LINE_ITEM_CREATED = "ONE_OFF_LINE_ITEM_CREATED"
+    SETUP_FEE_CREATED = "SETUP_FEE_CREATED"
+    BULK_SETUP_FEES_CREATED = "BULK_SETUP_FEES_CREATED"
 
 
 def log_audit_event(
@@ -160,6 +166,12 @@ def log_billing_event(
         "monthly_invoice_generated_for_office": AuditEvent.MONTHLY_INVOICE_GENERATED_FOR_OFFICE,
         "monthly_billing_cycle_completed": AuditEvent.MONTHLY_BILLING_CYCLE_COMPLETED,
         "billing_cycle_updated_for_office": AuditEvent.BILLING_CYCLE_UPDATED_FOR_OFFICE,
+        # One-off billing actions
+        "one_off_charge_created": AuditEvent.ONE_OFF_CHARGE_CREATED,
+        "one_off_charge_failed": AuditEvent.ONE_OFF_CHARGE_FAILED,
+        "one_off_line_item_created": AuditEvent.ONE_OFF_LINE_ITEM_CREATED,
+        "setup_fee_created": AuditEvent.SETUP_FEE_CREATED,
+        "bulk_setup_fees_created": AuditEvent.BULK_SETUP_FEES_CREATED,
     }
 
     event_type = action_event_map.get(action, action.upper())
