@@ -96,11 +96,66 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 ✅ **Error handling**: Graceful degradation and proper HTTP responses
 </info added on 2025-05-29T22:06:35.681Z>
 
-## 4. Add RBAC to branding endpoints [pending]
+## 4. Add RBAC to branding endpoints [done]
 ### Dependencies: None
 ### Description: Implement role-based access controls for all branding operations
 ### Details:
+<info added on 2025-05-29T22:14:28.690Z>
+## RBAC Implementation Summary
 
+### ✅ Enhanced Security Architecture
+- **Replaced manual role checks** with the standardized `require_role()` dependency factory
+- **Added centralized role groups** for consistent permission management
+- **Implemented reusable office access control** helper function
+- **Used RoleType enum** for type-safe role definitions
+
+### 🔐 Role-Based Access Control Groups
+1. **BRANDING_MODIFY_ROLES**: `[admin, chiropractor]`
+   - Can create, update, and delete branding
+   - Applied to: POST `/`, PUT `/{office_id}`, DELETE `/{office_id}`
+
+2. **BRANDING_VIEW_ROLES**: `[admin, chiropractor, office_manager]`
+   - Can view effective branding with defaults
+   - Applied to: GET `/{office_id}`
+
+3. **ADMIN_ONLY_ROLES**: `[admin]`
+   - Can view raw branding data for debugging/admin purposes
+   - Applied to: GET `/{office_id}/raw`
+
+### 🏢 Office-Level Access Control
+- **check_office_access()** helper function enforces office-level permissions
+- **Admins**: Can access branding for any office (global access)
+- **Non-admin users**: Can only access branding for their own office
+- **Consistent error messaging** with HTTP 403 responses
+
+### 🔧 Technical Improvements
+- **Dependency injection**: All endpoints use `require_role()` for authentication/authorization
+- **Code reduction**: Eliminated ~50 lines of repetitive role-checking code
+- **Type safety**: Using `RoleType` enum prevents string-based role errors
+- **Maintainability**: Centralized role definitions make future changes easier
+
+### 📋 Endpoint RBAC Summary
+| Endpoint | Method | Roles Required | Office Access Check |
+|----------|--------|---------------|-------------------|
+| `/` | POST | admin, chiropractor | ✅ Own office only |
+| `/{office_id}` | PUT | admin, chiropractor | ✅ Own office only |
+| `/{office_id}` | GET | admin, chiropractor, office_manager | ✅ Own office only |
+| `/{office_id}/raw` | GET | admin | ❌ Global access |
+| `/{office_id}` | DELETE | admin, chiropractor | ✅ Own office only |
+
+### 🛡️ Security Benefits
+- **Principle of least privilege**: Users can only access resources they need
+- **Defense in depth**: Both role-based and office-level access controls
+- **Consistent authorization**: Standardized across all branding operations
+- **Audit ready**: Clear role requirements for compliance reporting
+
+### ✅ Verification Complete
+- All imports working correctly
+- Role groups properly defined with correct enum values
+- Office access control helper function available
+- All 5 branding endpoints protected with appropriate RBAC
+- Code compiles and imports successfully
+</info added on 2025-05-29T22:14:28.690Z>
 
 ## 5. Implement audit logging for branding changes [pending]
 ### Dependencies: None

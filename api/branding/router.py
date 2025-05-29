@@ -21,10 +21,33 @@ from api.schemas.branding import (
 from api.crud.crud_branding import crud_branding
 from api.core.audit_logger import log_audit_event
 import logging
+from api.core.config import RoleType
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Define role groups for branding operations
+BRANDING_MODIFY_ROLES = [RoleType.ADMIN, RoleType.CHIROPRACTOR]
+BRANDING_VIEW_ROLES = [RoleType.ADMIN, RoleType.CHIROPRACTOR, RoleType.OFFICE_MANAGER]
+ADMIN_ONLY_ROLES = [RoleType.ADMIN]
+
+
+def check_office_access(current_user: User, office_id: int) -> None:
+    """
+    Check if user has access to the specified office.
+    Admins can access any office, others can only access their own.
+
+    Raises HTTPException if access is denied.
+    """
+    if (
+        current_user.role.name != RoleType.ADMIN.value
+        and current_user.office_id != office_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only access branding for your own office",
+        )
 
 
 @router.post("/", response_model=BrandingResponse)
@@ -32,29 +55,15 @@ def create_branding(
     *,
     db: Session = Depends(get_db),
     branding_in: BrandingCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_role(BRANDING_MODIFY_ROLES)),
 ) -> BrandingResponse:
     """
     Create custom branding for an office.
 
     Requires admin or chiropractor role.
     """
-    # Check if user has permission to modify branding for this office
-    if current_user.role.name not in ["admin", "chiropractor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins and chiropractors can create branding",
-        )
-
-    # For non-admin users, ensure they can only modify their own office
-    if (
-        current_user.role.name != "admin"
-        and current_user.office_id != branding_in.office_id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only create branding for your own office",
-        )
+    # Check office access permission
+    check_office_access(current_user, branding_in.office_id)
 
     try:
         branding = crud_branding.create(
@@ -98,7 +107,7 @@ def update_branding(
     db: Session = Depends(get_db),
     office_id: int,
     branding_in: BrandingUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_role(BRANDING_MODIFY_ROLES)),
 ) -> BrandingResponse:
     """
     Update or create branding for an office.
@@ -106,19 +115,8 @@ def update_branding(
     This endpoint uses upsert logic - if branding doesn't exist, it creates it.
     Requires admin or chiropractor role.
     """
-    # Check permissions
-    if current_user.role.name not in ["admin", "chiropractor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins and chiropractors can update branding",
-        )
-
-    # For non-admin users, ensure they can only modify their own office
-    if current_user.role.name != "admin" and current_user.office_id != office_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only update branding for your own office",
-        )
+    # Check office access permission
+    check_office_access(current_user, office_id)
 
     try:
         branding = crud_branding.create_or_update(
@@ -155,20 +153,16 @@ def get_branding(
     *,
     db: Session = Depends(get_db),
     office_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_role(BRANDING_VIEW_ROLES)),
 ) -> BrandingResponseWithDefaults:
     """
     Get effective branding for an office with default fallbacks.
 
     Returns the custom branding if it exists, otherwise returns default branding.
-    Requires authenticated user.
+    Requires authenticated user with branding view permissions.
     """
-    # For non-admin users, ensure they can only view their own office
-    if current_user.role.name != "admin" and current_user.office_id != office_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only view branding for your own office",
-        )
+    # Check office access permission
+    check_office_access(current_user, office_id)
 
     try:
         effective_branding = crud_branding.get_effective_branding(
@@ -190,7 +184,7 @@ def get_raw_branding(
     *,
     db: Session = Depends(get_db),
     office_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_role(ADMIN_ONLY_ROLES)),
 ) -> Optional[BrandingResponse]:
     """
     Get raw custom branding for an office (without defaults).
@@ -198,11 +192,7 @@ def get_raw_branding(
     Returns None if no custom branding exists.
     Requires admin role for security.
     """
-    if current_user.role.name != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view raw branding data",
-        )
+    # Admins can access any office, so no additional check needed
 
     try:
         branding = crud_branding.get_by_office_id(db=db, office_id=office_id)
@@ -224,7 +214,7 @@ def delete_branding(
     *,
     db: Session = Depends(get_db),
     office_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_role(BRANDING_MODIFY_ROLES)),
 ) -> Dict[str, str]:
     """
     Delete custom branding for an office.
@@ -232,19 +222,8 @@ def delete_branding(
     After deletion, the office will use default branding.
     Requires admin or chiropractor role.
     """
-    # Check permissions
-    if current_user.role.name not in ["admin", "chiropractor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins and chiropractors can delete branding",
-        )
-
-    # For non-admin users, ensure they can only modify their own office
-    if current_user.role.name != "admin" and current_user.office_id != office_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only delete branding for your own office",
-        )
+    # Check office access permission
+    check_office_access(current_user, office_id)
 
     try:
         branding = crud_branding.get_by_office_id(db=db, office_id=office_id)
