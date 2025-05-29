@@ -17,7 +17,7 @@ Test upload and retrieval of custom branding elements via the POST /branding end
 ### Details:
 
 
-## 2. Set up Branding database table [pending]
+## 2. Set up Branding database table [done]
 ### Dependencies: None
 ### Description: Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema
 ### Details:
