@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/branding", response_model=BrandingResponse)
+@router.post("/", response_model=BrandingResponse)
 def create_branding(
     *,
     db: Session = Depends(get_db),
@@ -92,7 +92,7 @@ def create_branding(
         )
 
 
-@router.put("/branding/{office_id}", response_model=BrandingResponse)
+@router.put("/{office_id}", response_model=BrandingResponse)
 def update_branding(
     *,
     db: Session = Depends(get_db),
@@ -150,7 +150,7 @@ def update_branding(
         )
 
 
-@router.get("/branding/{office_id}", response_model=BrandingResponseWithDefaults)
+@router.get("/{office_id}", response_model=BrandingResponseWithDefaults)
 def get_branding(
     *,
     db: Session = Depends(get_db),
@@ -185,7 +185,7 @@ def get_branding(
         )
 
 
-@router.get("/branding/{office_id}/raw", response_model=Optional[BrandingResponse])
+@router.get("/{office_id}/raw", response_model=Optional[BrandingResponse])
 def get_raw_branding(
     *,
     db: Session = Depends(get_db),
@@ -219,7 +219,7 @@ def get_raw_branding(
         )
 
 
-@router.delete("/branding/{office_id}")
+@router.delete("/{office_id}")
 def delete_branding(
     *,
     db: Session = Depends(get_db),
