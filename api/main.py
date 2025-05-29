@@ -14,6 +14,7 @@ from api.progress.router import router as progress_router
 from api.media.router import router as media_router
 from api.offices.router import router as offices_router  # Import offices router
 from api.users.router import router as users_router
+from api.branding.router import router as branding_router
 
 from api.core.middleware import SecureHeadersMiddleware  # Import the new middleware
 from api.core.security_validator import (
@@ -100,6 +101,9 @@ app.include_router(
     offices_router, prefix=settings.API_V1_STR + "/offices", tags=["offices"]
 )
 app.include_router(users_router, prefix=settings.API_V1_STR + "/users", tags=["users"])
+app.include_router(
+    branding_router, prefix=settings.API_V1_STR + "/branding", tags=["branding"]
+)
 
 
 @app.on_event("startup")
