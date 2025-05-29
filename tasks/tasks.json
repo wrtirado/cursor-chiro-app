@@ -535,7 +535,7 @@
       "id": 10,
       "title": "Branding Customization API with HIPAA Compliance",
       "description": "Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [
         5
       ],

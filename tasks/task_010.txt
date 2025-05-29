@@ -1,6 +1,6 @@
 # Task ID: 10
 # Title: Branding Customization API with HIPAA Compliance
-# Status: in-progress
+# Status: done
 # Dependencies: 5
 # Priority: low
 # Description: Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.
