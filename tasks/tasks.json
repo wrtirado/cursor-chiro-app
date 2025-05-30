@@ -1957,132 +1957,13 @@
       ]
     },
     {
-      "id": 29,
-      "title": "Overhaul Alembic Migrations for libSQL/SQLite Compatibility",
-      "description": "Reset the migration history by removing all existing migration files and generating a single initial migration that reflects the libSQL-compatible database models using the new custom migration tool.",
-      "status": "pending",
-      "dependencies": [
-        28,
-        33
-      ],
-      "priority": "high",
-      "details": "Following Option B from section 4 of `docs/switching-db-to-libsql.md`, this task involves:\n\n1. Back up the existing migration files in `alembic/versions/` directory to a separate location (for reference purposes)\n2. Delete all migration script files from the `alembic/versions/` directory\n3. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility (dependent on Task 28)\n4. Generate a new initial migration using the custom migration tool (developed in Task 33)\n5. Review the generated migration file to ensure it correctly captures all model definitions\n6. Update any documentation that references specific migration versions\n7. Configure the custom migration tool for proper libSQL integration\n8. Test the migration by applying it to a fresh database\n\nNote: This approach will erase the previous migration history, meaning that existing databases cannot be upgraded using the standard upgrade path. A separate data migration strategy may be needed for production environments.",
-      "testStrategy": "1. Create a fresh libSQL/SQLite database\n2. Run the custom migration tool to apply the new initial migration\n3. Verify that all tables, columns, indexes, and constraints are created correctly by:\n   - Inspecting the database schema using SQLite tools or commands\n   - Comparing the actual schema with the expected schema based on the models\n   - Ensuring all model classes can be instantiated and saved to the database\n4. Test rollback functionality with the custom migration tool\n5. Verify the application can connect to and operate with the new database schema by:\n   - Running a subset of existing integration tests against the new schema\n   - Performing CRUD operations on all major entities\n   - Testing any complex queries that might be affected by SQLite's limitations\n6. Document any schema differences between the previous PostgreSQL schema and the new SQLite schema",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Back up and clean existing Alembic migration files",
-          "description": "Create a backup of all existing migration files in the alembic/versions/ directory and then remove them from the active project directory.",
-          "dependencies": [],
-          "details": "Implementation steps:\n1. Create a backup directory outside the project structure (e.g., 'alembic_backup/')\n2. Copy all files from 'alembic/versions/' to the backup directory with their original filenames and timestamps preserved\n3. Document the backup location in a README file within the backup directory\n4. Remove all migration script files from the 'alembic/versions/' directory\n5. Verify the directory is empty except for any necessary __init__.py file\n\nTesting approach:\n- Confirm all files were properly backed up by comparing file counts and checksums\n- Verify the alembic/versions/ directory is properly cleaned",
-          "status": "done",
-          "parentTaskId": 29
-        },
-        {
-          "id": 2,
-          "title": "Update Alembic environment configuration for libSQL",
-          "description": "Modify the Alembic environment configuration in env.py to ensure proper compatibility with libSQL/SQLite.",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation steps:\n1. Review the current env.py file in the Alembic directory\n2. Update the database URL handling to properly connect to libSQL/SQLite\n3. Modify any SQLAlchemy configuration options that need adjustment for libSQL compatibility\n4. Ensure proper handling of SQLite-specific constraints and types\n5. Add comments explaining the libSQL-specific configurations\n6. Update any render_item or include_object functions to handle SQLite-specific schema elements\n\nTesting approach:\n- Run a basic Alembic command like 'alembic current' to verify the configuration works\n- Check logs for any SQLite-specific warnings or errors",
-          "status": "done",
-          "parentTaskId": 29
-        },
-        {
-          "id": 3,
-          "title": "Generate new initial migration for libSQL schema",
-          "description": "Create a new initial migration that captures the complete database schema compatible with libSQL/SQLite.",
-          "dependencies": [
-            1,
-            2
-          ],
-          "details": "Implementation steps:\n1. Ensure all SQLAlchemy models have been properly adapted for libSQL/SQLite compatibility\n2. Run the command: `alembic revision --autogenerate -m \"Initial schema for SQLite/libSQL\"`\n3. Capture the new migration version ID for documentation\n4. Verify the migration file was created in the alembic/versions/ directory\n5. Check that the migration includes all expected tables, indices, and constraints\n\nTesting approach:\n- Review the generated migration file to ensure it correctly captures all model definitions\n- Verify no SQLite-incompatible operations are included\n- Check for any unexpected schema differences",
-          "status": "done",
-          "parentTaskId": 29
-        },
-        {
-          "id": 4,
-          "title": "Review and optimize the generated migration",
-          "description": "Carefully review the auto-generated migration file and make any necessary adjustments for optimal libSQL compatibility.",
-          "dependencies": [
-            3
-          ],
-          "details": "Implementation steps:\n1. Open the newly generated migration file\n2. Review all create_table, create_index, and other schema operations\n3. Check for and fix any SQLite-incompatible operations (like certain constraint types)\n4. Optimize index definitions for libSQL performance characteristics\n5. Add comments explaining any manual adjustments made\n6. Ensure proper handling of TEXT vs VARCHAR types and other SQLite-specific type mappings\n7. Verify foreign key constraints are properly defined\n\nTesting approach:\n- Manually review the SQL that would be generated using 'alembic upgrade --sql head'\n- Verify the SQL is valid for libSQL/SQLite\n- Check for any potential performance issues with the schema design",
-          "status": "done",
-          "parentTaskId": 29
-        },
-        {
-          "id": 5,
-          "title": "Test migration and update documentation",
-          "description": "Apply the migration to a test database and update all documentation that references Alembic migrations.",
-          "dependencies": [
-            3,
-            4
-          ],
-          "details": "Implementation steps:\n1. Create a fresh test libSQL/SQLite database\n2. Apply the migration using 'alembic upgrade head'\n3. Verify all tables, indices, and constraints were created correctly\n4. Update any documentation that references specific migration versions\n5. Update the database setup documentation to reflect the new migration approach\n6. Add a note in the documentation about the migration history reset\n7. Document the process for new installations vs. existing database migrations\n8. Update the switching-db-to-libsql.md document to mark this task as completed\n\nTesting approach:\n- Test the complete database initialization process on a fresh environment\n- Verify application functionality with the new database schema\n- Run database-dependent tests to ensure compatibility\n- Verify documentation accuracy by following it for a new setup",
-          "status": "done",
-          "parentTaskId": 29
-        },
-        {
-          "id": 6,
-          "title": "Adapt existing migrations to use the custom migration tool",
-          "description": "Convert the existing migration files to work with the new custom migration tool developed in Task #33.",
-          "dependencies": [
-            5
-          ],
-          "details": "Implementation steps:\n1. Review the structure and format required by the new custom migration tool\n2. Convert the initial migration created in subtask 3 to the format required by the custom tool\n3. Ensure all schema definitions are correctly translated to the new format\n4. Verify that all table definitions, indices, and constraints are preserved in the conversion\n5. Update any references to Alembic-specific functions or methods\n\nTesting approach:\n- Verify the converted migration file is valid for the custom migration tool\n- Compare the schema that would be generated by both approaches to ensure equivalence\n- Check for any functionality that might be missing in the conversion",
-          "status": "pending",
-          "parentTaskId": 29
-        },
-        {
-          "id": 7,
-          "title": "Update migration application and rollback procedures",
-          "description": "Replace Alembic-specific migration commands with the equivalent commands from the custom migration tool.",
-          "dependencies": [
-            6
-          ],
-          "details": "Implementation steps:\n1. Document the commands to apply migrations using the custom migration tool\n2. Document the commands to roll back migrations using the custom migration tool\n3. Update any scripts or documentation that reference 'alembic upgrade' or 'alembic downgrade'\n4. Create examples of common migration scenarios using the new tool\n5. Update CI/CD pipelines to use the new migration commands\n\nTesting approach:\n- Test applying migrations to a fresh database\n- Test rolling back migrations\n- Verify the commands work in all environments (development, testing, production)\n- Ensure the migration state is correctly tracked by the new tool",
-          "status": "pending",
-          "parentTaskId": 29
-        },
-        {
-          "id": 8,
-          "title": "Update developer documentation for the new migration workflow",
-          "description": "Create comprehensive documentation for developers on how to use the custom migration tool for all database schema changes.",
-          "dependencies": [
-            6,
-            7
-          ],
-          "details": "Implementation steps:\n1. Create a new documentation file explaining the custom migration tool workflow\n2. Document how to create new migrations\n3. Document how to apply and roll back migrations\n4. Provide examples of common migration scenarios\n5. Update any existing documentation that references Alembic\n6. Create a migration guide for developers transitioning from Alembic\n7. Document any differences in behavior or capabilities between Alembic and the custom tool\n\nTesting approach:\n- Have another developer follow the documentation to create and apply a test migration\n- Verify all commands and examples work as described\n- Ensure the documentation covers all common migration scenarios",
-          "status": "pending",
-          "parentTaskId": 29
-        },
-        {
-          "id": 9,
-          "title": "Final testing with the custom migration tool",
-          "description": "Perform comprehensive testing of the database schema using the custom migration tool.",
-          "dependencies": [
-            6,
-            7,
-            8
-          ],
-          "details": "Implementation steps:\n1. Create a fresh libSQL/SQLite database\n2. Apply the initial migration using the custom migration tool\n3. Verify all tables, indices, and constraints are created correctly\n4. Test the application's functionality with the new database schema\n5. Test the rollback functionality\n6. Verify that the migration state is correctly tracked\n7. Test creating and applying a new migration\n\nTesting approach:\n- Run a full suite of integration tests against the database\n- Verify all CRUD operations work correctly\n- Test complex queries and transactions\n- Ensure the application functions correctly with the new schema\n- Verify migration state tracking works correctly across multiple migrations",
-          "status": "pending",
-          "parentTaskId": 29
-        }
-      ]
-    },
-    {
       "id": 30,
       "title": "Rewrite Database Schema and Seed Scripts for SQLite Compatibility",
       "description": "Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.",
       "details": "This task involves rewriting the `database/init_schema.sql` file to use SQLite syntax and adapting the `scripts/seed_admin.py` script as needed. The changes should follow section 5 of `docs/switching-db-to-libsql.md`.\n\nFor `init_schema.sql`:\n1. Replace PostgreSQL-specific data types with SQLite equivalents\n2. Change primary key definitions to use `INTEGER PRIMARY KEY AUTOINCREMENT` syntax\n3. Adjust the `INSERT INTO Roles` statements to match SQLite syntax\n4. Ensure all table creation statements are SQLite-compatible\n5. Verify that any constraints or indexes are properly defined for SQLite\n\nFor `scripts/seed_admin.py`:\n1. Review the script to identify any PostgreSQL-specific SQLAlchemy code\n2. Update the script to work with the SQLite dialect if necessary\n3. Ensure it correctly interacts with the updated SQLAlchemy models\n4. Test that it can successfully create an admin user in the SQLite database\n\nThe implementation should maintain all existing functionality while ensuring compatibility with SQLite/libSQL. Pay special attention to data type conversions, auto-increment behavior, and any SQL syntax differences between PostgreSQL and SQLite.",
       "testStrategy": "1. Execute the rewritten `init_schema.sql` against a fresh SQLite database and verify it runs without errors\n2. Validate the database schema by inspecting the created tables using SQLite CLI or a GUI tool:\n   - Check that all tables have the correct structure\n   - Verify primary keys are properly set up with autoincrement\n   - Confirm that all indexes and constraints are present\n3. Run the adapted `seed_admin.py` script and verify:\n   - It executes without errors\n   - An admin user is successfully created in the database\n   - The user has the correct role and permissions\n4. Perform basic application operations that interact with the database to ensure the schema changes don't break functionality\n5. Write a simple test script that performs CRUD operations on each table to verify the schema works as expected\n6. Document any SQLite-specific limitations or behavior differences that developers should be aware of",
       "status": "done",
-      "dependencies": [
-        29
-      ],
+      "dependencies": [],
       "priority": "medium",
       "subtasks": [
         {

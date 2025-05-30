@@ -1,7 +1,7 @@
 # Task ID: 30
 # Title: Rewrite Database Schema and Seed Scripts for SQLite Compatibility
 # Status: done
-# Dependencies: 29
+# Dependencies: None
 # Priority: medium
 # Description: Rewrite the database initialization schema and adapt the admin seeding script to be compatible with SQLite syntax, following the guidelines in the documentation.
 # Details:
