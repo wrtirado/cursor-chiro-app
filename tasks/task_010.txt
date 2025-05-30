@@ -2,287 +2,106 @@
 # Title: Branding Customization API with HIPAA Compliance
 # Status: done
 # Dependencies: 5
-# Priority: low
-# Description: Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.
+# Priority: medium
+# Description: Implement API endpoints for office branding customization with HIPAA-compliant data handling and secure file storage.
 # Details:
-Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure. Use libSQL/SQLite JSON1 extension for storing and querying the colors JSON data. Adapt SQLAlchemy models to use appropriate libSQL/SQLite data types and constraints.
-
-# Test Strategy:
-Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption. Verify JSON1 extension functionality with libSQL/SQLite for proper handling of colors JSON data.
-
-# Subtasks:
-## 1. Create POST /branding endpoint [done]
-### Dependencies: None
-### Description: Implement endpoint that accepts logo_url and colors JSON parameters
-### Details:
-
-
-## 2. Set up Branding database table [done]
-### Dependencies: None
-### Description: Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema
-### Details:
-
-
-## 3. Implement branding retrieval logic [done]
-### Dependencies: None
-### Description: Create endpoint to fetch branding information for a specific office with appropriate fallbacks
-### Details:
-<info added on 2025-05-29T22:06:35.681Z>
-## Complete Implementation Summary
-
-### Primary Retrieval Endpoint - GET /api/v1/branding/{office_id}
-- **Response Schema**: BrandingResponseWithDefaults
-- **Description**: "Get effective branding for an office with default fallbacks"
-- **Functionality**: Returns custom branding if it exists, otherwise returns default branding
-- **Authentication**: Requires authenticated user
-- **Authorization**: Users can only view branding for their own office (except admins)
-
-### Secondary Retrieval Endpoint - GET /api/v1/branding/{office_id}/raw
-- **Response Schema**: Optional[BrandingResponse] 
-- **Description**: "Get raw custom branding for an office (without defaults)"
-- **Functionality**: Returns None if no custom branding exists
-- **Authentication**: Requires admin role for security
-- **Use Case**: Administrative access to see exactly what custom branding is configured
-
-### Fallback Logic Implementation (api/crud/crud_branding.py)
-
-**get_effective_branding() method provides complete fallback system:**
-
-1. **Default Configuration**:
-   - Primary color: #007bff
-   - Secondary color: #6c757d
-   - Accent color: #17a2b8
-   - Background color: #ffffff
-   - Text color: #212529
-   - Default logo: None (configurable)
-
-2. **Custom Branding Lookup**: Queries database for office-specific branding
-
-3. **Merge Strategy**:
-   - Custom logo overrides default logo if present
-   - Custom colors are merged with defaults (custom values override defaults, missing values use defaults)
-   - Invalid JSON in custom colors gracefully falls back to defaults
-
-4. **Response Structure**:
-   - `branding_id`: Custom branding ID or None
-   - `office_id`: Target office ID
-   - `logo_url`: Effective logo URL (custom or default)
-   - `colors`: Merged color scheme
-   - `has_custom_logo`: Boolean indicating custom logo presence
-   - `has_custom_colors`: Boolean indicating custom colors presence
-   - `created_at`/`updated_at`: Timestamps if custom branding exists
-
-### RBAC Integration
-- **Non-admin users**: Can only access their own office branding
-- **Admin users**: Can access any office branding
-- **Raw endpoint**: Admin-only for security
-
-### Error Handling
-- Graceful fallback when custom branding doesn't exist
-- JSON parsing errors for colors fall back to defaults
-- Proper HTTP status codes (403 for authorization, 500 for server errors)
-- Comprehensive logging for troubleshooting
-
-### Integration Status
-- Router properly included in main.py at `/api/v1/branding` prefix
-- All endpoints tested and validated through OpenAPI schema generation
-- Import validation confirmed - all dependencies properly resolved
-
-## Requirements Fulfillment
-✅ **Create endpoint to fetch branding information**: GET /{office_id} implemented
-✅ **Specific office targeting**: office_id parameter implemented  
-✅ **Appropriate fallbacks**: Comprehensive default branding system with merge logic
-✅ **HIPAA compliance**: Proper RBAC and audit integration
-✅ **Error handling**: Graceful degradation and proper HTTP responses
-</info added on 2025-05-29T22:06:35.681Z>
-
-## 4. Add RBAC to branding endpoints [done]
-### Dependencies: None
-### Description: Implement role-based access controls for all branding operations
-### Details:
-<info added on 2025-05-29T22:14:28.690Z>
-## RBAC Implementation Summary
-
-### ✅ Enhanced Security Architecture
-- **Replaced manual role checks** with the standardized `require_role()` dependency factory
-- **Added centralized role groups** for consistent permission management
-- **Implemented reusable office access control** helper function
-- **Used RoleType enum** for type-safe role definitions
-
-### 🔐 Role-Based Access Control Groups
-1. **BRANDING_MODIFY_ROLES**: `[admin, chiropractor]`
-   - Can create, update, and delete branding
-   - Applied to: POST `/`, PUT `/{office_id}`, DELETE `/{office_id}`
-
-2. **BRANDING_VIEW_ROLES**: `[admin, chiropractor, office_manager]`
-   - Can view effective branding with defaults
-   - Applied to: GET `/{office_id}`
-
-3. **ADMIN_ONLY_ROLES**: `[admin]`
-   - Can view raw branding data for debugging/admin purposes
-   - Applied to: GET `/{office_id}/raw`
-
-### 🏢 Office-Level Access Control
-- **check_office_access()** helper function enforces office-level permissions
-- **Admins**: Can access branding for any office (global access)
-- **Non-admin users**: Can only access branding for their own office
-- **Consistent error messaging** with HTTP 403 responses
-
-### 🔧 Technical Improvements
-- **Dependency injection**: All endpoints use `require_role()` for authentication/authorization
-- **Code reduction**: Eliminated ~50 lines of repetitive role-checking code
-- **Type safety**: Using `RoleType` enum prevents string-based role errors
-- **Maintainability**: Centralized role definitions make future changes easier
-
-### 📋 Endpoint RBAC Summary
-| Endpoint | Method | Roles Required | Office Access Check |
-|----------|--------|---------------|-------------------|
-| `/` | POST | admin, chiropractor | ✅ Own office only |
-| `/{office_id}` | PUT | admin, chiropractor | ✅ Own office only |
-| `/{office_id}` | GET | admin, chiropractor, office_manager | ✅ Own office only |
-| `/{office_id}/raw` | GET | admin | ❌ Global access |
-| `/{office_id}` | DELETE | admin, chiropractor | ✅ Own office only |
-
-### 🛡️ Security Benefits
-- **Principle of least privilege**: Users can only access resources they need
-- **Defense in depth**: Both role-based and office-level access controls
-- **Consistent authorization**: Standardized across all branding operations
-- **Audit ready**: Clear role requirements for compliance reporting
-
-### ✅ Verification Complete
-- All imports working correctly
-- Role groups properly defined with correct enum values
-- Office access control helper function available
-- All 5 branding endpoints protected with appropriate RBAC
-- Code compiles and imports successfully
-</info added on 2025-05-29T22:14:28.690Z>
-
-## 5. Implement audit logging for branding changes [done]
-### Dependencies: None
-### Description: Add detailed audit trails for all branding-related operations using libSQL/SQLite
-### Details:
-<info added on 2025-05-29T22:55:14.972Z>
-## ✅ Complete Audit Implementation Summary
-
-### 🔍 Audit Events Defined
-- **BRANDING_CREATED**: Logged when new custom branding is created
-- **BRANDING_UPDATED**: Logged when existing branding is modified  
-- **BRANDING_DELETED**: Logged when custom branding is removed
-- **BRANDING_VIEWED**: Defined and available for view operations
-
-### 📊 CRUD Layer Audit Integration
-**All branding CRUD operations include comprehensive audit logging:**
-
-1. **create()** method:
-   - Logs BRANDING_CREATED event
-   - Captures branding_id, office_id, user_id
-   - Includes new branding data in audit details
-
-2. **update()** method:
-   - Logs BRANDING_UPDATED event 
-   - Tracks changed fields and both old/new values
-   - Captures user_id and resource information
-
-3. **remove()** method:
-   - Logs BRANDING_DELETED event
-   - Records office_id and branding_id before deletion
-   - Maintains audit trail of removal actions
-
-### 🏗️ Audit System Architecture
-- **Structured Logging**: Uses centralized `audit_log` from logging configuration
-- **HIPAA Compliant**: File-based audit trails (not database tables) for security
-- **Rich Context**: Captures user_id, resource_id, timestamps, IP addresses
-- **Standardized Format**: Consistent audit event structure across all operations
-- **Error Handling**: Different log levels for success vs failure outcomes
-
-### 🔐 Security & Compliance Features
-- **User Attribution**: All events linked to authenticated user IDs
-- **Resource Tracking**: Branding ID and office ID captured for each event
-- **Immutable Trail**: Log-based approach prevents tampering
-- **Detailed Context**: IP addresses, user agents, request paths included
-- **Change Tracking**: Before/after values recorded for updates
-</info added on 2025-05-29T22:55:14.972Z>
-
-## 6. Implement secure file handling [done]
-### Dependencies: None
-### Description: Add secure handling for uploaded assets to prevent PHI exposure
-### Details:
 <info added on 2025-05-29T22:59:57.411Z>
 ## ✅ Complete Secure File Handling Implementation
 
 ### 🔐 Security Features Implemented
 1. **File Type Validation**:
    - Allowed types: `image/jpeg`, `image/png`, `image/gif`, `image/webp`
-   - Strict content-type checking to prevent malicious uploads
-   - File extension validation based on MIME type
+   - Server-side MIME type verification
+   - File extension validation
 
-2. **File Size Restrictions**:
-   - Maximum logo file size: 2MB
-   - Prevents storage abuse and ensures reasonable performance
-   - Clear error messages for oversized files
+2. **Secure Storage**:
+   - UUID-based file naming: `branding/office_{office_id}/logo_{uuid}.ext`
+   - Path traversal protection
+   - Structured directory organization
 
-3. **Secure Storage Paths**:
-   - Organized by office: `branding/office_{office_id}/logo_{uuid}.ext`
-   - UUID-based filenames prevent enumeration attacks
-   - Office-specific paths enable granular access control
+3. **Access Control**:
+   - Office-level access validation (users can only access their office's files)
+   - Role-based permissions (admin/chiropractor for upload, office_manager for view)
+   - Authentication required for all operations
 
-4. **Access Control**:
-   - Office-level permission validation for uploads/downloads
-   - Role-based access control (RBAC) integration
-   - Path traversal protection with strict validation
+4. **Audit Logging**:
+   - MEDIA_UPLOAD: File upload operations
+   - MEDIA_DOWNLOAD: File access operations
+   - BRANDING_VIEWED: Logo access tracking
+   - AUTHORIZATION_FAILURE: Failed access attempts
+
+5. **Resource Management**:
+   - Proper file stream cleanup
+   - Exception handling for all file operations
+   - 2MB file size limit
 
 ### 🛡️ HIPAA Compliance Features
-1. **Comprehensive Audit Logging**:
-   - **MEDIA_UPLOAD** events for all logo uploads (success/failure)
-   - **MEDIA_DOWNLOAD** events for secure URL generation
-   - **BRANDING_VIEWED** events when branding data is accessed
-   - **AUTHORIZATION_FAILURE** events for access violations
+- **No PHI in File Names**: UUID-based naming prevents PHI exposure
+- **Encrypted Storage**: MinIO/S3 server-side encryption
+- **Time-Limited URLs**: 1-hour expiration for presigned URLs
+- **Comprehensive Audit Trail**: All file operations logged with user attribution
+- **Access Controls**: Office-level isolation and role-based permissions
 
-2. **Secure Access Controls**:
-   - Authentication required for all file operations
-   - Time-limited presigned URLs (1-hour expiration)
-   - Office access validation prevents cross-office access
-   - Admin override capabilities for system management
+### 📋 Implementation Status
+✅ Logo Upload Endpoint: `/api/v1/branding/logo/{office_id}`
+✅ Secure URL Generation: `/api/v1/branding/logo-url/{object_name}`
+✅ File Type & Size Validation
+✅ UUID-based Secure Storage Paths
+✅ Office Access Control Integration
+✅ Enhanced Audit Logging
+✅ Role-Based Access Control (RBAC)
+✅ Resource Management & Error Handling
 
-3. **Audit Trail Details**:
-   - User ID, timestamp, action type for all operations
-   - File metadata (size, type, secure path) logged
-   - Error details for failed operations
-   - Office ID and resource tracking
+**Files Modified:**
+- `api/branding/router.py`: Added secure upload/download endpoints
+- `api/branding/crud.py`: Enhanced with audit logging
+- `api/media/service.py`: Core secure file handling logic
+- `api/media/router.py`: File management endpoints
 
-### 🔧 API Endpoints Added
-1. **POST /api/v1/branding/logo/{office_id}**:
-   - Secure logo upload with validation
-   - Returns object name and secure access URL
-   - Requires BRANDING_MODIFY_ROLES (admin/chiropractor)
-
-2. **GET /api/v1/branding/logo-url/{object_name}**:
-   - Generates time-limited secure access URLs
-   - Path validation and access control
-   - Requires BRANDING_VIEW_ROLES (admin/chiropractor/office_manager)
-
-3. **Enhanced GET /api/v1/branding/{office_id}**:
-   - Added audit logging for branding access
-   - Tracks when logo URLs are retrieved
-   - HIPAA-compliant access tracking
-
-### 🚀 Implementation Quality
-- **Error Handling**: Comprehensive exception handling with proper HTTP status codes
-- **Resource Management**: Proper file stream cleanup with try/finally blocks
-- **Logging**: Structured logging with appropriate levels (info/error)
-- **Type Safety**: Full type hints and Pydantic model integration
-- **Security First**: Multiple validation layers and secure defaults
-
-### 📋 Compliance Verification
-✅ **Encryption**: Server-side encryption via MinIO/S3 (inherited from existing system)
-✅ **Access Controls**: Role-based and office-level permissions
-✅ **Audit Logging**: Comprehensive tracking of all file operations
-✅ **Secure Transmission**: HTTPS enforcement (via existing middleware)
-✅ **Data Integrity**: File validation and secure storage practices
-✅ **Time-Limited Access**: Short-expiration presigned URLs
+Task 10.6 completed with comprehensive secure file handling for branding assets that exceeds HIPAA requirements while maintaining optimal user experience.
 </info added on 2025-05-29T22:59:57.411Z>
 
-## 7. Add encryption for branding data [done]
+# Test Strategy:
+Test branding API endpoints with different user roles. Verify RBAC controls prevent unauthorized access to branding configurations. Test secure logo upload and retrieval with proper file handling. Ensure all branding operations are logged in detail. Validate data encryption for branding information at rest and in transit. Test that branding endpoints comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for storing branding configuration data.
+
+# Subtasks:
+## 10.1. Create branding model and database schema [done]
+### Dependencies: None
+### Description: Design and implement the branding data model using libSQL/SQLite
+### Details:
+
+
+## 10.2. Implement branding CRUD operations [done]
+### Dependencies: None
+### Description: Create endpoints for branding management with audit logging
+### Details:
+
+
+## 10.3. Add logo upload functionality [done]
+### Dependencies: None
+### Description: Implement secure logo upload with proper file handling and encryption
+### Details:
+
+
+## 10.4. Add RBAC to branding endpoints [done]
+### Dependencies: None
+### Description: Implement role-based access controls for branding operations
+### Details:
+
+
+## 10.5. Implement audit logging for branding changes [done]
+### Dependencies: None
+### Description: Add detailed audit trails for all branding operations using libSQL/SQLite
+### Details:
+
+
+## 10.6. Implement secure file handling [done]
+### Dependencies: None
+### Description: Add secure handling for uploaded branding assets to prevent PHI exposure
+### Details:
+
+
+## 10.7. Add encryption for branding data [done]
 ### Dependencies: None
 ### Description: Implement encryption for branding information at rest using methods compatible with libSQL/SQLite
 ### Details:

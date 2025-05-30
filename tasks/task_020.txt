@@ -1,7 +1,7 @@
 # Task ID: 20
 # Title: Mobile App Notification and Progress Sync with HIPAA Compliance
 # Status: pending
-# Dependencies: 19, 8, 11
+# Dependencies: 19, 8
 # Priority: medium
 # Description: Implement local notifications and progress synchronization with HIPAA-compliant data handling.
 # Details:

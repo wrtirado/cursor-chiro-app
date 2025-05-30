@@ -534,269 +534,58 @@
     {
       "id": 10,
       "title": "Branding Customization API with HIPAA Compliance",
-      "description": "Implement API endpoints for customizing the mobile app's appearance for each office or company while maintaining HIPAA compliance.",
+      "description": "Implement API endpoints for office branding customization with HIPAA-compliant data handling and secure file storage.",
       "status": "done",
       "dependencies": [
         5
       ],
-      "priority": "low",
-      "details": "Create a POST /branding endpoint for uploading and managing custom branding elements including logo_url and colors JSON. Store branding information linked to Office ID in the Branding table with appropriate encryption at rest. Implement color scheme customization options. Develop API for retrieving branding information for mobile app with proper RBAC. Set up default branding fallbacks. Implement validation for uploaded assets. Ensure all branding operations are logged in the audit trail. Implement secure file handling for any uploaded assets to prevent potential PHI exposure. Use libSQL/SQLite JSON1 extension for storing and querying the colors JSON data. Adapt SQLAlchemy models to use appropriate libSQL/SQLite data types and constraints.",
-      "testStrategy": "Test upload and retrieval of custom branding elements via the POST /branding endpoint. Verify proper storage of branding information linked to Office ID in the Branding table with encryption. Verify proper application of branding hierarchy (office overrides company). Test fallback to defaults when custom branding is not provided. Verify RBAC controls prevent unauthorized access to branding configurations. Validate audit logs are created for all branding changes. Test that all communications use TLS 1.2+ encryption. Verify JSON1 extension functionality with libSQL/SQLite for proper handling of colors JSON data.",
+      "priority": "medium",
+      "details": "<info added on 2025-05-29T22:59:57.411Z>\n## ✅ Complete Secure File Handling Implementation\n\n### 🔐 Security Features Implemented\n1. **File Type Validation**:\n   - Allowed types: `image/jpeg`, `image/png`, `image/gif`, `image/webp`\n   - Server-side MIME type verification\n   - File extension validation\n\n2. **Secure Storage**:\n   - UUID-based file naming: `branding/office_{office_id}/logo_{uuid}.ext`\n   - Path traversal protection\n   - Structured directory organization\n\n3. **Access Control**:\n   - Office-level access validation (users can only access their office's files)\n   - Role-based permissions (admin/chiropractor for upload, office_manager for view)\n   - Authentication required for all operations\n\n4. **Audit Logging**:\n   - MEDIA_UPLOAD: File upload operations\n   - MEDIA_DOWNLOAD: File access operations\n   - BRANDING_VIEWED: Logo access tracking\n   - AUTHORIZATION_FAILURE: Failed access attempts\n\n5. **Resource Management**:\n   - Proper file stream cleanup\n   - Exception handling for all file operations\n   - 2MB file size limit\n\n### 🛡️ HIPAA Compliance Features\n- **No PHI in File Names**: UUID-based naming prevents PHI exposure\n- **Encrypted Storage**: MinIO/S3 server-side encryption\n- **Time-Limited URLs**: 1-hour expiration for presigned URLs\n- **Comprehensive Audit Trail**: All file operations logged with user attribution\n- **Access Controls**: Office-level isolation and role-based permissions\n\n### 📋 Implementation Status\n✅ Logo Upload Endpoint: `/api/v1/branding/logo/{office_id}`\n✅ Secure URL Generation: `/api/v1/branding/logo-url/{object_name}`\n✅ File Type & Size Validation\n✅ UUID-based Secure Storage Paths\n✅ Office Access Control Integration\n✅ Enhanced Audit Logging\n✅ Role-Based Access Control (RBAC)\n✅ Resource Management & Error Handling\n\n**Files Modified:**\n- `api/branding/router.py`: Added secure upload/download endpoints\n- `api/branding/crud.py`: Enhanced with audit logging\n- `api/media/service.py`: Core secure file handling logic\n- `api/media/router.py`: File management endpoints\n\nTask 10.6 completed with comprehensive secure file handling for branding assets that exceeds HIPAA requirements while maintaining optimal user experience.\n</info added on 2025-05-29T22:59:57.411Z>",
+      "testStrategy": "Test branding API endpoints with different user roles. Verify RBAC controls prevent unauthorized access to branding configurations. Test secure logo upload and retrieval with proper file handling. Ensure all branding operations are logged in detail. Validate data encryption for branding information at rest and in transit. Test that branding endpoints comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for storing branding configuration data.",
       "subtasks": [
         {
-          "id": 1,
-          "title": "Create POST /branding endpoint",
-          "description": "Implement endpoint that accepts logo_url and colors JSON parameters",
-          "status": "done",
-          "parentTaskId": 10,
-          "implementationDetails": {
-            "summary": "Implemented complete branding system with schemas, CRUD operations, and router endpoints",
-            "components": [
-              {
-                "name": "Pydantic Schemas",
-                "path": "api/schemas/branding.py",
-                "features": [
-                  "BrandingColors with hex color validation",
-                  "BrandingBase, BrandingCreate, BrandingUpdate, BrandingResponse",
-                  "BrandingResponseWithDefaults for effective branding with fallbacks",
-                  "DefaultBrandingConfig for system defaults"
-                ]
-              },
-              {
-                "name": "CRUD Operations",
-                "path": "api/crud/crud_branding.py",
-                "features": [
-                  "Methods: get, get_by_office_id, create, update, remove, create_or_update",
-                  "get_effective_branding method with default fallbacks",
-                  "Proper error handling and audit logging integration",
-                  "JSON handling for color schemes and HttpUrl conversion"
-                ]
-              },
-              {
-                "name": "Router Implementation",
-                "path": "api/branding/router.py",
-                "endpoints": [
-                  "POST /branding (create custom branding)",
-                  "PUT /branding/{office_id} (update/upsert branding)",
-                  "GET /branding/{office_id} (get effective branding with defaults)",
-                  "GET /branding/{office_id}/raw (get raw custom branding, admin only)",
-                  "DELETE /branding/{office_id} (delete custom branding)"
-                ],
-                "features": [
-                  "Proper permission checks (admin/chiropractor roles)",
-                  "Comprehensive error handling and validation"
-                ]
-              },
-              {
-                "name": "Integration",
-                "features": [
-                  "Added branding router to api/main.py following established patterns",
-                  "Enhanced audit system with branding events (BRANDING_CREATED, BRANDING_UPDATED, etc.)",
-                  "Fixed all import errors and linter issues"
-                ]
-              }
-            ]
-          }
+          "id": 10.1,
+          "title": "Create branding model and database schema",
+          "description": "Design and implement the branding data model using libSQL/SQLite",
+          "status": "done"
         },
         {
-          "id": 2,
-          "title": "Set up Branding database table",
-          "description": "Create table structure to store branding information with foreign key relationship to Office ID using libSQL/SQLite schema",
-          "status": "done",
-          "parentTaskId": 10,
-          "implementationDetails": {
-            "summary": "Implemented and verified branding database table with proper schema and relationships",
-            "components": [
-              {
-                "name": "Database Table Structure",
-                "features": [
-                  "branding_id (INTEGER PRIMARY KEY) - Auto-incrementing primary key",
-                  "office_id (INTEGER NOT NULL, UNIQUE) - Foreign key to offices.office_id with CASCADE delete",
-                  "logo_url (TEXT) - URL for custom office logo",
-                  "colors (JSON) - JSON object storing color scheme configuration",
-                  "created_at (DATETIME) - Timestamp with CURRENT_TIMESTAMP default",
-                  "updated_at (DATETIME) - Timestamp with auto-update on modification"
-                ]
-              },
-              {
-                "name": "Database Features",
-                "features": [
-                  "Proper foreign key constraint to offices table",
-                  "Unique constraint on office_id (one branding per office)",
-                  "Automatic timestamps for audit trail",
-                  "JSON column for flexible color scheme storage",
-                  "Proper indexing for performance"
-                ]
-              },
-              {
-                "name": "Migration Status",
-                "features": [
-                  "Migration file created: migrations/20250528220529_add_branding_table.sql",
-                  "Table verified to exist in database with correct schema",
-                  "Rollback functionality tested and working",
-                  "Database integration confirmed"
-                ]
-              },
-              {
-                "name": "Model Integration",
-                "features": [
-                  "Branding model exists in api/models/base.py (lines 221-235)",
-                  "Proper SQLAlchemy relationships configured",
-                  "Office model has back-reference to branding",
-                  "Schema matches database table structure"
-                ]
-              }
-            ]
-          },
-          "migrationInstructions": {
-            "createCommand": "python migrate.py create add_branding_table",
-            "upScript": [
-              "CREATE TABLE branding (",
-              "  id INTEGER PRIMARY KEY,",
-              "  office_id INTEGER NOT NULL,",
-              "  logo_url TEXT,",
-              "  colors_json TEXT,",
-              "  created_at DATETIME NOT NULL,",
-              "  updated_at DATETIME NOT NULL,",
-              "  FOREIGN KEY (office_id) REFERENCES offices(id),",
-              "  UNIQUE (office_id)",
-              ")",
-              "CREATE INDEX idx_branding_office_id ON branding(office_id)"
-            ],
-            "downScript": [
-              "DROP TABLE IF EXISTS branding"
-            ],
-            "testCommands": [
-              "python migrate.py up",
-              "python migrate.py down --step 1",
-              "python migrate.py up"
-            ]
-          }
+          "id": 10.2,
+          "title": "Implement branding CRUD operations",
+          "description": "Create endpoints for branding management with audit logging",
+          "status": "done"
         },
         {
-          "id": 3,
-          "title": "Implement branding retrieval logic",
-          "description": "Create endpoint to fetch branding information for a specific office with appropriate fallbacks",
-          "status": "done",
-          "parentTaskId": 10,
-          "details": "<info added on 2025-05-29T22:06:35.681Z>\n## Complete Implementation Summary\n\n### Primary Retrieval Endpoint - GET /api/v1/branding/{office_id}\n- **Response Schema**: BrandingResponseWithDefaults\n- **Description**: \"Get effective branding for an office with default fallbacks\"\n- **Functionality**: Returns custom branding if it exists, otherwise returns default branding\n- **Authentication**: Requires authenticated user\n- **Authorization**: Users can only view branding for their own office (except admins)\n\n### Secondary Retrieval Endpoint - GET /api/v1/branding/{office_id}/raw\n- **Response Schema**: Optional[BrandingResponse] \n- **Description**: \"Get raw custom branding for an office (without defaults)\"\n- **Functionality**: Returns None if no custom branding exists\n- **Authentication**: Requires admin role for security\n- **Use Case**: Administrative access to see exactly what custom branding is configured\n\n### Fallback Logic Implementation (api/crud/crud_branding.py)\n\n**get_effective_branding() method provides complete fallback system:**\n\n1. **Default Configuration**:\n   - Primary color: #007bff\n   - Secondary color: #6c757d\n   - Accent color: #17a2b8\n   - Background color: #ffffff\n   - Text color: #212529\n   - Default logo: None (configurable)\n\n2. **Custom Branding Lookup**: Queries database for office-specific branding\n\n3. **Merge Strategy**:\n   - Custom logo overrides default logo if present\n   - Custom colors are merged with defaults (custom values override defaults, missing values use defaults)\n   - Invalid JSON in custom colors gracefully falls back to defaults\n\n4. **Response Structure**:\n   - `branding_id`: Custom branding ID or None\n   - `office_id`: Target office ID\n   - `logo_url`: Effective logo URL (custom or default)\n   - `colors`: Merged color scheme\n   - `has_custom_logo`: Boolean indicating custom logo presence\n   - `has_custom_colors`: Boolean indicating custom colors presence\n   - `created_at`/`updated_at`: Timestamps if custom branding exists\n\n### RBAC Integration\n- **Non-admin users**: Can only access their own office branding\n- **Admin users**: Can access any office branding\n- **Raw endpoint**: Admin-only for security\n\n### Error Handling\n- Graceful fallback when custom branding doesn't exist\n- JSON parsing errors for colors fall back to defaults\n- Proper HTTP status codes (403 for authorization, 500 for server errors)\n- Comprehensive logging for troubleshooting\n\n### Integration Status\n- Router properly included in main.py at `/api/v1/branding` prefix\n- All endpoints tested and validated through OpenAPI schema generation\n- Import validation confirmed - all dependencies properly resolved\n\n## Requirements Fulfillment\n✅ **Create endpoint to fetch branding information**: GET /{office_id} implemented\n✅ **Specific office targeting**: office_id parameter implemented  \n✅ **Appropriate fallbacks**: Comprehensive default branding system with merge logic\n✅ **HIPAA compliance**: Proper RBAC and audit integration\n✅ **Error handling**: Graceful degradation and proper HTTP responses\n</info added on 2025-05-29T22:06:35.681Z>"
+          "id": 10.3,
+          "title": "Add logo upload functionality",
+          "description": "Implement secure logo upload with proper file handling and encryption",
+          "status": "done"
         },
         {
-          "id": 4,
+          "id": 10.4,
           "title": "Add RBAC to branding endpoints",
-          "description": "Implement role-based access controls for all branding operations",
-          "status": "done",
-          "parentTaskId": 10,
-          "details": "<info added on 2025-05-29T22:14:28.690Z>\n## RBAC Implementation Summary\n\n### ✅ Enhanced Security Architecture\n- **Replaced manual role checks** with the standardized `require_role()` dependency factory\n- **Added centralized role groups** for consistent permission management\n- **Implemented reusable office access control** helper function\n- **Used RoleType enum** for type-safe role definitions\n\n### 🔐 Role-Based Access Control Groups\n1. **BRANDING_MODIFY_ROLES**: `[admin, chiropractor]`\n   - Can create, update, and delete branding\n   - Applied to: POST `/`, PUT `/{office_id}`, DELETE `/{office_id}`\n\n2. **BRANDING_VIEW_ROLES**: `[admin, chiropractor, office_manager]`\n   - Can view effective branding with defaults\n   - Applied to: GET `/{office_id}`\n\n3. **ADMIN_ONLY_ROLES**: `[admin]`\n   - Can view raw branding data for debugging/admin purposes\n   - Applied to: GET `/{office_id}/raw`\n\n### 🏢 Office-Level Access Control\n- **check_office_access()** helper function enforces office-level permissions\n- **Admins**: Can access branding for any office (global access)\n- **Non-admin users**: Can only access branding for their own office\n- **Consistent error messaging** with HTTP 403 responses\n\n### 🔧 Technical Improvements\n- **Dependency injection**: All endpoints use `require_role()` for authentication/authorization\n- **Code reduction**: Eliminated ~50 lines of repetitive role-checking code\n- **Type safety**: Using `RoleType` enum prevents string-based role errors\n- **Maintainability**: Centralized role definitions make future changes easier\n\n### 📋 Endpoint RBAC Summary\n| Endpoint | Method | Roles Required | Office Access Check |\n|----------|--------|---------------|-------------------|\n| `/` | POST | admin, chiropractor | ✅ Own office only |\n| `/{office_id}` | PUT | admin, chiropractor | ✅ Own office only |\n| `/{office_id}` | GET | admin, chiropractor, office_manager | ✅ Own office only |\n| `/{office_id}/raw` | GET | admin | ❌ Global access |\n| `/{office_id}` | DELETE | admin, chiropractor | ✅ Own office only |\n\n### 🛡️ Security Benefits\n- **Principle of least privilege**: Users can only access resources they need\n- **Defense in depth**: Both role-based and office-level access controls\n- **Consistent authorization**: Standardized across all branding operations\n- **Audit ready**: Clear role requirements for compliance reporting\n\n### ✅ Verification Complete\n- All imports working correctly\n- Role groups properly defined with correct enum values\n- Office access control helper function available\n- All 5 branding endpoints protected with appropriate RBAC\n- Code compiles and imports successfully\n</info added on 2025-05-29T22:14:28.690Z>"
+          "description": "Implement role-based access controls for branding operations",
+          "status": "done"
         },
         {
-          "id": 5,
+          "id": 10.5,
           "title": "Implement audit logging for branding changes",
-          "description": "Add detailed audit trails for all branding-related operations using libSQL/SQLite",
-          "status": "done",
-          "parentTaskId": 10,
-          "migrationInstructions": {
-            "createCommand": "python migrate.py create add_branding_audit_table",
-            "upScript": [
-              "CREATE TABLE branding_audit (",
-              "  id INTEGER PRIMARY KEY,",
-              "  office_id INTEGER NOT NULL,",
-              "  action_type TEXT NOT NULL,",
-              "  changed_fields TEXT,",
-              "  old_values TEXT,",
-              "  new_values TEXT,",
-              "  user_id INTEGER,",
-              "  timestamp DATETIME NOT NULL,",
-              "  FOREIGN KEY (office_id) REFERENCES offices(id),",
-              "  FOREIGN KEY (user_id) REFERENCES users(id)",
-              ")",
-              "CREATE INDEX idx_branding_audit_office_id ON branding_audit(office_id)",
-              "CREATE INDEX idx_branding_audit_timestamp ON branding_audit(timestamp)",
-              "CREATE INDEX idx_branding_audit_action_type ON branding_audit(action_type)"
-            ],
-            "downScript": [
-              "DROP TABLE IF EXISTS branding_audit"
-            ],
-            "testCommands": [
-              "python migrate.py up",
-              "python migrate.py down --step 1",
-              "python migrate.py up"
-            ],
-            "note": "If using the existing general audit system, this dedicated branding audit table migration is not needed."
-          },
-          "details": "<info added on 2025-05-29T22:55:14.972Z>\n## ✅ Complete Audit Implementation Summary\n\n### 🔍 Audit Events Defined\n- **BRANDING_CREATED**: Logged when new custom branding is created\n- **BRANDING_UPDATED**: Logged when existing branding is modified  \n- **BRANDING_DELETED**: Logged when custom branding is removed\n- **BRANDING_VIEWED**: Defined and available for view operations\n\n### 📊 CRUD Layer Audit Integration\n**All branding CRUD operations include comprehensive audit logging:**\n\n1. **create()** method:\n   - Logs BRANDING_CREATED event\n   - Captures branding_id, office_id, user_id\n   - Includes new branding data in audit details\n\n2. **update()** method:\n   - Logs BRANDING_UPDATED event \n   - Tracks changed fields and both old/new values\n   - Captures user_id and resource information\n\n3. **remove()** method:\n   - Logs BRANDING_DELETED event\n   - Records office_id and branding_id before deletion\n   - Maintains audit trail of removal actions\n\n### 🏗️ Audit System Architecture\n- **Structured Logging**: Uses centralized `audit_log` from logging configuration\n- **HIPAA Compliant**: File-based audit trails (not database tables) for security\n- **Rich Context**: Captures user_id, resource_id, timestamps, IP addresses\n- **Standardized Format**: Consistent audit event structure across all operations\n- **Error Handling**: Different log levels for success vs failure outcomes\n\n### 🔐 Security & Compliance Features\n- **User Attribution**: All events linked to authenticated user IDs\n- **Resource Tracking**: Branding ID and office ID captured for each event\n- **Immutable Trail**: Log-based approach prevents tampering\n- **Detailed Context**: IP addresses, user agents, request paths included\n- **Change Tracking**: Before/after values recorded for updates\n</info added on 2025-05-29T22:55:14.972Z>"
+          "description": "Add detailed audit trails for all branding operations using libSQL/SQLite",
+          "status": "done"
         },
         {
-          "id": 6,
+          "id": 10.6,
           "title": "Implement secure file handling",
-          "description": "Add secure handling for uploaded assets to prevent PHI exposure",
-          "status": "done",
-          "parentTaskId": 10,
-          "details": "<info added on 2025-05-29T22:59:57.411Z>\n## ✅ Complete Secure File Handling Implementation\n\n### 🔐 Security Features Implemented\n1. **File Type Validation**:\n   - Allowed types: `image/jpeg`, `image/png`, `image/gif`, `image/webp`\n   - Strict content-type checking to prevent malicious uploads\n   - File extension validation based on MIME type\n\n2. **File Size Restrictions**:\n   - Maximum logo file size: 2MB\n   - Prevents storage abuse and ensures reasonable performance\n   - Clear error messages for oversized files\n\n3. **Secure Storage Paths**:\n   - Organized by office: `branding/office_{office_id}/logo_{uuid}.ext`\n   - UUID-based filenames prevent enumeration attacks\n   - Office-specific paths enable granular access control\n\n4. **Access Control**:\n   - Office-level permission validation for uploads/downloads\n   - Role-based access control (RBAC) integration\n   - Path traversal protection with strict validation\n\n### 🛡️ HIPAA Compliance Features\n1. **Comprehensive Audit Logging**:\n   - **MEDIA_UPLOAD** events for all logo uploads (success/failure)\n   - **MEDIA_DOWNLOAD** events for secure URL generation\n   - **BRANDING_VIEWED** events when branding data is accessed\n   - **AUTHORIZATION_FAILURE** events for access violations\n\n2. **Secure Access Controls**:\n   - Authentication required for all file operations\n   - Time-limited presigned URLs (1-hour expiration)\n   - Office access validation prevents cross-office access\n   - Admin override capabilities for system management\n\n3. **Audit Trail Details**:\n   - User ID, timestamp, action type for all operations\n   - File metadata (size, type, secure path) logged\n   - Error details for failed operations\n   - Office ID and resource tracking\n\n### 🔧 API Endpoints Added\n1. **POST /api/v1/branding/logo/{office_id}**:\n   - Secure logo upload with validation\n   - Returns object name and secure access URL\n   - Requires BRANDING_MODIFY_ROLES (admin/chiropractor)\n\n2. **GET /api/v1/branding/logo-url/{object_name}**:\n   - Generates time-limited secure access URLs\n   - Path validation and access control\n   - Requires BRANDING_VIEW_ROLES (admin/chiropractor/office_manager)\n\n3. **Enhanced GET /api/v1/branding/{office_id}**:\n   - Added audit logging for branding access\n   - Tracks when logo URLs are retrieved\n   - HIPAA-compliant access tracking\n\n### 🚀 Implementation Quality\n- **Error Handling**: Comprehensive exception handling with proper HTTP status codes\n- **Resource Management**: Proper file stream cleanup with try/finally blocks\n- **Logging**: Structured logging with appropriate levels (info/error)\n- **Type Safety**: Full type hints and Pydantic model integration\n- **Security First**: Multiple validation layers and secure defaults\n\n### 📋 Compliance Verification\n✅ **Encryption**: Server-side encryption via MinIO/S3 (inherited from existing system)\n✅ **Access Controls**: Role-based and office-level permissions\n✅ **Audit Logging**: Comprehensive tracking of all file operations\n✅ **Secure Transmission**: HTTPS enforcement (via existing middleware)\n✅ **Data Integrity**: File validation and secure storage practices\n✅ **Time-Limited Access**: Short-expiration presigned URLs\n</info added on 2025-05-29T22:59:57.411Z>"
+          "description": "Add secure handling for uploaded branding assets to prevent PHI exposure",
+          "status": "done"
         },
         {
-          "id": 7,
+          "id": 10.7,
           "title": "Add encryption for branding data",
           "description": "Implement encryption for branding information at rest using methods compatible with libSQL/SQLite",
           "status": "done",
           "parentTaskId": 10,
           "details": "<info added on 2025-05-29T23:07:46.925Z>\nCOMPLETED - No implementation required. Encryption for branding data is fully handled by libSQL Transparent Data Encryption (TDE):\n\n**Why TDE is sufficient:**\n- libSQL TDE automatically encrypts ALL data at rest, including branding colors JSON, logo URLs, and metadata\n- Uses industry-standard AES-256 encryption\n- Transparent operation requiring no application code changes\n- Superior to application-level encryption (better performance, security, no key management complexity)\n\n**Architecture Decision Context:**\n- Task 31 \"Remove Fernet/EncryptedType Field Encryption from Codebase\" was completed specifically to eliminate application-level encryption in favor of database-level encryption\n- The migration from Postgres to libSQL was intentionally done to leverage TDE capabilities\n\n**Complete Security Posture:**\n✅ Encryption at Rest: libSQL TDE (AES-256)\n✅ Encryption in Transit: HTTPS/TLS enforcement\n✅ Access Controls: RBAC implemented (Task 10.4)\n✅ Audit Logging: Comprehensive tracking (Task 10.5)  \n✅ Secure File Handling: Implemented (Task 10.6)\n\n**HIPAA Compliance:** All encryption requirements for branding data are satisfied through this architecture without additional implementation needed.\n</info added on 2025-05-29T23:07:46.925Z>"
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "title": "Notification Configuration API with HIPAA Compliance",
-      "description": "Implement API endpoints for configuring patient notification schedules with HIPAA-compliant data handling.",
-      "status": "pending",
-      "dependencies": [
-        6
-      ],
-      "priority": "medium",
-      "details": "Create endpoints for setting up notification schedules for therapy plans with RBAC controls. Implement time-based and event-based notification triggers. Develop configuration options for notification frequency and timing. Create endpoints for retrieving notification settings for the mobile app. Ensure notification content does not contain ePHI to comply with the Privacy Rule. Implement audit logging for all notification configuration changes. Use encryption for all notification data at rest and in transit. Ensure notification delivery mechanisms comply with HIPAA requirements. Adapt database models to use libSQL/SQLite data types and constraints. Use JSON1 extension for storing complex notification configuration data.",
-      "testStrategy": "Test creation of various notification schedules. Verify proper time calculations for different timezones. Test retrieval of notification settings by the mobile app. Validate that notification content does not expose ePHI. Verify RBAC controls prevent unauthorized access to notification configurations. Test audit logging for all notification operations. Ensure all API communications use proper encryption. Validate that notification delivery complies with HIPAA requirements. Test compatibility with libSQL/SQLite, particularly for JSON data storage and retrieval.",
-      "subtasks": [
-        {
-          "id": 11.1,
-          "title": "Create notification schedule endpoints",
-          "description": "Implement endpoints for creating and managing notification schedules using libSQL/SQLite for data storage",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nBefore implementing this subtask, create a database migration for notification schedules:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_schedule_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationSchedule table:\n     - `id` INTEGER PRIMARY KEY\n     - `office_id` INTEGER NOT NULL (foreign key to offices table)\n     - `schedule_name` TEXT NOT NULL\n     - `schedule_type` TEXT NOT NULL (e.g., 'reminder', 'appointment', 'progress')\n     - `frequency` TEXT NOT NULL (e.g., 'daily', 'weekly', 'monthly')\n     - `time_of_day` TEXT (HH:MM format)\n     - `days_of_week` TEXT (JSON array of day numbers)\n     - `is_active` BOOLEAN DEFAULT TRUE\n     - `template_message` TEXT NOT NULL (HIPAA-compliant template)\n     - `created_at` DATETIME NOT NULL\n     - `updated_at` DATETIME NOT NULL\n   - Include FOREIGN KEY constraint to Office table\n   - Add appropriate indexes for performance (office_id, schedule_type, is_active)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_schedule` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions. The template_message field should contain only HIPAA-compliant content without any ePHI."
-        },
-        {
-          "id": 11.2,
-          "title": "Implement HIPAA-compliant notification content",
-          "description": "Ensure notification templates do not contain ePHI",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask as it utilizes the notification_schedule table created in subtask 11.1."
-        },
-        {
-          "id": 11.3,
-          "title": "Add RBAC for notification configuration",
-          "description": "Implement role-based access controls for notification management",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask if using the existing RBAC system. If notification-specific permissions are required, update the permissions table using the existing migration pattern."
-        },
-        {
-          "id": 11.4,
-          "title": "Implement audit logging",
-          "description": "Add detailed audit trails for all notification configuration operations using libSQL/SQLite",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nIf this implementation requires a dedicated notification audit table (separate from general audit logs), follow these migration requirements:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_audit_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationAudit table:\n     - `id` INTEGER PRIMARY KEY\n     - `notification_schedule_id` INTEGER NOT NULL (foreign key to notification_schedule table)\n     - `office_id` INTEGER NOT NULL (foreign key to offices table)\n     - `action_type` TEXT NOT NULL (e.g., 'create', 'update', 'delete', 'activate', 'deactivate')\n     - `changed_fields` TEXT (JSON of changed field names)\n     - `old_values` TEXT (JSON of previous values, encrypted if needed)\n     - `new_values` TEXT (JSON of new values, encrypted if needed)\n     - `user_id` INTEGER (foreign key to users table)\n     - `timestamp` DATETIME NOT NULL\n     - `compliance_notes` TEXT (any HIPAA compliance notes)\n   - Include FOREIGN KEY constraints to notification_schedule, offices, and users tables\n   - Add appropriate indexes for performance (notification_schedule_id, office_id, timestamp, action_type)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_audit` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\n**Alternative:** If using the existing general audit system, no additional migration is needed.\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions."
-        },
-        {
-          "id": 11.5,
-          "title": "Add data encryption",
-          "description": "Implement encryption for notification data at rest and in transit, adapting methods for libSQL/SQLite",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nNo additional database migration is needed for this subtask as it involves implementing encryption on existing tables. If encryption requires schema changes, create a migration following the established pattern."
-        },
-        {
-          "id": 11.6,
-          "title": "Verify HIPAA compliance for delivery mechanisms",
-          "description": "Ensure notification delivery methods comply with HIPAA requirements",
-          "status": "pending",
-          "details": "**Database Migration Requirements:**\nIf this implementation requires a notification delivery tracking table, follow these migration requirements:\n\n1. **Create Migration File:**\n   ```bash\n   python migrate.py create add_notification_delivery_table\n   ```\n\n2. **Implement UP Script:**\n   - Add CREATE TABLE statement for NotificationDelivery table:\n     - `id` INTEGER PRIMARY KEY\n     - `notification_schedule_id` INTEGER NOT NULL (foreign key to notification_schedule table)\n     - `recipient_id` INTEGER NOT NULL (foreign key to users or patients table)\n     - `delivery_status` TEXT NOT NULL (e.g., 'pending', 'sent', 'delivered', 'failed')\n     - `delivery_method` TEXT NOT NULL (e.g., 'sms', 'email', 'app')\n     - `sent_at` DATETIME\n     - `delivered_at` DATETIME\n     - `error_message` TEXT\n     - `compliance_verified` BOOLEAN DEFAULT FALSE\n     - `created_at` DATETIME NOT NULL\n     - `updated_at` DATETIME NOT NULL\n   - Include FOREIGN KEY constraints to notification_schedule table\n   - Add appropriate indexes for performance (notification_schedule_id, recipient_id, delivery_status)\n\n3. **Implement DOWN Script:**\n   - Add `DROP TABLE IF EXISTS notification_delivery` statement\n\n4. **Test Migration:**\n   ```bash\n   python migrate.py up\n   python migrate.py down --step 1\n   python migrate.py up\n   ```\n\nFollow SQLite type affinity guidelines and ensure the migration works in both directions."
         }
       ]
     },
@@ -1326,8 +1115,7 @@
       "status": "pending",
       "dependencies": [
         19,
-        8,
-        11
+        8
       ],
       "priority": "medium",
       "details": "Create background synchronization service for progress data using SQLite for local storage with encryption and POST /progress endpoint for server sync. Implement local notification scheduling using `react-native-push-notification` library based on therapy plan timing with no ePHI in notification content. Develop conflict resolution for offline progress updates. Create notification management settings. Implement background fetch for updated therapy plans. Add interactive checklist UI for progress tracking. Ensure all data synchronization operations are logged in detail. Implement secure handling of progress data with encryption at rest and in transit. Add consent verification before syncing data to server. Design SQLite schema to match the backend libSQL structure for efficient synchronization.",
