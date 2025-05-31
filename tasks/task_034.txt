@@ -61,6 +61,9 @@ Implement UI components for selecting and displaying multiple roles, ensuring us
 ### Description: Create migration scripts using the custom migration tool to create the 'user_roles' table, migrate existing role assignments, and remove the obsolete 'role_id' column from the users table.
 ### Details:
 Map each user's current 'role_id' to a corresponding entry in 'user_roles'. Ensure data integrity and rollback capability.
+<info added on 2025-05-31T22:48:43.496Z>
+Map each user's current 'role_id' to a corresponding entry in 'user_roles'. As part of the migration, update the role name from "chiropractor" to "care_provider" in the Roles table. Ensure all users currently assigned the "chiropractor" role are properly transitioned to have the "care_provider" role in the new user_roles junction table. Implement data validation to verify all affected users maintain appropriate access levels after the transition. Ensure data integrity and rollback capability throughout the entire process.
+</info added on 2025-05-31T22:48:43.496Z>
 
 ## 8. Update and Validate Audit Logging for HIPAA Compliance [pending]
 ### Dependencies: 34.4, 34.7
@@ -91,4 +94,10 @@ Document schema changes, API updates, migration steps, and audit logging procedu
 ### Description: Deploy the updated system to production, monitor for issues, and validate that all role assignments, access controls, and audit logs function as intended.
 ### Details:
 Establish monitoring and alerting for role-related errors or access violations. Provide support for rollback if critical issues are detected.
+
+## 13. Update Role Names and References (chiropractor → care_provider) [pending]
+### Dependencies: 34.1, 34.2
+### Description: As part of the role system transition, update the "chiropractor" role to "care_provider" throughout the system, including database data, code references, enums, and documentation.
+### Details:
+Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.
 

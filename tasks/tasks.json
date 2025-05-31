@@ -2331,7 +2331,7 @@
           "dependencies": [
             2
           ],
-          "details": "Map each user's current 'role_id' to a corresponding entry in 'user_roles'. Ensure data integrity and rollback capability.",
+          "details": "Map each user's current 'role_id' to a corresponding entry in 'user_roles'. Ensure data integrity and rollback capability.\n<info added on 2025-05-31T22:48:43.496Z>\nMap each user's current 'role_id' to a corresponding entry in 'user_roles'. As part of the migration, update the role name from \"chiropractor\" to \"care_provider\" in the Roles table. Ensure all users currently assigned the \"chiropractor\" role are properly transitioned to have the \"care_provider\" role in the new user_roles junction table. Implement data validation to verify all affected users maintain appropriate access levels after the transition. Ensure data integrity and rollback capability throughout the entire process.\n</info added on 2025-05-31T22:48:43.496Z>",
           "status": "pending",
           "testStrategy": "Test migration on staging data, verifying that all users retain their roles and no data is lost."
         },
@@ -2389,6 +2389,18 @@
           "details": "Establish monitoring and alerting for role-related errors or access violations. Provide support for rollback if critical issues are detected.",
           "status": "pending",
           "testStrategy": "Monitor logs and user feedback post-deployment, and conduct a post-mortem review to ensure objectives are met."
+        },
+        {
+          "id": 13,
+          "title": "Update Role Names and References (chiropractor → care_provider)",
+          "description": "As part of the role system transition, update the \"chiropractor\" role to \"care_provider\" throughout the system, including database data, code references, enums, and documentation.",
+          "details": "Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.",
+          "status": "pending",
+          "dependencies": [
+            1,
+            2
+          ],
+          "parentTaskId": 34
         }
       ]
     }
