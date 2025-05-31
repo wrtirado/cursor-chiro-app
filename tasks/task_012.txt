@@ -5,10 +5,10 @@
 # Priority: high
 # Description: Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance. Use Vite, TypeScript, shadcn/ui, and Tailwind CSS as the frontend tech stack.
 # Details:
-Initialize React application with Vite and TypeScript for improved development experience and build performance. Set up project structure following Vite best practices. Configure Tailwind CSS and shadcn/ui component library for consistent UI design. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design using Tailwind CSS utilities. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging using shadcn/ui components. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend. Ensure proper TypeScript typing throughout the application for improved code quality and maintainability.
+Initialize React application with Vite and TypeScript for improved development experience and build performance. Set up project structure following Vite best practices. Configure Tailwind CSS and shadcn/ui component library for consistent UI design. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design using Tailwind CSS utilities. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging using shadcn/ui components. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend. Ensure proper TypeScript typing throughout the application for improved code quality and maintainability. Implement subscription-based feature gating in addition to RBAC, displaying all feature tabs to users regardless of subscription tier, but blurring content and showing upgrade prompts for features not included in their current plan. Follow a 'freemium' UX pattern where users can see what they're missing to encourage upgrades.
 
 # Test Strategy:
-Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts using Tailwind CSS on different screen sizes. Ensure shadcn/ui components render correctly across browsers. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend. Validate TypeScript type safety across the application.
+Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts using Tailwind CSS on different screen sizes. Ensure shadcn/ui components render correctly across browsers. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend. Validate TypeScript type safety across the application. Test subscription-based feature gating to ensure content is appropriately blurred for non-subscribed features. Verify upgrade prompts display correctly for features outside the user's subscription tier. Test the visibility of all feature tabs regardless of subscription level. Validate that upgrading subscription properly unlocks previously gated features.
 
 # Subtasks:
 ## 12.1. Set up basic React application structure [pending]
@@ -92,6 +92,42 @@ Test application initialization and routing. Verify protected routes redirect un
 ## 12.14. Create TypeScript interfaces for data models [pending]
 ### Dependencies: None
 ### Description: Define TypeScript interfaces for all data models used in the application
+### Details:
+
+
+## 12.15. Create subscription tier model [pending]
+### Dependencies: None
+### Description: Define TypeScript interfaces for subscription tiers and feature access levels
+### Details:
+
+
+## 12.16. Implement feature gating service [pending]
+### Dependencies: None
+### Description: Create a service to check user subscription against feature requirements with TypeScript typing
+### Details:
+
+
+## 12.17. Develop blur overlay components [pending]
+### Dependencies: None
+### Description: Create reusable shadcn/ui components for blurring content of features not included in user's subscription
+### Details:
+
+
+## 12.18. Design upgrade prompts [pending]
+### Dependencies: None
+### Description: Develop shadcn/ui components for upgrade prompts that display over gated features
+### Details:
+
+
+## 12.19. Implement freemium UX pattern [pending]
+### Dependencies: None
+### Description: Ensure all feature tabs are visible regardless of subscription tier, with appropriate visual indicators for locked features
+### Details:
+
+
+## 12.20. Create subscription management interface [pending]
+### Dependencies: None
+### Description: Build screens for users to view and upgrade their subscription using shadcn/ui components
 ### Details:
 
 

@@ -3,12 +3,12 @@
 # Status: pending
 # Dependencies: 12, 4
 # Priority: high
-# Description: Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.
+# Description: Implement user management interfaces for the web application with HIPAA-compliant data handling, access controls, and subscription-based feature gating using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.
 # Details:
-Create interfaces for user listing, creation, editing, and deletion with RBAC controls using shadcn/ui components with TypeScript type safety. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure using shadcn/ui data tables and forms. Create join code generation and management UI with shadcn/ui dialog components. Implement search and filtering for user lists with audit logging for all searches involving patient data, leveraging shadcn/ui data table filtering capabilities. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling using shadcn/ui forms and switches. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration, ensuring proper TypeScript typing throughout.
+Create interfaces for user listing, creation, editing, and deletion with RBAC controls using shadcn/ui components with TypeScript type safety. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure using shadcn/ui data tables and forms. Create join code generation and management UI with shadcn/ui dialog components. Implement search and filtering for user lists with audit logging for all searches involving patient data, leveraging shadcn/ui data table filtering capabilities. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling using shadcn/ui forms and switches. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration, ensuring proper TypeScript typing throughout. Implement subscription-based feature gating where all user management tabs are visible to all users regardless of subscription tier, but advanced features (bulk operations, detailed analytics, advanced permissions) are blurred with upgrade prompts for users without the appropriate subscription level, using shadcn/ui blur overlays and upgrade dialogs.
 
 # Test Strategy:
-Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations. Ensure TypeScript type safety across all components and API interactions.
+Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations. Ensure TypeScript type safety across all components and API interactions. Test subscription-based feature gating by verifying that advanced features are appropriately blurred with upgrade prompts for users without the required subscription tier, while ensuring all tabs remain visible regardless of subscription level.
 
 # Subtasks:
 ## 13.1. Create user listing interface with RBAC [pending]
@@ -56,6 +56,24 @@ Test user CRUD operations through the UI with different user roles. Verify prope
 ## 13.8. Configure Tailwind CSS theming for shadcn/ui [pending]
 ### Dependencies: None
 ### Description: Set up and customize Tailwind CSS theme to maintain consistent styling across all user management interfaces
+### Details:
+
+
+## 13.9. Implement subscription-based feature gating [pending]
+### Dependencies: None
+### Description: Create a system to blur advanced user management features with upgrade prompts for users without the appropriate subscription tier, while ensuring all tabs remain visible
+### Details:
+
+
+## 13.11. Develop blur overlay components [pending]
+### Dependencies: None
+### Description: Create reusable shadcn/ui blur overlay components that can be applied to premium features based on subscription status
+### Details:
+
+
+## 13.12. Add subscription tier checking logic [pending]
+### Dependencies: None
+### Description: Implement TypeScript utility functions to determine feature access based on user subscription tier
 ### Details:
 
 

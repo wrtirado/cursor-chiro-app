@@ -598,8 +598,8 @@
         3
       ],
       "priority": "high",
-      "details": "Initialize React application with Vite and TypeScript for improved development experience and build performance. Set up project structure following Vite best practices. Configure Tailwind CSS and shadcn/ui component library for consistent UI design. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design using Tailwind CSS utilities. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging using shadcn/ui components. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend. Ensure proper TypeScript typing throughout the application for improved code quality and maintainability.",
-      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts using Tailwind CSS on different screen sizes. Ensure shadcn/ui components render correctly across browsers. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend. Validate TypeScript type safety across the application.",
+      "details": "Initialize React application with Vite and TypeScript for improved development experience and build performance. Set up project structure following Vite best practices. Configure Tailwind CSS and shadcn/ui component library for consistent UI design. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design using Tailwind CSS utilities. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging using shadcn/ui components. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend. Ensure proper TypeScript typing throughout the application for improved code quality and maintainability. Implement subscription-based feature gating in addition to RBAC, displaying all feature tabs to users regardless of subscription tier, but blurring content and showing upgrade prompts for features not included in their current plan. Follow a 'freemium' UX pattern where users can see what they're missing to encourage upgrades.",
+      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts using Tailwind CSS on different screen sizes. Ensure shadcn/ui components render correctly across browsers. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend. Validate TypeScript type safety across the application. Test subscription-based feature gating to ensure content is appropriately blurred for non-subscribed features. Verify upgrade prompts display correctly for features outside the user's subscription tier. Test the visibility of all feature tabs regardless of subscription level. Validate that upgrading subscription properly unlocks previously gated features.",
       "subtasks": [
         {
           "id": "12.1",
@@ -684,21 +684,57 @@
           "title": "Create TypeScript interfaces for data models",
           "description": "Define TypeScript interfaces for all data models used in the application",
           "status": "pending"
+        },
+        {
+          "id": "12.15",
+          "title": "Create subscription tier model",
+          "description": "Define TypeScript interfaces for subscription tiers and feature access levels",
+          "status": "pending"
+        },
+        {
+          "id": "12.16",
+          "title": "Implement feature gating service",
+          "description": "Create a service to check user subscription against feature requirements with TypeScript typing",
+          "status": "pending"
+        },
+        {
+          "id": "12.17",
+          "title": "Develop blur overlay components",
+          "description": "Create reusable shadcn/ui components for blurring content of features not included in user's subscription",
+          "status": "pending"
+        },
+        {
+          "id": "12.18",
+          "title": "Design upgrade prompts",
+          "description": "Develop shadcn/ui components for upgrade prompts that display over gated features",
+          "status": "pending"
+        },
+        {
+          "id": "12.19",
+          "title": "Implement freemium UX pattern",
+          "description": "Ensure all feature tabs are visible regardless of subscription tier, with appropriate visual indicators for locked features",
+          "status": "pending"
+        },
+        {
+          "id": "12.20",
+          "title": "Create subscription management interface",
+          "description": "Build screens for users to view and upgrade their subscription using shadcn/ui components",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 13,
       "title": "Web App User Management Interface with HIPAA Compliance",
-      "description": "Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
+      "description": "Implement user management interfaces for the web application with HIPAA-compliant data handling, access controls, and subscription-based feature gating using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
       "status": "pending",
       "dependencies": [
         12,
         4
       ],
       "priority": "high",
-      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls using shadcn/ui components with TypeScript type safety. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure using shadcn/ui data tables and forms. Create join code generation and management UI with shadcn/ui dialog components. Implement search and filtering for user lists with audit logging for all searches involving patient data, leveraging shadcn/ui data table filtering capabilities. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling using shadcn/ui forms and switches. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration, ensuring proper TypeScript typing throughout.",
-      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations. Ensure TypeScript type safety across all components and API interactions.",
+      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls using shadcn/ui components with TypeScript type safety. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure using shadcn/ui data tables and forms. Create join code generation and management UI with shadcn/ui dialog components. Implement search and filtering for user lists with audit logging for all searches involving patient data, leveraging shadcn/ui data table filtering capabilities. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling using shadcn/ui forms and switches. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration, ensuring proper TypeScript typing throughout. Implement subscription-based feature gating where all user management tabs are visible to all users regardless of subscription tier, but advanced features (bulk operations, detailed analytics, advanced permissions) are blurred with upgrade prompts for users without the appropriate subscription level, using shadcn/ui blur overlays and upgrade dialogs.",
+      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations. Ensure TypeScript type safety across all components and API interactions. Test subscription-based feature gating by verifying that advanced features are appropriately blurred with upgrade prompts for users without the required subscription tier, while ensuring all tabs remain visible regardless of subscription level.",
       "subtasks": [
         {
           "id": 13.1,
@@ -747,13 +783,31 @@
           "title": "Configure Tailwind CSS theming for shadcn/ui",
           "description": "Set up and customize Tailwind CSS theme to maintain consistent styling across all user management interfaces",
           "status": "pending"
+        },
+        {
+          "id": 13.9,
+          "title": "Implement subscription-based feature gating",
+          "description": "Create a system to blur advanced user management features with upgrade prompts for users without the appropriate subscription tier, while ensuring all tabs remain visible",
+          "status": "pending"
+        },
+        {
+          "id": 13.11,
+          "title": "Develop blur overlay components",
+          "description": "Create reusable shadcn/ui blur overlay components that can be applied to premium features based on subscription status",
+          "status": "pending"
+        },
+        {
+          "id": 13.12,
+          "title": "Add subscription tier checking logic",
+          "description": "Implement TypeScript utility functions to determine feature access based on user subscription tier",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 14,
       "title": "Web App Therapy Plan Creation Interface with HIPAA Compliance",
-      "description": "Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling using Vite React, TypeScript, shadcn/ui, and Tailwind CSS.",
+      "description": "Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling using Vite React, TypeScript, shadcn/ui, and Tailwind CSS, with subscription-based feature gating.",
       "status": "pending",
       "dependencies": [
         12,
@@ -761,8 +815,8 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan editor with sections for details, exercises, and scheduling using shadcn/ui form components. Implement media upload functionality for images and videos with secure handling and encryption at rest, leveraging shadcn/ui file upload components. Develop exercise sequencing and organization tools with drag-and-drop functionality. Create plan assignment interface using shadcn/ui cards and dialogs for linking plans to patients with audit logging. Implement plan templates and duplication features with shadcn/ui data tables for management. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references. Build the entire interface using Vite React with TypeScript for type safety and Tailwind CSS for styling.",
-      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields using shadcn/ui form validation. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships. Test responsive design and accessibility of shadcn/ui components across different devices and screen sizes.",
+      "details": "Create therapy plan editor with sections for details, exercises, and scheduling using shadcn/ui form components. Implement media upload functionality for images and videos with secure handling and encryption at rest, leveraging shadcn/ui file upload components. Develop exercise sequencing and organization tools with drag-and-drop functionality. Create plan assignment interface using shadcn/ui cards and dialogs for linking plans to patients with audit logging. Implement plan templates and duplication features with shadcn/ui data tables for management. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references. Build the entire interface using Vite React with TypeScript for type safety and Tailwind CSS for styling. Implement subscription-based feature gating where all therapy plan creation tabs are visible, but premium features (bulk plan templates, exercise library uploads, advanced progress tracking, detailed analytics) are blurred with upgrade prompts for users on lower subscription tiers, using shadcn/ui components for blur overlays and upgrade dialogs.",
+      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields using shadcn/ui form validation. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships. Test responsive design and accessibility of shadcn/ui components across different devices and screen sizes. Test subscription-based feature gating to ensure premium features are properly blurred and upgrade prompts display correctly for users on different subscription tiers.",
       "subtasks": [
         {
           "id": 14.1,
@@ -817,21 +871,39 @@
           "title": "Set up Vite React with TypeScript project structure",
           "description": "Configure Vite React with TypeScript, shadcn/ui, and Tailwind CSS for the therapy plan management interfaces",
           "status": "pending"
+        },
+        {
+          "id": 14.11,
+          "title": "Design and implement blur overlays",
+          "description": "Create visually appealing blur overlays using shadcn/ui components and Tailwind CSS for premium features that require subscription upgrades",
+          "status": "pending"
+        },
+        {
+          "id": 14.12,
+          "title": "Create upgrade dialog components",
+          "description": "Implement shadcn/ui dialogs for subscription upgrade prompts that appear when users attempt to access premium features",
+          "status": "pending"
+        },
+        {
+          "id": 14.13,
+          "title": "Add subscription tier checking logic",
+          "description": "Implement logic to check user subscription tiers and conditionally display appropriate features or blur overlays with upgrade prompts",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 15,
       "title": "Web App Analytics and Reporting Dashboard with HIPAA Compliance",
-      "description": "Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
+      "description": "Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS, with subscription-based feature gating.",
       "status": "pending",
       "dependencies": [
         12,
         8
       ],
       "priority": "medium",
-      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls using shadcn/ui components. Implement charts and visualizations using shadcn/ui chart components for progress data with de-identification where appropriate. Develop filtering and date range selection tools with shadcn/ui data tables, filters, and date pickers, with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion using shadcn/ui cards and dialogs. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data. Adapt analytics queries to use libSQL/SQLite syntax and optimize for its performance characteristics. Use JSON1 extension for complex data aggregation where appropriate. Build the entire interface using Vite React with TypeScript and style with Tailwind CSS.",
-      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics in shadcn/ui components. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features. Verify performance of analytics queries with libSQL/SQLite, especially for large datasets. Test responsive design and component behavior across different screen sizes.",
+      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls using shadcn/ui components. Implement charts and visualizations using shadcn/ui chart components for progress data with de-identification where appropriate. Develop filtering and date range selection tools with shadcn/ui data tables, filters, and date pickers, with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion using shadcn/ui cards and dialogs. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data. Adapt analytics queries to use libSQL/SQLite syntax and optimize for its performance characteristics. Use JSON1 extension for complex data aggregation where appropriate. Build the entire interface using Vite React with TypeScript and style with Tailwind CSS. Implement subscription-based feature gating where all analytics tabs are visible but advanced features (detailed patient reports, revenue analytics, custom report generation, data exports, advanced visualizations) are blurred with upgrade prompts for users on lower subscription tiers using shadcn/ui components for blur overlays and upgrade dialogs.",
+      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics in shadcn/ui components. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features. Verify performance of analytics queries with libSQL/SQLite, especially for large datasets. Test responsive design and component behavior across different screen sizes. Test subscription-based feature gating by verifying appropriate blur overlays and upgrade prompts appear for users on different subscription tiers. Verify that upgrading subscription properly unlocks all gated features.",
       "subtasks": [
         {
           "id": 15.1,
@@ -886,21 +958,39 @@
           "title": "Set up Vite React with TypeScript project",
           "description": "Initialize and configure Vite React with TypeScript for the analytics dashboard",
           "status": "pending"
+        },
+        {
+          "id": 15.11,
+          "title": "Design and implement upgrade dialogs",
+          "description": "Create shadcn/ui dialogs that appear when users attempt to access premium features, explaining benefits and subscription options",
+          "status": "pending"
+        },
+        {
+          "id": 15.12,
+          "title": "Create blur overlay components",
+          "description": "Develop reusable blur overlay components using shadcn/ui and Tailwind CSS for premium features with appropriate messaging",
+          "status": "pending"
+        },
+        {
+          "id": 15.13,
+          "title": "Implement feature access control service",
+          "description": "Create service to check user subscription level and determine feature access permissions across the analytics dashboard",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 16,
       "title": "Web App Payment and Billing Interface with HIPAA Compliance",
-      "description": "Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
+      "description": "Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS, including subscription-based feature gating.",
       "status": "pending",
       "dependencies": [
         12,
         9
       ],
       "priority": "medium",
-      "details": "Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework.",
-      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes.",
+      "details": "Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework. Implement subscription-based feature gating where all billing tabs are visible, but advanced features (detailed revenue analytics, automated billing workflows, custom invoice templates, payment analytics, and advanced financial reporting) are blurred with upgrade prompts for users on lower subscription tiers using shadcn/ui components for blur overlays and upgrade dialogs.",
+      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes. Test subscription-based feature gating to ensure advanced features are properly blurred and upgrade prompts display correctly for users on lower subscription tiers. Verify that upgrade flows work correctly when users attempt to access premium features.",
       "subtasks": [
         {
           "id": 16.1,
@@ -954,6 +1044,18 @@
           "id": 16.9,
           "title": "Create TypeScript interfaces for payment data",
           "description": "Define TypeScript interfaces for all payment-related data structures to ensure type safety across the payment system",
+          "status": "pending"
+        },
+        {
+          "id": 16.11,
+          "title": "Create upgrade prompts for premium features",
+          "description": "Design and implement shadcn/ui-based blur overlays and upgrade dialog components that appear when users on lower subscription tiers attempt to access premium billing features",
+          "status": "pending"
+        },
+        {
+          "id": 16.12,
+          "title": "Develop subscription tier detection logic",
+          "description": "Implement TypeScript logic to detect user subscription tier and conditionally apply feature gating across billing interfaces",
           "status": "pending"
         }
       ]

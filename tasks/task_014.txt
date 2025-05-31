@@ -3,12 +3,12 @@
 # Status: pending
 # Dependencies: 12, 6, 7
 # Priority: high
-# Description: Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling using Vite React, TypeScript, shadcn/ui, and Tailwind CSS.
+# Description: Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling using Vite React, TypeScript, shadcn/ui, and Tailwind CSS, with subscription-based feature gating.
 # Details:
-Create therapy plan editor with sections for details, exercises, and scheduling using shadcn/ui form components. Implement media upload functionality for images and videos with secure handling and encryption at rest, leveraging shadcn/ui file upload components. Develop exercise sequencing and organization tools with drag-and-drop functionality. Create plan assignment interface using shadcn/ui cards and dialogs for linking plans to patients with audit logging. Implement plan templates and duplication features with shadcn/ui data tables for management. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references. Build the entire interface using Vite React with TypeScript for type safety and Tailwind CSS for styling.
+Create therapy plan editor with sections for details, exercises, and scheduling using shadcn/ui form components. Implement media upload functionality for images and videos with secure handling and encryption at rest, leveraging shadcn/ui file upload components. Develop exercise sequencing and organization tools with drag-and-drop functionality. Create plan assignment interface using shadcn/ui cards and dialogs for linking plans to patients with audit logging. Implement plan templates and duplication features with shadcn/ui data tables for management. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references. Build the entire interface using Vite React with TypeScript for type safety and Tailwind CSS for styling. Implement subscription-based feature gating where all therapy plan creation tabs are visible, but premium features (bulk plan templates, exercise library uploads, advanced progress tracking, detailed analytics) are blurred with upgrade prompts for users on lower subscription tiers, using shadcn/ui components for blur overlays and upgrade dialogs.
 
 # Test Strategy:
-Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields using shadcn/ui form validation. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships. Test responsive design and accessibility of shadcn/ui components across different devices and screen sizes.
+Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields using shadcn/ui form validation. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships. Test responsive design and accessibility of shadcn/ui components across different devices and screen sizes. Test subscription-based feature gating to ensure premium features are properly blurred and upgrade prompts display correctly for users on different subscription tiers.
 
 # Subtasks:
 ## 14.1. Create therapy plan editor UI [pending]
@@ -62,6 +62,24 @@ Test creation of plans with various media types. Verify proper saving and retrie
 ## 14.9. Set up Vite React with TypeScript project structure [pending]
 ### Dependencies: None
 ### Description: Configure Vite React with TypeScript, shadcn/ui, and Tailwind CSS for the therapy plan management interfaces
+### Details:
+
+
+## 14.11. Design and implement blur overlays [pending]
+### Dependencies: None
+### Description: Create visually appealing blur overlays using shadcn/ui components and Tailwind CSS for premium features that require subscription upgrades
+### Details:
+
+
+## 14.12. Create upgrade dialog components [pending]
+### Dependencies: None
+### Description: Implement shadcn/ui dialogs for subscription upgrade prompts that appear when users attempt to access premium features
+### Details:
+
+
+## 14.13. Add subscription tier checking logic [pending]
+### Dependencies: None
+### Description: Implement logic to check user subscription tiers and conditionally display appropriate features or blur overlays with upgrade prompts
 ### Details:
 
 

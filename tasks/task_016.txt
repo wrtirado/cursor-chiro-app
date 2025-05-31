@@ -3,12 +3,12 @@
 # Status: pending
 # Dependencies: 12, 9
 # Priority: medium
-# Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.
+# Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS, including subscription-based feature gating.
 # Details:
-Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework.
+Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework. Implement subscription-based feature gating where all billing tabs are visible, but advanced features (detailed revenue analytics, automated billing workflows, custom invoice templates, payment analytics, and advanced financial reporting) are blurred with upgrade prompts for users on lower subscription tiers using shadcn/ui components for blur overlays and upgrade dialogs.
 
 # Test Strategy:
-Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes.
+Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes. Test subscription-based feature gating to ensure advanced features are properly blurred and upgrade prompts display correctly for users on lower subscription tiers. Verify that upgrade flows work correctly when users attempt to access premium features.
 
 # Subtasks:
 ## 16.1. Create payment configuration UI [pending]
@@ -62,6 +62,18 @@ Test payment configuration options with different user roles. Verify proper disp
 ## 16.9. Create TypeScript interfaces for payment data [pending]
 ### Dependencies: None
 ### Description: Define TypeScript interfaces for all payment-related data structures to ensure type safety across the payment system
+### Details:
+
+
+## 16.11. Create upgrade prompts for premium features [pending]
+### Dependencies: None
+### Description: Design and implement shadcn/ui-based blur overlays and upgrade dialog components that appear when users on lower subscription tiers attempt to access premium billing features
+### Details:
+
+
+## 16.12. Develop subscription tier detection logic [pending]
+### Dependencies: None
+### Description: Implement TypeScript logic to detect user subscription tier and conditionally apply feature gating across billing interfaces
 ### Details:
 
 
