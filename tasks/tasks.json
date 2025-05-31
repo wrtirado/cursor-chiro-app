@@ -665,7 +665,8 @@
           "id": "12.11",
           "title": "Implement multi-factor authentication",
           "description": "Add MFA options using shadcn/ui components for enhanced security of ePHI access",
-          "status": "pending"
+          "status": "pending",
+          "dependencies": []
         },
         {
           "id": "12.12",
@@ -2243,6 +2244,151 @@
           "status": "done",
           "dependencies": [],
           "parentTaskId": 33
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "title": "Transition to Many-to-Many User Role System with HIPAA Compliance",
+      "description": "Refactor the user role architecture to support multiple roles per user using a many-to-many relationship, updating all backend, API, and audit logic to maintain HIPAA compliance and system stability.",
+      "details": "1. Analyze the current user-role schema, identifying all locations where the single 'role_id' foreign key is referenced in models, queries, and business logic.\n2. Design and implement a new 'user_roles' junction table with user_id and role_id as foreign keys, establishing a many-to-many relationship between users and roles in the database. Update the SQLAlchemy models to reflect this association using the 'secondary' parameter in relationship definitions, ensuring bidirectional access (users.roles, roles.users) and compatibility with libSQL/SQLite. \n3. Refactor the RBAC logic, including the 'require_role()' function, to check for membership in a user's set of roles rather than a single role match. Update all API endpoints and business logic that perform role checks to use the new logic.\n4. Update user creation and update schemas/DTOs to support assigning multiple roles, and modify the frontend role selection UI to allow multi-select and display of multiple roles per user.\n5. Develop and execute a migration plan using the custom migration tool (Task 33) to create the new table, migrate existing data (mapping each user's current role_id to a user_roles entry), and remove the obsolete role_id column from the users table.\n6. Ensure all role changes and assignments are audit logged in accordance with HIPAA, preserving access controls and data minimization. Review and update documentation to reflect the new role system and compliance considerations.",
+      "testStrategy": "- Write and run migration tests to verify correct creation of the user_roles table, accurate data migration, and removal of the old role_id column.\n- Implement unit and integration tests for the updated RBAC logic, ensuring users with multiple roles are correctly authorized and denied access as appropriate.\n- Test all user management endpoints for correct handling of multiple roles, including creation, update, and retrieval.\n- Validate that audit logs are generated for all role assignment and change events, and that no unauthorized access is possible under the new system.\n- Conduct regression testing on all endpoints and UI components affected by the role system change to ensure system stability and HIPAA compliance.",
+      "status": "pending",
+      "dependencies": [
+        4,
+        33
+      ],
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Audit Current User-Role Schema and References",
+          "description": "Identify all locations in the codebase, database schema, and business logic where the single 'role_id' foreign key is referenced, including models, queries, API endpoints, and RBAC logic.",
+          "dependencies": [],
+          "details": "Perform a comprehensive search for 'role_id' usage in models, controllers, services, and database migrations to map all dependencies.",
+          "status": "pending",
+          "testStrategy": "Verify that all references to 'role_id' are cataloged and documented for subsequent refactoring."
+        },
+        {
+          "id": 2,
+          "title": "Design Many-to-Many User-Role Schema",
+          "description": "Design a new 'user_roles' junction table with 'user_id' and 'role_id' as foreign keys to establish a many-to-many relationship between users and roles.",
+          "dependencies": [
+            1
+          ],
+          "details": "Ensure the schema supports bidirectional access and is compatible with libSQL/SQLite. Define appropriate indexes and constraints for performance and data integrity.",
+          "status": "pending",
+          "testStrategy": "Review schema design for normalization, referential integrity, and scalability."
+        },
+        {
+          "id": 3,
+          "title": "Update ORM Models for Many-to-Many Association",
+          "description": "Refactor SQLAlchemy models to use the new 'user_roles' association table, updating relationship definitions with the 'secondary' parameter for bidirectional access.",
+          "dependencies": [
+            2
+          ],
+          "details": "Modify User and Role models to reflect the new association, ensuring compatibility with existing queries and business logic.",
+          "status": "pending",
+          "testStrategy": "Run unit tests to confirm that users can have multiple roles and roles can be assigned to multiple users."
+        },
+        {
+          "id": 4,
+          "title": "Refactor RBAC Logic and Role Checks",
+          "description": "Update all role-based access control logic, including the 'require_role()' function and related middleware, to check for membership in a user's set of roles instead of a single role.",
+          "dependencies": [
+            3
+          ],
+          "details": "Ensure all API endpoints and business logic that perform role checks are updated to use the new logic.",
+          "status": "pending",
+          "testStrategy": "Test all endpoints for correct access control with users assigned multiple roles."
+        },
+        {
+          "id": 5,
+          "title": "Modify API Schemas and DTOs for Multi-Role Support",
+          "description": "Update user creation and update schemas/DTOs to support assigning and displaying multiple roles per user.",
+          "dependencies": [
+            3
+          ],
+          "details": "Adjust API request/response models to accept and return arrays of role IDs. Ensure backward compatibility where possible.",
+          "status": "pending",
+          "testStrategy": "Validate API endpoints with payloads containing multiple roles and ensure correct serialization/deserialization."
+        },
+        {
+          "id": 6,
+          "title": "Update Frontend Role Management UI",
+          "description": "Modify the frontend user management interface to allow multi-select role assignment and display multiple roles per user.",
+          "dependencies": [
+            5
+          ],
+          "details": "Implement UI components for selecting and displaying multiple roles, ensuring usability and accessibility.",
+          "status": "pending",
+          "testStrategy": "Perform UI tests to confirm users can assign, update, and view multiple roles per user."
+        },
+        {
+          "id": 7,
+          "title": "Develop Migration Scripts for Data Transition",
+          "description": "Create migration scripts using the custom migration tool to create the 'user_roles' table, migrate existing role assignments, and remove the obsolete 'role_id' column from the users table.",
+          "dependencies": [
+            2
+          ],
+          "details": "Map each user's current 'role_id' to a corresponding entry in 'user_roles'. Ensure data integrity and rollback capability.",
+          "status": "pending",
+          "testStrategy": "Test migration on staging data, verifying that all users retain their roles and no data is lost."
+        },
+        {
+          "id": 8,
+          "title": "Update and Validate Audit Logging for HIPAA Compliance",
+          "description": "Ensure all role changes and assignments are audit logged in accordance with HIPAA, preserving access controls and data minimization.",
+          "dependencies": [
+            4,
+            7
+          ],
+          "details": "Review and update audit logging mechanisms to capture multi-role assignments, changes, and removals with appropriate metadata.",
+          "status": "pending",
+          "testStrategy": "Simulate role changes and verify that audit logs are complete, accurate, and compliant with HIPAA requirements."
+        },
+        {
+          "id": 9,
+          "title": "Comprehensive Testing of Role System Functionality",
+          "description": "Develop and execute unit, integration, and regression tests to validate the new many-to-many role system across backend, API, and frontend layers.",
+          "dependencies": [
+            4,
+            6,
+            7
+          ],
+          "details": "Test scenarios including multi-role assignment, access control enforcement, data migration, and UI interactions.",
+          "status": "pending",
+          "testStrategy": "Ensure all tests pass and coverage is sufficient to detect regressions or security issues."
+        },
+        {
+          "id": 10,
+          "title": "Performance and Security Review",
+          "description": "Conduct a performance and security review of the updated role system, focusing on query efficiency, data access patterns, and HIPAA compliance.",
+          "dependencies": [],
+          "details": "Profile database queries, review access control logic, and perform security audits to identify and remediate potential vulnerabilities.",
+          "status": "pending",
+          "testStrategy": "Benchmark key operations and run security scans to confirm compliance and performance targets."
+        },
+        {
+          "id": 11,
+          "title": "Update System Documentation and Compliance Records",
+          "description": "Revise technical documentation, user guides, and compliance records to reflect the new many-to-many role system and HIPAA considerations.",
+          "dependencies": [
+            8,
+            10
+          ],
+          "details": "Document schema changes, API updates, migration steps, and audit logging procedures. Update compliance checklists as needed.",
+          "status": "pending",
+          "testStrategy": "Review documentation for completeness, clarity, and accuracy."
+        },
+        {
+          "id": 12,
+          "title": "Production Deployment and Post-Deployment Monitoring",
+          "description": "Deploy the updated system to production, monitor for issues, and validate that all role assignments, access controls, and audit logs function as intended.",
+          "dependencies": [],
+          "details": "Establish monitoring and alerting for role-related errors or access violations. Provide support for rollback if critical issues are detected.",
+          "status": "pending",
+          "testStrategy": "Monitor logs and user feedback post-deployment, and conduct a post-mortem review to ensure objectives are met."
         }
       ]
     }
