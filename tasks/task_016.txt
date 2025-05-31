@@ -3,47 +3,47 @@
 # Status: pending
 # Dependencies: 12, 9
 # Priority: medium
-# Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling.
+# Description: Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.
 # Details:
-Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data.
+Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework.
 
 # Test Strategy:
-Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval.
+Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes.
 
 # Subtasks:
 ## 16.1. Create payment configuration UI [pending]
 ### Dependencies: None
-### Description: Implement screens for managing payment settings at company and office levels
+### Description: Implement screens for managing payment settings at company and office levels using shadcn/ui form components and card layouts with TypeScript and Tailwind CSS
 ### Details:
 
 
 ## 16.2. Develop subscription management interface [pending]
 ### Dependencies: None
-### Description: Add UI for creating and managing subscriptions
+### Description: Add UI for creating and managing subscriptions using shadcn/ui components, TypeScript, and Tailwind CSS
 ### Details:
 
 
 ## 16.3. Implement invoice management [pending]
 ### Dependencies: None
-### Description: Create screens for viewing and managing invoices with minimal ePHI
+### Description: Create screens for viewing and managing invoices with minimal ePHI using shadcn/ui data tables and TypeScript
 ### Details:
 
 
 ## 16.4. Add payment history reporting [pending]
 ### Dependencies: None
-### Description: Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite
+### Description: Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite and displaying data with shadcn/ui data tables
 ### Details:
 
 
 ## 16.5. Create payment method UI [pending]
 ### Dependencies: None
-### Description: Add interface for securely managing payment methods
+### Description: Add interface for securely managing payment methods using shadcn/ui form components and card layouts with TypeScript
 ### Details:
 
 
 ## 16.6. Implement RBAC for payment features [pending]
 ### Dependencies: None
-### Description: Add role-based access controls for all payment functionality
+### Description: Add role-based access controls for all payment functionality, integrating with shadcn/ui components for permission-based UI rendering
 ### Details:
 
 
@@ -55,7 +55,13 @@ Test payment configuration options with different user roles. Verify proper disp
 
 ## 16.8. Ensure HIPAA-compliant billing documents [pending]
 ### Dependencies: None
-### Description: Verify that invoices and other billing documents limit ePHI exposure
+### Description: Verify that invoices and other billing documents limit ePHI exposure, implementing with shadcn/ui components
+### Details:
+
+
+## 16.9. Create TypeScript interfaces for payment data [pending]
+### Dependencies: None
+### Description: Define TypeScript interfaces for all payment-related data structures to ensure type safety across the payment system
 ### Details:
 
 

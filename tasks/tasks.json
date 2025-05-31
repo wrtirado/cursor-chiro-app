@@ -592,80 +592,97 @@
     {
       "id": 12,
       "title": "React Web Application Setup with HIPAA Compliance",
-      "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance.",
+      "description": "Set up the React web application for chiropractors with routing and state management, focusing on login, account management, and therapy plan creation while ensuring HIPAA compliance. Use Vite, TypeScript, shadcn/ui, and Tailwind CSS as the frontend tech stack.",
       "status": "in-progress",
       "dependencies": [
         3
       ],
       "priority": "high",
-      "details": "Initialize React application with proper project structure. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design framework. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend.",
-      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts on different screen sizes. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend.",
+      "details": "Initialize React application with Vite and TypeScript for improved development experience and build performance. Set up project structure following Vite best practices. Configure Tailwind CSS and shadcn/ui component library for consistent UI design. Set up routing with React Router including RBAC for protected routes. Implement state management with Redux or Context API with secure handling of ePHI. Create authentication flows with multi-factor authentication options and automatic session timeouts. Implement protected routes for login and account management. Develop responsive design using Tailwind CSS utilities. Set up API client for backend communication with TLS 1.2+ encryption. Implement secure local storage handling to prevent ePHI caching. Develop interfaces for therapy plan creation with audit logging using shadcn/ui components. Consider optional Dockerization using Node.js and Nginx for deployment if desired, with proper security configurations. Implement client-side data encryption for any sensitive information. Update API client to handle any specific requirements for communicating with the libSQL/SQLite backend. Ensure proper TypeScript typing throughout the application for improved code quality and maintainability.",
+      "testStrategy": "Test application initialization and routing. Verify protected routes redirect unauthenticated users. Test RBAC implementation for different user roles. Validate session timeout functionality. Test responsive layouts using Tailwind CSS on different screen sizes. Ensure shadcn/ui components render correctly across browsers. Ensure API client correctly handles authentication tokens and uses proper encryption. Validate therapy plan creation workflow with audit logging. Test secure storage handling to prevent ePHI exposure. If Dockerized, test container deployment with security configurations. Verify API client correctly handles any specific requirements for the libSQL/SQLite backend. Validate TypeScript type safety across the application.",
       "subtasks": [
         {
           "id": "12.1",
           "title": "Set up basic React application structure",
+          "description": "Initialize React application with Vite and TypeScript, configure project structure, and set up Tailwind CSS with shadcn/ui",
           "status": "pending"
         },
         {
           "id": "12.2",
           "title": "Implement authentication and login interface",
+          "description": "Create login screens using shadcn/ui components and Tailwind CSS styling",
           "status": "pending"
         },
         {
           "id": "12.3",
           "title": "Create account management screens",
+          "description": "Develop account management interfaces using shadcn/ui components with TypeScript type safety",
           "status": "pending"
         },
         {
           "id": "12.4",
           "title": "Develop therapy plan creation interface",
+          "description": "Build therapy plan creation screens using shadcn/ui components and Tailwind CSS for responsive design",
           "status": "pending"
         },
         {
           "id": "12.5",
           "title": "Set up API client for backend communication",
-          "description": "Configure API client to handle communication with the libSQL/SQLite backend",
+          "description": "Configure TypeScript-based API client to handle communication with the libSQL/SQLite backend",
           "status": "pending"
         },
         {
           "id": "12.6",
           "title": "Create Dockerfile and Nginx configuration (optional)",
+          "description": "Set up Docker configuration optimized for Vite React application deployment",
           "status": "pending"
         },
         {
           "id": "12.7",
           "title": "Implement HIPAA-compliant session management",
-          "description": "Add automatic session timeouts and secure session handling",
+          "description": "Add automatic session timeouts and secure session handling with TypeScript type safety",
           "status": "pending"
         },
         {
           "id": "12.8",
           "title": "Set up client-side RBAC implementation",
-          "description": "Implement role-based access controls for UI components and routes",
+          "description": "Implement role-based access controls for UI components and routes with TypeScript interfaces",
           "status": "pending"
         },
         {
           "id": "12.9",
           "title": "Implement secure local storage handling",
-          "description": "Ensure no ePHI is cached in browser storage",
+          "description": "Ensure no ePHI is cached in browser storage with TypeScript utility functions",
           "status": "pending"
         },
         {
           "id": "12.10",
           "title": "Add client-side audit logging",
-          "description": "Implement detailed logging of user actions for HIPAA compliance",
+          "description": "Implement detailed logging of user actions for HIPAA compliance with TypeScript typing",
           "status": "pending"
         },
         {
           "id": "12.11",
           "title": "Implement multi-factor authentication",
-          "description": "Add MFA options for enhanced security of ePHI access",
+          "description": "Add MFA options using shadcn/ui components for enhanced security of ePHI access",
           "status": "pending"
         },
         {
           "id": "12.12",
           "title": "Add client-side data encryption",
-          "description": "Implement encryption for any sensitive data handled in the browser",
+          "description": "Implement encryption for any sensitive data handled in the browser with TypeScript",
+          "status": "pending"
+        },
+        {
+          "id": "12.13",
+          "title": "Configure shadcn/ui theming",
+          "description": "Set up shadcn/ui theming system with Tailwind CSS for consistent UI appearance",
+          "status": "pending"
+        },
+        {
+          "id": "12.14",
+          "title": "Create TypeScript interfaces for data models",
+          "description": "Define TypeScript interfaces for all data models used in the application",
           "status": "pending"
         }
       ]
@@ -673,50 +690,62 @@
     {
       "id": 13,
       "title": "Web App User Management Interface with HIPAA Compliance",
-      "description": "Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls.",
+      "description": "Implement user management interfaces for the web application with HIPAA-compliant data handling and access controls using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
       "status": "pending",
       "dependencies": [
         12,
         4
       ],
       "priority": "high",
-      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure. Create join code generation and management UI. Implement search and filtering for user lists with audit logging for all searches involving patient data. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration.",
-      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations.",
+      "details": "Create interfaces for user listing, creation, editing, and deletion with RBAC controls using shadcn/ui components with TypeScript type safety. Implement role assignment functionality with principle of least privilege. Develop patient management screens for chiropractors with minimal ePHI exposure using shadcn/ui data tables and forms. Create join code generation and management UI with shadcn/ui dialog components. Implement search and filtering for user lists with audit logging for all searches involving patient data, leveraging shadcn/ui data table filtering capabilities. Ensure all user management operations are logged in detail. Implement secure data handling practices to limit ePHI exposure according to the Privacy Rule. Add consent management features for patient data handling using shadcn/ui forms and switches. Update API interactions to accommodate any changes in data format or response structure due to the libSQL/SQLite migration, ensuring proper TypeScript typing throughout.",
+      "testStrategy": "Test user CRUD operations through the UI with different user roles. Verify proper display of role-specific information based on RBAC. Test join code generation and display. Ensure proper error handling and user feedback. Validate audit logging for all user management operations. Test that searches involving patient data are properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent management features. Verify compatibility with the libSQL/SQLite backend, particularly for search and filtering operations. Ensure TypeScript type safety across all components and API interactions.",
       "subtasks": [
         {
           "id": 13.1,
           "title": "Create user listing interface with RBAC",
-          "description": "Implement UI for viewing users with role-based filtering and access controls",
+          "description": "Implement UI for viewing users with role-based filtering and access controls using shadcn/ui data tables with TypeScript",
           "status": "pending"
         },
         {
           "id": 13.2,
           "title": "Develop user creation/editing forms",
-          "description": "Create forms for adding and modifying users with proper validation",
+          "description": "Create forms for adding and modifying users with proper validation using shadcn/ui form components and TypeScript interfaces",
           "status": "pending"
         },
         {
           "id": 13.3,
           "title": "Implement join code generation UI",
-          "description": "Add interface for generating and managing patient join codes",
+          "description": "Add interface for generating and managing patient join codes using shadcn/ui dialog and button components",
           "status": "pending"
         },
         {
           "id": 13.4,
           "title": "Add search and filtering with audit logging",
-          "description": "Implement search functionality with detailed logging for HIPAA compliance, adapting to libSQL/SQLite search capabilities",
+          "description": "Implement search functionality with detailed logging for HIPAA compliance, adapting to libSQL/SQLite search capabilities and using shadcn/ui data table filtering",
           "status": "pending"
         },
         {
           "id": 13.5,
           "title": "Create consent management interface",
-          "description": "Develop UI for tracking and managing patient consent for data handling",
+          "description": "Develop UI for tracking and managing patient consent for data handling using shadcn/ui forms, switches, and cards",
           "status": "pending"
         },
         {
           "id": 13.6,
           "title": "Implement data minimization in UI",
-          "description": "Ensure interfaces limit display of ePHI according to the Privacy Rule",
+          "description": "Ensure interfaces limit display of ePHI according to the Privacy Rule, using shadcn/ui components with proper access control",
+          "status": "pending"
+        },
+        {
+          "id": 13.7,
+          "title": "Set up TypeScript interfaces for user data",
+          "description": "Create comprehensive TypeScript interfaces for all user-related data structures to ensure type safety across components",
+          "status": "pending"
+        },
+        {
+          "id": 13.8,
+          "title": "Configure Tailwind CSS theming for shadcn/ui",
+          "description": "Set up and customize Tailwind CSS theme to maintain consistent styling across all user management interfaces",
           "status": "pending"
         }
       ]
@@ -724,7 +753,7 @@
     {
       "id": 14,
       "title": "Web App Therapy Plan Creation Interface with HIPAA Compliance",
-      "description": "Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling.",
+      "description": "Implement interfaces for creating and managing therapy plans with HIPAA-compliant data handling using Vite React, TypeScript, shadcn/ui, and Tailwind CSS.",
       "status": "pending",
       "dependencies": [
         12,
@@ -732,37 +761,37 @@
         7
       ],
       "priority": "high",
-      "details": "Create therapy plan editor with sections for details, exercises, and scheduling. Implement media upload functionality for images and videos with secure handling and encryption at rest. Develop exercise sequencing and organization tools. Create plan assignment interface for linking plans to patients with audit logging. Implement plan templates and duplication features. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references.",
-      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships.",
+      "details": "Create therapy plan editor with sections for details, exercises, and scheduling using shadcn/ui form components. Implement media upload functionality for images and videos with secure handling and encryption at rest, leveraging shadcn/ui file upload components. Develop exercise sequencing and organization tools with drag-and-drop functionality. Create plan assignment interface using shadcn/ui cards and dialogs for linking plans to patients with audit logging. Implement plan templates and duplication features with shadcn/ui data tables for management. Ensure all therapy plan operations are logged in detail. Implement RBAC to control access to patient therapy plans. Add consent tracking for therapy plans. Ensure secure handling of any ePHI included in therapy plans. Adapt data storage and retrieval to work with libSQL/SQLite, particularly for complex data structures and media references. Build the entire interface using Vite React with TypeScript for type safety and Tailwind CSS for styling.",
+      "testStrategy": "Test creation of plans with various media types. Verify proper saving and retrieval of plan data with encryption. Test media uploads and previews with secure handling. Ensure proper validation of required fields using shadcn/ui form validation. Validate audit logging for all therapy plan operations. Test RBAC controls for different user roles. Verify that consent is properly tracked and enforced. Test that all communications use TLS 1.2+ encryption. Verify compatibility with libSQL/SQLite for complex data structures and relationships. Test responsive design and accessibility of shadcn/ui components across different devices and screen sizes.",
       "subtasks": [
         {
           "id": 14.1,
           "title": "Create therapy plan editor UI",
-          "description": "Implement interface for creating and editing therapy plans with all required sections",
+          "description": "Implement interface for creating and editing therapy plans with all required sections using shadcn/ui form components and Tailwind CSS",
           "status": "pending"
         },
         {
           "id": 14.2,
           "title": "Implement secure media upload",
-          "description": "Add functionality for uploading images and videos with encryption and secure handling",
+          "description": "Add functionality for uploading images and videos with encryption and secure handling using shadcn/ui file upload components",
           "status": "pending"
         },
         {
           "id": 14.3,
           "title": "Develop plan assignment interface",
-          "description": "Create UI for assigning plans to patients with proper consent tracking",
+          "description": "Create UI for assigning plans to patients with proper consent tracking using shadcn/ui cards and dialogs",
           "status": "pending"
         },
         {
           "id": 14.4,
           "title": "Add template functionality",
-          "description": "Implement ability to create and use plan templates",
+          "description": "Implement ability to create and use plan templates with shadcn/ui data tables for template management",
           "status": "pending"
         },
         {
           "id": 14.5,
           "title": "Implement RBAC for therapy plans",
-          "description": "Add role-based access controls to limit plan access to authorized users",
+          "description": "Add role-based access controls to limit plan access to authorized users, integrating with shadcn/ui components",
           "status": "pending"
         },
         {
@@ -774,7 +803,19 @@
         {
           "id": 14.7,
           "title": "Create consent tracking UI",
-          "description": "Add interface for tracking patient consent for therapy plans",
+          "description": "Add interface for tracking patient consent for therapy plans using shadcn/ui form components",
+          "status": "pending"
+        },
+        {
+          "id": 14.8,
+          "title": "Implement drag-and-drop exercise sequencing",
+          "description": "Create drag-and-drop functionality for organizing and sequencing exercises within therapy plans",
+          "status": "pending"
+        },
+        {
+          "id": 14.9,
+          "title": "Set up Vite React with TypeScript project structure",
+          "description": "Configure Vite React with TypeScript, shadcn/ui, and Tailwind CSS for the therapy plan management interfaces",
           "status": "pending"
         }
       ]
@@ -782,44 +823,44 @@
     {
       "id": 15,
       "title": "Web App Analytics and Reporting Dashboard with HIPAA Compliance",
-      "description": "Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling.",
+      "description": "Implement analytics and reporting interfaces for tracking patient progress with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
       "status": "pending",
       "dependencies": [
         12,
         8
       ],
       "priority": "medium",
-      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls. Implement charts and visualizations for progress data with de-identification where appropriate. Develop filtering and date range selection tools with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data. Adapt analytics queries to use libSQL/SQLite syntax and optimize for its performance characteristics. Use JSON1 extension for complex data aggregation where appropriate.",
-      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features. Verify performance of analytics queries with libSQL/SQLite, especially for large datasets.",
+      "details": "Create dashboard for viewing patient adherence metrics with RBAC controls using shadcn/ui components. Implement charts and visualizations using shadcn/ui chart components for progress data with de-identification where appropriate. Develop filtering and date range selection tools with shadcn/ui data tables, filters, and date pickers, with audit logging for all data access. Create patient-specific progress reports with minimal ePHI inclusion using shadcn/ui cards and dialogs. Implement export functionality for reports with encryption and access controls. Ensure all reporting operations are logged in detail. Implement data minimization practices to limit ePHI exposure. Add consent verification before generating reports containing patient data. Adapt analytics queries to use libSQL/SQLite syntax and optimize for its performance characteristics. Use JSON1 extension for complex data aggregation where appropriate. Build the entire interface using Vite React with TypeScript and style with Tailwind CSS.",
+      "testStrategy": "Test dashboard with various data scenarios. Verify accurate calculation and display of metrics in shadcn/ui components. Test filtering and date range functionality with audit logging. Ensure exports contain correct and complete data with proper encryption. Validate RBAC controls for different user roles. Test that all report generation and viewing is properly logged. Verify that ePHI exposure is limited according to the Privacy Rule. Test consent verification features. Verify performance of analytics queries with libSQL/SQLite, especially for large datasets. Test responsive design and component behavior across different screen sizes.",
       "subtasks": [
         {
           "id": 15.1,
           "title": "Create analytics dashboard UI",
-          "description": "Implement main dashboard interface with adherence metrics and visualizations",
+          "description": "Implement main dashboard interface with adherence metrics and visualizations using shadcn/ui cards and chart components with Tailwind CSS styling",
           "status": "pending"
         },
         {
           "id": 15.2,
           "title": "Develop filtering and date range tools",
-          "description": "Add controls for filtering data with audit logging, adapting to libSQL/SQLite query capabilities",
+          "description": "Add controls for filtering data with shadcn/ui data tables, filters, and date pickers with audit logging, adapting to libSQL/SQLite query capabilities",
           "status": "pending"
         },
         {
           "id": 15.3,
           "title": "Implement patient progress reports",
-          "description": "Create detailed reports with minimal ePHI exposure",
+          "description": "Create detailed reports with minimal ePHI exposure using shadcn/ui cards and dialogs",
           "status": "pending"
         },
         {
           "id": 15.4,
           "title": "Add secure export functionality",
-          "description": "Implement encrypted exports with access controls",
+          "description": "Implement encrypted exports with access controls using shadcn/ui buttons and dialogs for the export interface",
           "status": "pending"
         },
         {
           "id": 15.5,
           "title": "Implement RBAC for analytics",
-          "description": "Add role-based access controls for dashboard and reports",
+          "description": "Add role-based access controls for dashboard and reports, integrating with shadcn/ui component visibility",
           "status": "pending"
         },
         {
@@ -831,7 +872,7 @@
         {
           "id": 15.7,
           "title": "Create consent verification system",
-          "description": "Add checks to verify patient consent before generating reports",
+          "description": "Add checks to verify patient consent before generating reports using shadcn/ui dialogs and alerts",
           "status": "pending"
         },
         {
@@ -839,56 +880,62 @@
           "title": "Implement data de-identification",
           "description": "Add functionality to de-identify data for certain reporting scenarios",
           "status": "pending"
+        },
+        {
+          "id": 15.9,
+          "title": "Set up Vite React with TypeScript project",
+          "description": "Initialize and configure Vite React with TypeScript for the analytics dashboard",
+          "status": "pending"
         }
       ]
     },
     {
       "id": 16,
       "title": "Web App Payment and Billing Interface with HIPAA Compliance",
-      "description": "Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling.",
+      "description": "Implement payment management and billing interfaces for the web application with HIPAA-compliant data handling using Vite React with TypeScript, shadcn/ui, and Tailwind CSS.",
       "status": "pending",
       "dependencies": [
         12,
         9
       ],
       "priority": "medium",
-      "details": "Create payment configuration screens for company and office settings with RBAC controls. Implement subscription management interface. Develop invoice viewing and management tools with minimal ePHI inclusion. Create payment history and reporting screens with audit logging. Implement payment method management UI with secure handling of payment information. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data.",
-      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval.",
+      "details": "Create payment configuration screens for company and office settings with RBAC controls using shadcn/ui form components and card layouts. Implement subscription management interface with shadcn/ui components. Develop invoice viewing and management tools with minimal ePHI inclusion using shadcn/ui data tables. Create payment history and reporting screens with audit logging using shadcn/ui components. Implement payment method management UI with secure handling of payment information using shadcn/ui form components. Ensure all payment operations are logged in detail. Implement secure data handling practices to limit ePHI exposure in billing documents. Verify BAA is in place with payment processor. Ensure invoices and billing documents comply with HIPAA requirements. Adapt payment data storage and retrieval to work with libSQL/SQLite, using JSON1 extension for complex payment configuration data. Build all interfaces using TypeScript for type safety and Tailwind CSS for styling within the shadcn/ui component framework.",
+      "testStrategy": "Test payment configuration options with different user roles. Verify proper display of billing information with minimal ePHI. Test subscription management workflows with audit logging. Ensure proper handling of payment errors and user feedback. Validate RBAC controls for different user roles. Test that all payment operations are properly logged. Verify that payment information is securely handled and encrypted. Test that billing documents comply with HIPAA requirements. Verify compatibility with libSQL/SQLite for payment data storage and retrieval. Test TypeScript type safety across all payment interfaces. Verify responsive design of shadcn/ui components across different screen sizes.",
       "subtasks": [
         {
           "id": 16.1,
           "title": "Create payment configuration UI",
-          "description": "Implement screens for managing payment settings at company and office levels",
+          "description": "Implement screens for managing payment settings at company and office levels using shadcn/ui form components and card layouts with TypeScript and Tailwind CSS",
           "status": "pending"
         },
         {
           "id": 16.2,
           "title": "Develop subscription management interface",
-          "description": "Add UI for creating and managing subscriptions",
+          "description": "Add UI for creating and managing subscriptions using shadcn/ui components, TypeScript, and Tailwind CSS",
           "status": "pending"
         },
         {
           "id": 16.3,
           "title": "Implement invoice management",
-          "description": "Create screens for viewing and managing invoices with minimal ePHI",
+          "description": "Create screens for viewing and managing invoices with minimal ePHI using shadcn/ui data tables and TypeScript",
           "status": "pending"
         },
         {
           "id": 16.4,
           "title": "Add payment history reporting",
-          "description": "Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite",
+          "description": "Implement reporting screens for payment history with audit logging, adapting queries for libSQL/SQLite and displaying data with shadcn/ui data tables",
           "status": "pending"
         },
         {
           "id": 16.5,
           "title": "Create payment method UI",
-          "description": "Add interface for securely managing payment methods",
+          "description": "Add interface for securely managing payment methods using shadcn/ui form components and card layouts with TypeScript",
           "status": "pending"
         },
         {
           "id": 16.6,
           "title": "Implement RBAC for payment features",
-          "description": "Add role-based access controls for all payment functionality",
+          "description": "Add role-based access controls for all payment functionality, integrating with shadcn/ui components for permission-based UI rendering",
           "status": "pending"
         },
         {
@@ -900,7 +947,13 @@
         {
           "id": 16.8,
           "title": "Ensure HIPAA-compliant billing documents",
-          "description": "Verify that invoices and other billing documents limit ePHI exposure",
+          "description": "Verify that invoices and other billing documents limit ePHI exposure, implementing with shadcn/ui components",
+          "status": "pending"
+        },
+        {
+          "id": 16.9,
+          "title": "Create TypeScript interfaces for payment data",
+          "description": "Define TypeScript interfaces for all payment-related data structures to ensure type safety across the payment system",
           "status": "pending"
         }
       ]
