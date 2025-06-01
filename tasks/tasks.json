@@ -2265,8 +2265,8 @@
           "title": "Audit Current User-Role Schema and References",
           "description": "Identify all locations in the codebase, database schema, and business logic where the single 'role_id' foreign key is referenced, including models, queries, API endpoints, and RBAC logic.",
           "dependencies": [],
-          "details": "Perform a comprehensive search for 'role_id' usage in models, controllers, services, and database migrations to map all dependencies.",
-          "status": "pending",
+          "details": "Perform a comprehensive search for 'role_id' usage in models, controllers, services, and database migrations to map all dependencies.\n<info added on 2025-06-01T03:01:05.564Z>\n# Current User-Role Schema Audit Results\n\n## Database Schema References:\n1. **Tables with role_id**:\n   - `Roles` table: `role_id` as PRIMARY KEY \n   - `Users` table: `role_id` as FOREIGN KEY to Roles(role_id) - NOT NULL\n   - **Current relationship**: One-to-one (User has one Role)\n\n2. **Seeded role names**: patient, chiropractor, office_manager, billing_admin, admin\n\n## SQLAlchemy Model References:\n1. **Role model** (api/models/base.py:69):\n   - `role_id` primary key\n   - `users` relationship back to User model\n\n2. **User model** (api/models/base.py:83):\n   - `role_id` foreign key column\n   - `role` relationship to Role model\n\n## RoleType Enum (api/core/config.py):\n- PATIENT = \"patient\"\n- CHIROPRACTOR = \"chiropractor\" ← **NEEDS UPDATE TO CARE_PROVIDER**\n- OFFICE_MANAGER = \"office_manager\" \n- BILLING_ADMIN = \"billing_admin\"\n- ADMIN = \"admin\"\n\n## RBAC Implementation:\n- **require_role() function** (api/auth/dependencies.py:49): Checks if `RoleType(current_user.role.name)` matches required roles\n- **Single role assumption**: Current logic assumes one role per user\n\n## Code References Requiring Updates:\n### Direct role_id usage:\n- api/crud/crud_user.py (lines 47, 52-56)\n- api/models/base.py (lines 74, 83)  \n- api/schemas/user.py (lines 9, 24)\n- api/schemas/role.py (line 10)\n- scripts/seed_admin.py (lines 34-43, 66)\n\n### Chiropractor role references:\n- RoleType.CHIROPRACTOR usage in 6+ router files\n- Variable names like `chiropractor_id` in TherapyPlan model\n- Business logic checking for \"chiropractor\" role string\n- API endpoint documentation and comments\n\n### Role-based access control:\n- 15+ API endpoints using require_role() with RoleType.CHIROPRACTOR\n- Role validation in crud operations\n- Business logic filtering based on single role assumption\n\n## Migration Requirements:\n1. Create user_roles junction table\n2. Migrate existing role_id data to user_roles entries\n3. Update \"chiropractor\" to \"care_provider\" in Roles table\n4. Remove role_id column from Users table\n</info added on 2025-06-01T03:01:05.564Z>",
+          "status": "done",
           "testStrategy": "Verify that all references to 'role_id' are cataloged and documented for subsequent refactoring."
         },
         {
@@ -2276,7 +2276,7 @@
           "dependencies": [
             1
           ],
-          "details": "Ensure the schema supports bidirectional access and is compatible with libSQL/SQLite. Define appropriate indexes and constraints for performance and data integrity.",
+          "details": "Ensure the schema supports bidirectional access and is compatible with libSQL/SQLite. Define appropriate indexes and constraints for performance and data integrity.\n<info added on 2025-06-01T03:07:28.825Z>\n**REFERENCE REQUIRED**: Before implementing, review the comprehensive audit findings in `docs/role-system-audit-report.md` which details all current schema references and files that need updating.\n\nWhen designing the user_roles junction table, pay special attention to:\n- Current Users table has `role_id` foreign key (NOT NULL) that needs removal\n- Roles table has `role_id` primary key  \n- Need to support bidirectional access for libSQL/SQLite compatibility\n- Must account for the role name change from \"chiropractor\" to \"care_provider\" \n- Consider performance implications for 15+ API endpoints with role checks\n\nThe audit report provides exact file locations and line numbers for all schema references.\n</info added on 2025-06-01T03:07:28.825Z>",
           "status": "pending",
           "testStrategy": "Review schema design for normalization, referential integrity, and scalability."
         },
@@ -2287,7 +2287,7 @@
           "dependencies": [
             2
           ],
-          "details": "Modify User and Role models to reflect the new association, ensuring compatibility with existing queries and business logic.",
+          "details": "Modify User and Role models to reflect the new association, ensuring compatibility with existing queries and business logic.\n<info added on 2025-06-01T03:07:37.623Z>\n**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for specific SQLAlchemy model changes needed.\n\nKey findings from audit:\n- Role model (api/models/base.py:74): `role_id` primary key needs relationship update\n- User model (api/models/base.py:83): `role_id` foreign key column must be removed\n- Current single `role` relationship needs conversion to many-to-many `roles` \n- TherapyPlan model has `chiropractor_id` field requiring updates to support care_provider role\n- Must maintain bidirectional access (users.roles, roles.users)\n\nReview the audit report's \"SQLAlchemy Models\" section for complete details on required changes.\n</info added on 2025-06-01T03:07:37.623Z>",
           "status": "pending",
           "testStrategy": "Run unit tests to confirm that users can have multiple roles and roles can be assigned to multiple users."
         },
@@ -2298,7 +2298,7 @@
           "dependencies": [
             3
           ],
-          "details": "Ensure all API endpoints and business logic that perform role checks are updated to use the new logic.",
+          "details": "Ensure all API endpoints and business logic that perform role checks are updated to use the new logic.\n<info added on 2025-06-01T03:07:50.063Z>\n**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for complete RBAC changes needed.\n\nKey updates required:\n1. Modify `require_role()` function in api/auth/dependencies.py:49 to check if ANY of user's roles match required roles instead of current single role check\n2. Replace all instances of RoleType.CHIROPRACTOR with RoleType.CARE_PROVIDER across the codebase\n3. Update API endpoints in the following router files:\n   - media\n   - plans\n   - progress\n   - branding\n   - auth\n   - companies\n   - offices\n   - users\n\nThe audit report contains specific file locations and line numbers for all role checks that need to be updated. Refer to this document for comprehensive guidance during implementation.\n</info added on 2025-06-01T03:07:50.063Z>",
           "status": "pending",
           "testStrategy": "Test all endpoints for correct access control with users assigned multiple roles."
         },
@@ -2309,7 +2309,7 @@
           "dependencies": [
             3
           ],
-          "details": "Adjust API request/response models to accept and return arrays of role IDs. Ensure backward compatibility where possible.",
+          "details": "Adjust API request/response models to accept and return arrays of role IDs. Ensure backward compatibility where possible.\n<info added on 2025-06-01T03:08:05.301Z>\n**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for specific schema files to update.\n\nKey schema updates needed:\n- api/schemas/user.py (lines 9, 24): Replace role_id fields with roles list\n- api/schemas/role.py (line 10): Update role_id field\n- Modify UserCreate/UserUpdate schemas to support multiple role assignment\n- Create new schemas for role assignment operations\n- Update frontend schemas to display multiple roles per user\n\nRefer to the \"Pydantic Schemas\" section in the audit report for comprehensive details on all required changes to support multi-role functionality. Ensure backward compatibility where possible when adjusting API request/response models.\n</info added on 2025-06-01T03:08:05.301Z>",
           "status": "pending",
           "testStrategy": "Validate API endpoints with payloads containing multiple roles and ensure correct serialization/deserialization."
         },
@@ -2394,7 +2394,7 @@
           "id": 13,
           "title": "Update Role Names and References (chiropractor → care_provider)",
           "description": "As part of the role system transition, update the \"chiropractor\" role to \"care_provider\" throughout the system, including database data, code references, enums, and documentation.",
-          "details": "Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.",
+          "details": "Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.\n<info added on 2025-06-01T03:08:14.824Z>\n**REFERENCE REQUIRED**: Review `docs/role-system-audit-report.md` before implementation for complete list of chiropractor references.\n\nKey items from audit requiring updates:\n- RoleType enum (api/core/config.py): CHIROPRACTOR = \"chiropractor\" → CARE_PROVIDER = \"care_provider\"\n- 15+ API router files with RoleType.CHIROPRACTOR usage\n- Variable names like TherapyPlan.chiropractor_id throughout system\n- Hard-coded \"chiropractor\" string checks in business logic\n- Seed scripts updating role names in database\n- All documentation and comments\n\nThe audit report provides exact file locations and line numbers for every reference requiring updates.\n</info added on 2025-06-01T03:08:14.824Z>",
           "status": "pending",
           "dependencies": [
             1,

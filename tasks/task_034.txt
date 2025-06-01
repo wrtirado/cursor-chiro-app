@@ -20,35 +20,145 @@
 - Conduct regression testing on all endpoints and UI components affected by the role system change to ensure system stability and HIPAA compliance.
 
 # Subtasks:
-## 1. Audit Current User-Role Schema and References [pending]
+## 1. Audit Current User-Role Schema and References [done]
 ### Dependencies: None
 ### Description: Identify all locations in the codebase, database schema, and business logic where the single 'role_id' foreign key is referenced, including models, queries, API endpoints, and RBAC logic.
 ### Details:
 Perform a comprehensive search for 'role_id' usage in models, controllers, services, and database migrations to map all dependencies.
+<info added on 2025-06-01T03:01:05.564Z>
+# Current User-Role Schema Audit Results
+
+## Database Schema References:
+1. **Tables with role_id**:
+   - `Roles` table: `role_id` as PRIMARY KEY 
+   - `Users` table: `role_id` as FOREIGN KEY to Roles(role_id) - NOT NULL
+   - **Current relationship**: One-to-one (User has one Role)
+
+2. **Seeded role names**: patient, chiropractor, office_manager, billing_admin, admin
+
+## SQLAlchemy Model References:
+1. **Role model** (api/models/base.py:69):
+   - `role_id` primary key
+   - `users` relationship back to User model
+
+2. **User model** (api/models/base.py:83):
+   - `role_id` foreign key column
+   - `role` relationship to Role model
+
+## RoleType Enum (api/core/config.py):
+- PATIENT = "patient"
+- CHIROPRACTOR = "chiropractor" ← **NEEDS UPDATE TO CARE_PROVIDER**
+- OFFICE_MANAGER = "office_manager" 
+- BILLING_ADMIN = "billing_admin"
+- ADMIN = "admin"
+
+## RBAC Implementation:
+- **require_role() function** (api/auth/dependencies.py:49): Checks if `RoleType(current_user.role.name)` matches required roles
+- **Single role assumption**: Current logic assumes one role per user
+
+## Code References Requiring Updates:
+### Direct role_id usage:
+- api/crud/crud_user.py (lines 47, 52-56)
+- api/models/base.py (lines 74, 83)  
+- api/schemas/user.py (lines 9, 24)
+- api/schemas/role.py (line 10)
+- scripts/seed_admin.py (lines 34-43, 66)
+
+### Chiropractor role references:
+- RoleType.CHIROPRACTOR usage in 6+ router files
+- Variable names like `chiropractor_id` in TherapyPlan model
+- Business logic checking for "chiropractor" role string
+- API endpoint documentation and comments
+
+### Role-based access control:
+- 15+ API endpoints using require_role() with RoleType.CHIROPRACTOR
+- Role validation in crud operations
+- Business logic filtering based on single role assumption
+
+## Migration Requirements:
+1. Create user_roles junction table
+2. Migrate existing role_id data to user_roles entries
+3. Update "chiropractor" to "care_provider" in Roles table
+4. Remove role_id column from Users table
+</info added on 2025-06-01T03:01:05.564Z>
 
 ## 2. Design Many-to-Many User-Role Schema [pending]
 ### Dependencies: 34.1
 ### Description: Design a new 'user_roles' junction table with 'user_id' and 'role_id' as foreign keys to establish a many-to-many relationship between users and roles.
 ### Details:
 Ensure the schema supports bidirectional access and is compatible with libSQL/SQLite. Define appropriate indexes and constraints for performance and data integrity.
+<info added on 2025-06-01T03:07:28.825Z>
+**REFERENCE REQUIRED**: Before implementing, review the comprehensive audit findings in `docs/role-system-audit-report.md` which details all current schema references and files that need updating.
+
+When designing the user_roles junction table, pay special attention to:
+- Current Users table has `role_id` foreign key (NOT NULL) that needs removal
+- Roles table has `role_id` primary key  
+- Need to support bidirectional access for libSQL/SQLite compatibility
+- Must account for the role name change from "chiropractor" to "care_provider" 
+- Consider performance implications for 15+ API endpoints with role checks
+
+The audit report provides exact file locations and line numbers for all schema references.
+</info added on 2025-06-01T03:07:28.825Z>
 
 ## 3. Update ORM Models for Many-to-Many Association [pending]
 ### Dependencies: 34.2
 ### Description: Refactor SQLAlchemy models to use the new 'user_roles' association table, updating relationship definitions with the 'secondary' parameter for bidirectional access.
 ### Details:
 Modify User and Role models to reflect the new association, ensuring compatibility with existing queries and business logic.
+<info added on 2025-06-01T03:07:37.623Z>
+**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for specific SQLAlchemy model changes needed.
+
+Key findings from audit:
+- Role model (api/models/base.py:74): `role_id` primary key needs relationship update
+- User model (api/models/base.py:83): `role_id` foreign key column must be removed
+- Current single `role` relationship needs conversion to many-to-many `roles` 
+- TherapyPlan model has `chiropractor_id` field requiring updates to support care_provider role
+- Must maintain bidirectional access (users.roles, roles.users)
+
+Review the audit report's "SQLAlchemy Models" section for complete details on required changes.
+</info added on 2025-06-01T03:07:37.623Z>
 
 ## 4. Refactor RBAC Logic and Role Checks [pending]
 ### Dependencies: 34.3
 ### Description: Update all role-based access control logic, including the 'require_role()' function and related middleware, to check for membership in a user's set of roles instead of a single role.
 ### Details:
 Ensure all API endpoints and business logic that perform role checks are updated to use the new logic.
+<info added on 2025-06-01T03:07:50.063Z>
+**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for complete RBAC changes needed.
+
+Key updates required:
+1. Modify `require_role()` function in api/auth/dependencies.py:49 to check if ANY of user's roles match required roles instead of current single role check
+2. Replace all instances of RoleType.CHIROPRACTOR with RoleType.CARE_PROVIDER across the codebase
+3. Update API endpoints in the following router files:
+   - media
+   - plans
+   - progress
+   - branding
+   - auth
+   - companies
+   - offices
+   - users
+
+The audit report contains specific file locations and line numbers for all role checks that need to be updated. Refer to this document for comprehensive guidance during implementation.
+</info added on 2025-06-01T03:07:50.063Z>
 
 ## 5. Modify API Schemas and DTOs for Multi-Role Support [pending]
 ### Dependencies: 34.3
 ### Description: Update user creation and update schemas/DTOs to support assigning and displaying multiple roles per user.
 ### Details:
 Adjust API request/response models to accept and return arrays of role IDs. Ensure backward compatibility where possible.
+<info added on 2025-06-01T03:08:05.301Z>
+**REFERENCE REQUIRED**: Before implementing, review `docs/role-system-audit-report.md` for specific schema files to update.
+
+Key schema updates needed:
+- api/schemas/user.py (lines 9, 24): Replace role_id fields with roles list
+- api/schemas/role.py (line 10): Update role_id field
+- Modify UserCreate/UserUpdate schemas to support multiple role assignment
+- Create new schemas for role assignment operations
+- Update frontend schemas to display multiple roles per user
+
+Refer to the "Pydantic Schemas" section in the audit report for comprehensive details on all required changes to support multi-role functionality. Ensure backward compatibility where possible when adjusting API request/response models.
+</info added on 2025-06-01T03:08:05.301Z>
 
 ## 6. Update Frontend Role Management UI [pending]
 ### Dependencies: 34.5
@@ -100,4 +210,17 @@ Establish monitoring and alerting for role-related errors or access violations. 
 ### Description: As part of the role system transition, update the "chiropractor" role to "care_provider" throughout the system, including database data, code references, enums, and documentation.
 ### Details:
 Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.
+<info added on 2025-06-01T03:08:14.824Z>
+**REFERENCE REQUIRED**: Review `docs/role-system-audit-report.md` before implementation for complete list of chiropractor references.
+
+Key items from audit requiring updates:
+- RoleType enum (api/core/config.py): CHIROPRACTOR = "chiropractor" → CARE_PROVIDER = "care_provider"
+- 15+ API router files with RoleType.CHIROPRACTOR usage
+- Variable names like TherapyPlan.chiropractor_id throughout system
+- Hard-coded "chiropractor" string checks in business logic
+- Seed scripts updating role names in database
+- All documentation and comments
+
+The audit report provides exact file locations and line numbers for every reference requiring updates.
+</info added on 2025-06-01T03:08:14.824Z>
 
