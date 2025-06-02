@@ -82,7 +82,7 @@ Perform a comprehensive search for 'role_id' usage in models, controllers, servi
 4. Remove role_id column from Users table
 </info added on 2025-06-01T03:01:05.564Z>
 
-## 2. Design Many-to-Many User-Role Schema [pending]
+## 2. Design Many-to-Many User-Role Schema [done]
 ### Dependencies: 34.1
 ### Description: Design a new 'user_roles' junction table with 'user_id' and 'role_id' as foreign keys to establish a many-to-many relationship between users and roles.
 ### Details:
@@ -99,6 +99,42 @@ When designing the user_roles junction table, pay special attention to:
 
 The audit report provides exact file locations and line numbers for all schema references.
 </info added on 2025-06-01T03:07:28.825Z>
+<info added on 2025-06-02T02:39:22.035Z>
+## ✅ DESIGN COMPLETE
+
+I have completed the comprehensive many-to-many user-role schema design. The complete design is documented in `docs/many-to-many-role-schema-design.md`.
+
+### Key Design Elements:
+
+**New Junction Table: `user_roles`**
+- Primary key: `user_role_id` (AUTOINCREMENT for libSQL)
+- Foreign keys: `user_id`, `role_id` 
+- Audit fields: `assigned_at`, `assigned_by_id`
+- Soft deletion: `is_active` boolean flag
+- Unique constraint: Prevents duplicate role assignments
+
+**Schema Changes:**
+- Remove `role_id` column from Users table
+- Update "chiropractor" → "care_provider" in Roles table
+- Add performance indexes for common query patterns
+
+**libSQL/SQLite Compatibility:**
+- Uses INTEGER PRIMARY KEY AUTOINCREMENT
+- Compatible timestamp functions
+- Proper foreign key constraints
+
+**Performance Optimization:**
+- Composite indexes for role checking queries
+- Eager loading strategies defined
+- Query patterns optimized for 15+ API endpoints
+
+**HIPAA Compliance:**
+- Complete audit trail preservation
+- Role assignment tracking
+- Soft deletion maintains history
+
+The design provides flexibility for multiple roles per user while maintaining system performance and regulatory compliance.
+</info added on 2025-06-02T02:39:22.035Z>
 
 ## 3. Update ORM Models for Many-to-Many Association [pending]
 ### Dependencies: 34.2
