@@ -8,6 +8,18 @@ class RoleBase(BaseModel):
     name: str
 
 
+class RoleCreate(RoleBase):
+    """Schema for creating a new role"""
+
+    pass
+
+
+class RoleUpdate(BaseModel):
+    """Schema for updating an existing role"""
+
+    name: Optional[str] = None
+
+
 # Schema for Role read from DB (includes ID)
 class Role(RoleBase):
     role_id: int

@@ -3,8 +3,8 @@
 -- DESCRIPTION: Drop old users table and rename users_new to users
 
 -- UP script
-DROP TABLE users;
-ALTER TABLE users_new RENAME TO users;
+DROP TABLE Users;
+ALTER TABLE users_new RENAME TO Users;
 
 -- DOWN script
 -- Recreate users table with role_id column
@@ -21,8 +21,8 @@ CREATE TABLE users_old (
     activated_at DATETIME,
     deactivated_at DATETIME,
     last_billed_cycle DATETIME,
-    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE SET NULL,
-    FOREIGN KEY (office_id) REFERENCES offices(office_id) ON DELETE SET NULL
+    FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE SET NULL,
+    FOREIGN KEY (office_id) REFERENCES Offices(office_id) ON DELETE SET NULL
 );
 
 -- Copy data back and restore first role assignment for each user
@@ -35,9 +35,9 @@ SELECT
     (SELECT ur.role_id FROM user_roles ur WHERE ur.user_id = u.user_id AND ur.is_active = 1 LIMIT 1) as role_id,
     u.join_code, u.office_id, u.created_at, u.updated_at,
     u.activated_at, u.deactivated_at, u.last_billed_cycle
-FROM users u;
+FROM Users u;
 
 -- Drop current table and rename old table back
-DROP TABLE users;
-ALTER TABLE users_old RENAME TO users;
+DROP TABLE Users;
+ALTER TABLE users_old RENAME TO Users;
 

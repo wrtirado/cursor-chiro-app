@@ -3,19 +3,19 @@
 
 -- UP script
 -- Create branding table for storing office branding customization
-CREATE TABLE branding (
+CREATE TABLE IF NOT EXISTS branding (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     office_id INTEGER NOT NULL,
     logo_url TEXT,
     colors_json TEXT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (office_id) REFERENCES offices(id),
+    FOREIGN KEY (office_id) REFERENCES Offices(office_id),
     UNIQUE (office_id)
 );
 
 -- Create index on office_id for performance
-CREATE INDEX idx_branding_office_id ON branding(office_id);
+CREATE INDEX IF NOT EXISTS idx_branding_office_id ON branding(office_id);
 
 -- DOWN script
 -- Remove the index first, then drop the table

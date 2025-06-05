@@ -1,9 +1,17 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from fastapi import Request
+import json
+from datetime import datetime
 
 # Import the configured logger instance
 from api.core.logging_config import audit_log
 from api.models.base import User  # To get user ID easily
+
+# Import AuditLog model for database logging (avoid circular imports)
+try:
+    from api.models.audit_log import AuditLog
+except ImportError:
+    AuditLog = None  # Fallback if model not available
 
 
 # Define standard audit event types (can be expanded)
@@ -19,6 +27,21 @@ class AuditEvent:
     USER_UPDATE = "USER_UPDATE"
     USER_DELETE = "USER_DELETE"
     USER_VIEW = "USER_VIEW"
+
+    # NEW: Role-specific audit events for HIPAA compliance
+    ROLE_ASSIGNED = "ROLE_ASSIGNED"
+    ROLE_UNASSIGNED = "ROLE_UNASSIGNED"
+    ROLE_DEACTIVATED = "ROLE_DEACTIVATED"
+    ROLE_REACTIVATED = "ROLE_REACTIVATED"
+    ROLE_ASSIGNMENT_ATTEMPT = "ROLE_ASSIGNMENT_ATTEMPT"
+    ROLE_ACCESS_GRANTED = "ROLE_ACCESS_GRANTED"
+    ROLE_ACCESS_DENIED = "ROLE_ACCESS_DENIED"
+    ROLE_CHECK_PERFORMED = "ROLE_CHECK_PERFORMED"
+    MULTIPLE_ROLES_ACCESS = "MULTIPLE_ROLES_ACCESS"
+    ROLE_CREATED = "ROLE_CREATED"
+    ROLE_UPDATED = "ROLE_UPDATED"
+    ROLE_DELETED = "ROLE_DELETED"
+
     PLAN_CREATE = "PLAN_CREATE"
     PLAN_UPDATE = "PLAN_UPDATE"
     PLAN_DELETE = "PLAN_DELETE"
@@ -71,8 +94,15 @@ def log_audit_event(
     resource_type: Optional[str] = None,
     resource_id: Optional[Any] = None,
     details: Optional[Dict[str, Any]] = None,
+    db_session: Optional[Any] = None,  # SQLAlchemy session for database logging
 ):
-    """Helper function to log structured audit events."""
+    """
+    Helper function to log structured audit events to both file and database.
+
+    This dual logging approach ensures HIPAA compliance by providing:
+    - File-based logs for real-time monitoring and debugging
+    - Database logs for structured queries and compliance reporting
+    """
     props: Dict[str, Any] = {
         "event_type": event_type,
         "outcome": outcome,
@@ -82,6 +112,9 @@ def log_audit_event(
     if user:
         props["user_id"] = user.user_id
         props["user_email"] = user.email
+    elif details and "user_id" in details:
+        # Extract user_id from details if user object not provided
+        props["user_id"] = details["user_id"]
     else:
         # Maybe get user ID from token if user object not passed?
         props["user_id"] = None  # Or indicate anonymous/system action
@@ -113,12 +146,51 @@ def log_audit_event(
             message += f" {resource_id}"
     message += f" - {outcome}"
 
-    # Log using the configured audit logger
+    # Log to file using the configured audit logger
     # Pass structured data via the 'extra' dictionary
     if outcome == "FAILURE":
         audit_log.warning(message, extra={"props": props})
     else:
         audit_log.info(message, extra={"props": props})
+
+    # Log to database for HIPAA compliance and structured querying
+    if db_session and AuditLog:
+        try:
+            audit_entry = AuditLog(
+                timestamp=datetime.now(),
+                user_id=user.user_id if user else props.get("user_id"),
+                event_type=event_type,
+                resource_type=resource_type,
+                resource_id=str(resource_id) if resource_id is not None else None,
+                outcome=outcome,
+                source_ip=props.get("source_ip"),
+                user_agent=props.get("user_agent"),
+                request_path=props.get("request_path"),
+                request_method=props.get("request_method"),
+                message=message,
+                props=json.dumps(props),  # Store props as JSON string
+            )
+
+            db_session.add(audit_entry)
+            try:
+                db_session.commit()
+                print(f"✅ Audit log saved to database: {event_type}")  # Debug print
+            except Exception as commit_error:
+                db_session.rollback()
+                raise commit_error
+
+        except Exception as e:
+            # Don't let database logging failures break the application
+            # Log the error but continue
+            print(f"❌ Failed to write audit log to database: {e}")  # Debug print
+            audit_log.error(
+                f"Failed to write audit log to database: {e}",
+                extra={"props": {"error": str(e)}},
+            )
+            if db_session:
+                db_session.rollback()
+    elif db_session and not AuditLog:
+        print("⚠️ AuditLog model not available for database logging")  # Debug print
 
 
 def log_application_startup():
@@ -227,3 +299,184 @@ def log_billing_event(
         audit_log.warning(message, extra={"props": props})
     else:
         audit_log.info(message, extra={"props": props})
+
+
+def log_role_event(
+    action: str,
+    user_id: Optional[int] = None,
+    target_user_id: Optional[int] = None,
+    role_id: Optional[int] = None,
+    role_name: Optional[str] = None,
+    assigned_by_id: Optional[int] = None,
+    request: Optional[Request] = None,
+    user: Optional[User] = None,
+    details: Optional[Dict[str, Any]] = None,
+    outcome: str = "SUCCESS",
+    db_session: Optional[Any] = None,  # Database session for audit logging
+):
+    """
+    Helper function to log role-related audit events for HIPAA compliance.
+
+    Args:
+        action: The role action performed (e.g., 'role_assigned', 'role_removed')
+        user_id: ID of the user performing the action (if different from user object)
+        target_user_id: ID of the user whose roles are being modified
+        role_id: ID of the role being assigned/removed
+        role_name: Name of the role (for readability)
+        assigned_by_id: ID of the user who assigned the role
+        request: FastAPI request object for IP/user-agent tracking
+        user: User object performing the action
+        details: Additional context details
+        outcome: SUCCESS, FAILURE, or other outcome
+    """
+
+    # Map common role actions to audit event types
+    action_event_map = {
+        "role_assigned": AuditEvent.ROLE_ASSIGNED,
+        "role_unassigned": AuditEvent.ROLE_UNASSIGNED,
+        "role_deactivated": AuditEvent.ROLE_DEACTIVATED,
+        "role_reactivated": AuditEvent.ROLE_REACTIVATED,
+        "role_assignment_attempt": AuditEvent.ROLE_ASSIGNMENT_ATTEMPT,
+        "role_access_granted": AuditEvent.ROLE_ACCESS_GRANTED,
+        "role_access_denied": AuditEvent.ROLE_ACCESS_DENIED,
+        "role_check_performed": AuditEvent.ROLE_CHECK_PERFORMED,
+        "multiple_roles_access": AuditEvent.MULTIPLE_ROLES_ACCESS,
+        "role_created": AuditEvent.ROLE_CREATED,
+        "role_updated": AuditEvent.ROLE_UPDATED,
+        "role_deleted": AuditEvent.ROLE_DELETED,
+    }
+
+    event_type = action_event_map.get(action, action.upper())
+
+    # Build structured props for role events
+    props: Dict[str, Any] = {
+        "event_type": event_type,
+        "outcome": outcome,
+        "resource_type": "user_role",
+    }
+
+    # Add user info if available
+    if user:
+        props["user_id"] = user.user_id
+        props["user_email"] = user.email
+    elif user_id:
+        props["user_id"] = user_id
+
+    # Add request info if available
+    if request:
+        props["source_ip"] = request.client.host if request.client else None
+        props["user_agent"] = request.headers.get("user-agent")
+        props["request_path"] = request.url.path
+        props["request_method"] = request.method
+    else:
+        props["source_ip"] = "system"
+        props["user_agent"] = "system"
+        props["request_path"] = "role_operation"
+        props["request_method"] = "SYSTEM"
+
+    # Add role-specific information
+    if target_user_id:
+        props["target_user_id"] = target_user_id
+        props["resource_id"] = str(target_user_id)  # Primary resource being modified
+
+    if role_id:
+        props["role_id"] = role_id
+
+    if role_name:
+        props["role_name"] = role_name
+
+    if assigned_by_id:
+        props["assigned_by_id"] = assigned_by_id
+
+    # Add details for HIPAA compliance
+    if details:
+        props["details"] = details
+
+    # Construct message for role events
+    message = f"Role audit: {action}"
+    if target_user_id and target_user_id != user_id:
+        message += f" for user {target_user_id}"
+    if role_name:
+        message += f" role '{role_name}'"
+    elif role_id:
+        message += f" role ID {role_id}"
+    if assigned_by_id and user_id != assigned_by_id:
+        message += f" by user {assigned_by_id}"
+    message += f" - {outcome}"
+
+    # Use centralized audit logging for both file and database
+    log_audit_event(
+        request=request,
+        user=user,
+        event_type=event_type,
+        outcome=outcome,
+        resource_type="user_role",
+        resource_id=target_user_id,
+        details=props,
+        db_session=db_session,
+    )
+
+
+def log_role_access_check(
+    user_id: int,
+    required_roles: List[str],
+    user_roles: List[str],
+    granted: bool,
+    request: Optional[Request] = None,
+    resource_type: Optional[str] = None,
+    resource_id: Optional[str] = None,
+    db_session: Optional[Any] = None,  # Database session for audit logging
+):
+    """
+    Log role-based access control checks for audit compliance.
+
+    This function provides detailed logging of every role check, which is
+    critical for HIPAA audit trails showing who accessed what and when.
+    """
+    outcome = "SUCCESS" if granted else "FAILURE"
+    event_type = (
+        AuditEvent.ROLE_ACCESS_GRANTED if granted else AuditEvent.ROLE_ACCESS_DENIED
+    )
+
+    props: Dict[str, Any] = {
+        "event_type": event_type,
+        "outcome": outcome,
+        "user_id": user_id,
+        "required_roles": required_roles,
+        "user_roles": user_roles,
+        "access_granted": granted,
+    }
+
+    # Add request context
+    if request:
+        props["source_ip"] = request.client.host if request.client else None
+        props["user_agent"] = request.headers.get("user-agent")
+        props["request_path"] = request.url.path
+        props["request_method"] = request.method
+
+    # Add resource context
+    if resource_type:
+        props["resource_type"] = resource_type
+    if resource_id:
+        props["resource_id"] = resource_id
+
+    # Create detailed message
+    action = "granted" if granted else "denied"
+    message = f"Role access {action} for user {user_id}"
+    if resource_type:
+        message += f" accessing {resource_type}"
+        if resource_id:
+            message += f" {resource_id}"
+    message += f" - required: {required_roles}, user has: {user_roles}"
+
+    # Use centralized audit logging for both file and database
+    log_audit_event(
+        request=request,
+        user=None,  # We only have user_id here
+        event_type=event_type,
+        outcome=outcome,
+        resource_type=resource_type or "endpoint",
+        resource_id=resource_id,
+        details=props,
+        db_session=db_session,
+    )

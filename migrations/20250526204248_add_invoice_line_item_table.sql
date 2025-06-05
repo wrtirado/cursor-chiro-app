@@ -2,7 +2,7 @@
 -- CREATED_AT: 2025-05-26T20:42:48.498864
 
 -- UP script
-CREATE TABLE invoice_line_item (
+CREATE TABLE IF NOT EXISTS invoice_line_item (
     id INTEGER PRIMARY KEY,
     invoice_id INTEGER NOT NULL,
     item_type TEXT NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE invoice_line_item (
 );
 
 -- Add indexes for performance
-CREATE INDEX idx_invoice_line_item_invoice_id ON invoice_line_item(invoice_id);
-CREATE INDEX idx_invoice_line_item_type ON invoice_line_item(item_type);
+CREATE INDEX IF NOT EXISTS idx_invoice_line_item_invoice_id ON invoice_line_item(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_line_item_type ON invoice_line_item(item_type);
 
 -- DOWN script
 -- Remove indexes first

@@ -4,11 +4,11 @@
 
 -- UP script
 -- Update role name from "chiropractor" to "care_provider"
-UPDATE roles 
+UPDATE Roles 
 SET name = 'care_provider' 
 WHERE name = 'chiropractor';
 
--- Migrate existing role assignments from users.role_id to user_roles table
+-- Migrate existing role assignments from Users.role_id to user_roles table
 INSERT INTO user_roles (user_id, role_id, assigned_at, assigned_by_id, is_active)
 SELECT 
     user_id,
@@ -16,7 +16,7 @@ SELECT
     created_at,  -- Use user creation time as assignment time
     NULL,        -- No assigned_by_id for existing data
     1            -- Mark all existing assignments as active
-FROM users 
+FROM Users 
 WHERE role_id IS NOT NULL;
 
 -- DOWN script
@@ -24,7 +24,7 @@ WHERE role_id IS NOT NULL;
 DELETE FROM user_roles;
 
 -- Revert role name from "care_provider" back to "chiropractor"
-UPDATE roles 
+UPDATE Roles 
 SET name = 'chiropractor' 
 WHERE name = 'care_provider';
 

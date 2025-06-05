@@ -2,7 +2,7 @@
 -- CREATED_AT: 2025-05-25T19:52:33.541838
 
 -- UP script
-CREATE TABLE invoice (
+CREATE TABLE IF NOT EXISTS invoice (
     id INTEGER PRIMARY KEY,
     office_id INTEGER NOT NULL,
     billing_period_start DATETIME,
@@ -14,7 +14,7 @@ CREATE TABLE invoice (
     notes TEXT,
     created_at DATETIME NOT NULL DEFAULT (datetime('now')),
     updated_at DATETIME NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (office_id) REFERENCES offices(office_id) ON DELETE CASCADE
+    FOREIGN KEY (office_id) REFERENCES Offices(office_id) ON DELETE CASCADE
 );
 
 -- DOWN script

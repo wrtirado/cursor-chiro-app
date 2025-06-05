@@ -3,7 +3,7 @@
 -- DESCRIPTION: Create new users table without role_id column
 
 -- UP script
-CREATE TABLE users_new (
+CREATE TABLE IF NOT EXISTS users_new (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE users_new (
     activated_at DATETIME,
     deactivated_at DATETIME,
     last_billed_cycle DATETIME,
-    FOREIGN KEY (office_id) REFERENCES offices(office_id) ON DELETE SET NULL
+    FOREIGN KEY (office_id) REFERENCES Offices(office_id) ON DELETE SET NULL
 );
 
 -- DOWN script

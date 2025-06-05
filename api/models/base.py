@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from api.database.session import Base
 from api.models.audit import BillingAuditLog  # noqa
+from api.models.audit_log import AuditLog  # noqa
 
 # Re-defining tables from init_schema.sql using SQLAlchemy ORM
 
@@ -75,7 +76,13 @@ class Role(Base):
     __tablename__ = "roles"
     role_id = Column(Integer, primary_key=True, index=True)
     name = Column(Text, unique=True, nullable=False, index=True)
-    users = relationship("User", secondary="user_roles", back_populates="roles")
+    # Fix relationship conflicts by specifying foreign keys explicitly
+    users = relationship(
+        "User",
+        secondary="user_roles",
+        primaryjoin="Role.role_id==UserRole.role_id",
+        secondaryjoin="UserRole.user_id==User.user_id",
+    )
 
 
 class UserRole(Base):
@@ -151,7 +158,8 @@ class User(Base):
     roles = relationship(
         "Role",
         secondary="user_roles",
-        back_populates="users",
+        primaryjoin="User.user_id==UserRole.user_id",
+        secondaryjoin="UserRole.role_id==Role.role_id",
         lazy="selectin",  # Eager loading for performance
     )
     # Relationships for TherapyPlans, PlanAssignments, Progress if needed
@@ -166,6 +174,8 @@ class User(Base):
         foreign_keys="[PlanAssignment.patient_id]",
         back_populates="patient",
     )
+    # NEW: Audit logs relationship for HIPAA compliance
+    audit_logs = relationship("AuditLog", back_populates="user")
 
     # Helper methods for role checking
     def has_role(self, role_name: str) -> bool:
