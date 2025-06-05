@@ -62,7 +62,7 @@ class TherapyPlanUpdate(BaseModel):
 
 class TherapyPlanInDBBase(TherapyPlanBase):
     plan_id: int
-    chiropractor_id: int
+    care_provider_id: int  # Updated from chiropractor_id to care_provider_id
     version: int
     created_at: datetime.datetime
     updated_at: datetime.datetime

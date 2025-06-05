@@ -296,7 +296,7 @@ Update the `require_role()` function and all role-based auth logic to handle use
 **Next Steps**: The RBAC system is now ready for the database migration (Task 34.7) and can handle multiple roles per user seamlessly.
 </info added on 2025-06-05T05:58:10.116Z>
 
-## 5. Modify API Schemas and DTOs for Multi-Role Support [pending]
+## 5. Modify API Schemas and DTOs for Multi-Role Support [done]
 ### Dependencies: 34.3
 ### Description: Update user creation and update schemas/DTOs to support assigning and displaying multiple roles per user.
 ### Details:
@@ -335,6 +335,49 @@ When updating Pydantic schemas:
 
 Test API responses thoroughly to verify correct serialization of the new relationship structure in both directions.
 </info added on 2025-06-02T09:05:54.764Z>
+<info added on 2025-06-05T06:03:22.987Z>
+## API Schema Updates for Many-to-Many Role System
+
+### Updated api/schemas/user.py:
+✅ **Replaced single role_id with multiple roles support**:
+- Updated `UserBase` to remove `role_id` field
+- Modified `UserCreate` to include `role_ids: List[int]` with validation
+- Enhanced `UserUpdate` to support optional `role_ids: Optional[List[int]]`  
+- Updated `UserInDBBase` to include `roles: List[RoleReference] = []`
+- Added backward compatibility field `legacy_role_id: Optional[int]` for smooth migration
+- Created `UserWithRolesSummary` for efficient role name display
+- Added `UserProfile` for secure user profile responses
+
+### Updated api/schemas/role.py:
+✅ **Added comprehensive UserRole junction table schemas**:
+- Created `UserRoleBase`, `UserRoleCreate`, `UserRoleUpdate` schemas for user-role associations
+- Added full `UserRole` schema with audit fields (assigned_at, assigned_by_id)
+- Created `RoleReference` for efficient nested responses
+- Added `RoleAssignmentRequest` and `RoleUnassignmentRequest` for role management endpoints
+- Included `BulkRoleAssignmentRequest` for efficient multi-user role operations
+
+### Updated api/schemas/plan.py:
+✅ **Updated field references for consistency**:
+- Changed `TherapyPlanInDBBase.chiropractor_id` to `care_provider_id` to match model updates
+
+### Updated api/schemas/token.py:
+✅ **Enhanced authentication responses**:
+- Added `TokenWithUser` schema that includes user info and role names for frontend convenience
+- Supports `role_names: List[str]` for easy frontend role checking
+
+## Key Features Implemented:
+- **Multi-role support**: Users can now have multiple roles assigned simultaneously
+- **Role assignment auditing**: Track who assigned roles and when
+- **Backward compatibility**: Legacy role_id field to ease migration
+- **Efficient role checking**: Role name lists and reference objects for performance
+- **Bulk operations**: Support for assigning/unassigning roles to multiple users
+- **Type safety**: Full Pydantic validation and type hints throughout
+
+## Validation:
+✅ All schemas successfully import without syntax errors
+✅ Maintains HIPAA compliance with proper audit fields
+✅ Ready for CRUD operation updates and API endpoint implementation
+</info added on 2025-06-05T06:03:22.987Z>
 
 ## 6. Update Frontend Role Management UI [pending]
 ### Dependencies: 34.5
