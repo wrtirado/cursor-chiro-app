@@ -72,7 +72,7 @@ def register_user(
 
 
 @router.post("/associate", response_model=dict)
-def associate_patient_with_chiropractor(
+def associate_patient_with_care_provider(
     associate_request: AssociateRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
@@ -80,30 +80,35 @@ def associate_patient_with_chiropractor(
     ),  # Only patients can associate
 ):
     """
-    Associate a patient with a chiropractor/office using a join code.
+    Associate a patient with a care provider/office using a join code.
     Requires: join_code
-    Returns: chiro_id and office_id of the associated chiropractor.
+    Returns: care_provider_id and office_id of the associated care provider.
     """
-    # Find the user (likely chiropractor) who owns the join code
-    chiro_user = crud_user.get_user_by_join_code(
+    # Find the user (likely care provider) who owns the join code
+    care_provider_user = crud_user.get_user_by_join_code(
         db, join_code=associate_request.join_code
     )
 
-    if not chiro_user or not chiro_user.role or chiro_user.role.name != "chiropractor":
+    if not care_provider_user or not care_provider_user.has_role("care_provider"):
         raise HTTPException(
-            status_code=404, detail="Invalid or non-chiropractor join code"
+            status_code=404, detail="Invalid or non-care-provider join code"
         )
 
-    if not chiro_user.office_id:
+    if not care_provider_user.office_id:
         raise HTTPException(
             status_code=400,
-            detail="Chiropractor associated with join code has no office assigned",
+            detail="Care provider associated with join code has no office assigned",
         )
 
-    # Associate the current patient user with the chiropractor's office
-    crud_user.associate_user_with_chiro(db, patient=current_user, chiro=chiro_user)
+    # Associate the current patient user with the care provider's office
+    crud_user.associate_user_with_chiro(
+        db, patient=current_user, chiro=care_provider_user
+    )
 
-    return {"chiro_id": chiro_user.user_id, "office_id": chiro_user.office_id}
+    return {
+        "care_provider_id": care_provider_user.user_id,
+        "office_id": care_provider_user.office_id,
+    }
 
 
 # Example protected endpoint

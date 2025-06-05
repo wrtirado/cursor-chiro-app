@@ -13,7 +13,7 @@ from api.models.base import User
 router = APIRouter()
 
 # Define allowed roles (e.g., Chiropractors can upload media for plans)
-UPLOAD_ROLES = [RoleType.CHIROPRACTOR]
+UPLOAD_ROLES = [RoleType.CARE_PROVIDER]
 
 # Define allowed content types
 ALLOWED_CONTENT_TYPES = {
@@ -21,15 +21,16 @@ ALLOWED_CONTENT_TYPES = {
     "image/png": ".png",
     "image/gif": ".gif",
     "video/mp4": ".mp4",
-    "video/quicktime": ".mov" # Example
+    "video/quicktime": ".mov",  # Example
     # Add other allowed types
 }
+
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_media(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role(UPLOAD_ROLES))
+    current_user: User = Depends(require_role(UPLOAD_ROLES)),
 ):
     """
     Uploads an image or video file to S3/MinIO storage.
@@ -43,7 +44,7 @@ async def upload_media(
     if file.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_CONTENT_TYPES.keys())}"
+            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_CONTENT_TYPES.keys())}",
         )
 
     # Generate a unique object name (e.g., using UUID)
@@ -59,11 +60,13 @@ async def upload_media(
         uploaded_object_name = s3_client.upload_file_to_s3(
             file_stream=file_stream,
             object_name=object_name,
-            content_type=file.content_type
+            content_type=file.content_type,
         )
 
         if not uploaded_object_name:
-            raise HTTPException(status_code=500, detail="Failed to upload file to storage.")
+            raise HTTPException(
+                status_code=500, detail="Failed to upload file to storage."
+            )
 
         # Return the object name (path) - the client can construct the full URL or request presigned URLs
         # Or potentially return a presigned URL directly?
@@ -72,15 +75,18 @@ async def upload_media(
 
     except Exception as e:
         # Log the exception details
-        print(f"Error during file upload: {e}") # Replace with proper logging
-        raise HTTPException(status_code=500, detail="An error occurred during file upload.")
+        print(f"Error during file upload: {e}")  # Replace with proper logging
+        raise HTTPException(
+            status_code=500, detail="An error occurred during file upload."
+        )
     finally:
         await file.close()
+
 
 @router.get("/url/{object_name:path}")
 def get_media_url(
     object_name: str,
-    current_user: User = Depends(get_current_active_user) # Require logged-in user
+    current_user: User = Depends(get_current_active_user),  # Require logged-in user
 ):
     """
     Generates a pre-signed URL for accessing a media file.
@@ -92,16 +98,23 @@ def get_media_url(
         raise HTTPException(status_code=400, detail="Invalid object name")
 
     try:
-        presigned_url = s3_client.get_presigned_url_for_s3_object(object_name=object_name)
+        presigned_url = s3_client.get_presigned_url_for_s3_object(
+            object_name=object_name
+        )
 
         if not presigned_url:
             # Could be object not found or S3 error
-            raise HTTPException(status_code=404, detail="Could not generate URL for object, it may not exist.")
+            raise HTTPException(
+                status_code=404,
+                detail="Could not generate URL for object, it may not exist.",
+            )
 
         return {"url": presigned_url}
     except HTTPException as http_exc:
         # Re-raise HTTPExceptions from s3_client initialization
         raise http_exc
     except Exception as e:
-        print(f"Error generating presigned URL: {e}") # Replace with proper logging
-        raise HTTPException(status_code=500, detail="Could not generate URL for object.") 
+        print(f"Error generating presigned URL: {e}")  # Replace with proper logging
+        raise HTTPException(
+            status_code=500, detail="Could not generate URL for object."
+        )

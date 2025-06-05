@@ -12,7 +12,7 @@ load_dotenv()  # Load environment variables from .env file
 # Define roles using Enum for consistency
 class RoleType(str, Enum):
     PATIENT = "patient"
-    CHIROPRACTOR = "chiropractor"
+    CARE_PROVIDER = "care_provider"
     OFFICE_MANAGER = "office_manager"
     BILLING_ADMIN = "billing_admin"
     ADMIN = "admin"  # Added Admin role

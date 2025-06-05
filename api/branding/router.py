@@ -31,8 +31,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Define role groups for branding operations
-BRANDING_MODIFY_ROLES = [RoleType.ADMIN, RoleType.CHIROPRACTOR]
-BRANDING_VIEW_ROLES = [RoleType.ADMIN, RoleType.CHIROPRACTOR, RoleType.OFFICE_MANAGER]
+BRANDING_MODIFY_ROLES = [RoleType.ADMIN, RoleType.CARE_PROVIDER]
+BRANDING_VIEW_ROLES = [RoleType.ADMIN, RoleType.CARE_PROVIDER, RoleType.OFFICE_MANAGER]
 ADMIN_ONLY_ROLES = [RoleType.ADMIN]
 
 # Define allowed logo content types for security
@@ -49,15 +49,14 @@ MAX_LOGO_FILE_SIZE = 2 * 1024 * 1024  # 2MB in bytes
 
 def check_office_access(current_user: User, office_id: int) -> None:
     """
-    Check if user has access to the specified office.
-    Admins can access any office, others can only access their own.
+    Check if the current user has access to branding for the specified office.
+
+    Admins can access any office.
+    Other users can only access their own office's branding.
 
     Raises HTTPException if access is denied.
     """
-    if (
-        current_user.role.name != RoleType.ADMIN.value
-        and current_user.office_id != office_id
-    ):
+    if not current_user.has_role("admin") and current_user.office_id != office_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only access branding for your own office",
@@ -497,14 +496,14 @@ def get_secure_logo_url(
                 check_office_access(current_user, office_id)
             else:
                 # Allow admins to access any logo, others need office context
-                if current_user.role.name != RoleType.ADMIN.value:
+                if not current_user.has_role("admin"):
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail="Access denied to logo resource",
                     )
         except (ValueError, IndexError):
             # If we can't parse office ID, only allow admin access
-            if current_user.role.name != RoleType.ADMIN.value:
+            if not current_user.has_role("admin"):
                 log_audit_event(
                     user=current_user,
                     event_type=AuditEvent.AUTHORIZATION_FAILURE,

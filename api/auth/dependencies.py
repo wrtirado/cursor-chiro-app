@@ -13,9 +13,9 @@ from api.core.config import settings, RoleType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
+
 def get_current_user(
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -33,28 +33,39 @@ def get_current_user(
     user = crud_user.get_user_by_email(db, email=token_data.email)
     if user is None:
         raise credentials_exception
-    if not user.role:
-        pass
 
     return user
 
-def get_current_active_user(
-    current_user: User = Depends(get_current_user)
-) -> User:
+
+def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     # Add logic here if users can be deactivated
     # if not current_user.is_active:
     #     raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
+
 # Dependency to check for specific roles
 def require_role(required_roles: List[RoleType]):
     """Dependency factory to check if the current user has one of the required roles."""
+
     def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
-        if not current_user.role or RoleType(current_user.role.name) not in required_roles:
+        if not current_user.roles:
             role_names = [role.value for role in required_roles]
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"User does not have required role(s): {', '.join(role_names)}"
+                detail=f"User has no roles assigned. Required role(s): {', '.join(role_names)}",
+            )
+
+        # Check if user has any of the required roles using the new many-to-many relationship
+        user_role_names = {role.name for role in current_user.roles}
+        required_role_names = {role.value for role in required_roles}
+
+        if not user_role_names.intersection(required_role_names):
+            role_names = [role.value for role in required_roles]
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"User does not have required role(s): {', '.join(role_names)}",
             )
         return current_user
-    return role_checker 
+
+    return role_checker
