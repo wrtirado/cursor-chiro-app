@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     JSON,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -74,14 +75,32 @@ class Role(Base):
     __tablename__ = "roles"
     role_id = Column(Integer, primary_key=True, index=True)
     name = Column(Text, unique=True, nullable=False, index=True)
-    users = relationship("User", back_populates="role")
+    users = relationship("User", secondary="user_roles", back_populates="roles")
+
+
+class UserRole(Base):
+    __tablename__ = "user_roles"
+
+    user_role_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
+    assigned_at = Column(DateTime, default=func.now())
+    assigned_by_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    is_active = Column(Boolean, default=True)
+
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id])
+    role = relationship("Role")
+    assigned_by = relationship("User", foreign_keys=[assigned_by_id])
+
+    # Constraints
+    __table_args__ = (UniqueConstraint("user_id", "role_id", name="unique_user_role"),)
 
 
 class User(Base):
     __tablename__ = "users"
     user_id = Column(Integer, primary_key=True, index=True)
     office_id = Column(Integer, ForeignKey("offices.office_id", ondelete="SET NULL"))
-    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
     name = Column(Text, nullable=False)
     # Encrypting email: Makes direct lookup via email complex.
     # Consider if lookup is essential or if user_id is primary lookup key.
@@ -128,7 +147,13 @@ class User(Base):
     )
 
     office = relationship("Office", back_populates="users")
-    role = relationship("Role", back_populates="users")
+    # NEW: Many-to-many relationship with roles
+    roles = relationship(
+        "Role",
+        secondary="user_roles",
+        back_populates="users",
+        lazy="selectin",  # Eager loading for performance
+    )
     # Relationships for TherapyPlans, PlanAssignments, Progress if needed
     therapy_plans_created = relationship("TherapyPlan", back_populates="creator")
     assignments_given = relationship(
@@ -142,11 +167,22 @@ class User(Base):
         back_populates="patient",
     )
 
+    # Helper methods for role checking
+    def has_role(self, role_name: str) -> bool:
+        """Check if user has a specific role by name"""
+        return any(role.name == role_name for role in self.roles)
+
+    def get_active_roles(self):
+        """Get all active roles for this user"""
+        # Note: This would need to be updated to query user_roles.is_active
+        # For now, returns all roles as we don't have direct access to is_active here
+        return self.roles
+
 
 class TherapyPlan(Base):
     __tablename__ = "therapyplans"
     plan_id = Column(Integer, primary_key=True, index=True)
-    chiropractor_id = Column(
+    care_provider_id = Column(
         Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
     title = Column(Text, nullable=False)

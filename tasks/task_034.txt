@@ -136,7 +136,7 @@ I have completed the comprehensive many-to-many user-role schema design. The com
 The design provides flexibility for multiple roles per user while maintaining system performance and regulatory compliance.
 </info added on 2025-06-02T02:39:22.035Z>
 
-## 3. Update ORM Models for Many-to-Many Association [pending]
+## 3. Update ORM Models for Many-to-Many Association [done]
 ### Dependencies: 34.2
 ### Description: Refactor SQLAlchemy models to use the new 'user_roles' association table, updating relationship definitions with the 'secondary' parameter for bidirectional access.
 ### Details:
@@ -167,6 +167,46 @@ The schema design document provides:
 
 Implement the models exactly as specified in the schema design to ensure compatibility with the performance optimizations and query patterns.
 </info added on 2025-06-02T09:05:10.345Z>
+<info added on 2025-06-05T05:50:59.347Z>
+**COMPLETED**: Successfully implemented many-to-many User-Role associations in SQLAlchemy models.
+
+**Changes Made**:
+
+1. **Updated Role Model**: 
+   - Changed relationship from `relationship("User", back_populates="role")` to `relationship("User", secondary="user_roles", back_populates="roles")`
+   - Now supports many-to-many through `user_roles` junction table
+
+2. **Created UserRole Association Model**:
+   - Added new `UserRole` class with `user_roles` table
+   - Includes audit fields: `assigned_at`, `assigned_by_id`, `is_active`
+   - Implements unique constraint on `(user_id, role_id)` to prevent duplicates
+   - Supports soft deletion through `is_active` boolean field
+
+3. **Updated User Model**:
+   - **REMOVED**: `role_id` foreign key column (breaking change - requires migration)
+   - **REMOVED**: Single `role` relationship 
+   - **ADDED**: Many-to-many `roles` relationship with `lazy="selectin"` for performance
+   - **ADDED**: `has_role(role_name)` helper method for checking role membership
+   - **ADDED**: `get_active_roles()` helper method for retrieving roles
+
+4. **Updated TherapyPlan Model**:
+   - Changed `chiropractor_id` to `care_provider_id` to align with role name change
+   - Maintains same foreign key relationship to Users table
+
+**Technical Implementation**:
+- Uses SQLAlchemy's `secondary` parameter for many-to-many relationships
+- Eager loading with `lazy="selectin"` prevents N+1 query issues
+- Bidirectional relationships: `users.roles` and `roles.users`
+- Audit trail support through UserRole association model
+- HIPAA-compliant with soft deletion and change tracking
+
+**Ready for Next Steps**: Models are now prepared for:
+- Migration script implementation (Task 34.7)
+- RBAC logic updates (Task 34.4) 
+- API schema updates (Task 34.5)
+
+All model changes follow the specifications in `docs/many-to-many-role-schema-design.md`.
+</info added on 2025-06-05T05:50:59.347Z>
 
 ## 4. Refactor RBAC Logic and Role Checks [pending]
 ### Dependencies: 34.3
