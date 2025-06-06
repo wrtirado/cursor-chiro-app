@@ -2401,6 +2401,60 @@
             2
           ],
           "parentTaskId": 34
+        },
+        {
+          "id": 14,
+          "title": "Unit Tests for CRUD Operations and Role Logic",
+          "description": "Create comprehensive unit tests for UserRole CRUD operations, role checking utilities, and many-to-many relationship logic.",
+          "details": "Test the fundamental building blocks: CRUDUserRole class methods (assign_roles, unassign_roles, get_user_roles), User.has_role() helper method, User.get_active_roles() method, Role assignment validation, and database constraints.",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 34
+        },
+        {
+          "id": 15,
+          "title": "Integration Tests for API Endpoints and Authentication",
+          "description": "Test all role-related API endpoints with the new many-to-many system, including authentication, authorization, and role assignment operations.",
+          "details": "Test API endpoints: /api/v1/roles/assign, /api/v1/roles/unassign, /api/v1/users/{id}/roles, authentication with multi-role users, require_role() dependency with various role combinations, and API response serialization.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 34
+        },
+        {
+          "id": 16,
+          "title": "Security and Authorization Tests",
+          "description": "Comprehensive security testing for access control, permission escalation prevention, and authorization edge cases.",
+          "details": "Test unauthorized access attempts, role boundary enforcement, privilege escalation prevention, multi-role authorization scenarios, audit logging for security events, and HIPAA compliance for role access patterns.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 34
+        },
+        {
+          "id": 17,
+          "title": "Performance Tests and Database Query Optimization",
+          "description": "Test performance impact of many-to-many role checking and optimize database queries for role-related operations.",
+          "details": "Benchmark role checking performance, test N+1 query prevention with eager loading, measure database query times for multi-role scenarios, test role checking with large numbers of users/roles, and validate index usage for performance optimization.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 34
+        },
+        {
+          "id": 18,
+          "title": "Error Handling and Edge Case Tests",
+          "description": "Test error scenarios, edge cases, and resilience of the role system under various failure conditions.",
+          "details": "Test duplicate role assignments, role assignment to non-existent users/roles, database constraint violations, transaction rollback scenarios, soft deletion edge cases, and graceful handling of invalid role data.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 34
+        },
+        {
+          "id": 19,
+          "title": "Multi-Role Scenarios and Audit Logging Validation",
+          "description": "Test complex multi-role scenarios and validate comprehensive audit logging for HIPAA compliance.",
+          "details": "Test users with multiple active roles, role precedence and hierarchy scenarios, comprehensive audit trail validation, HIPAA-compliant access logging, role change history preservation, and audit log integrity checks.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 34
         }
       ]
     }

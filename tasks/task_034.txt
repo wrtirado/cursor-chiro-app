@@ -522,3 +522,39 @@ Implementation sequence:
 5. Update documentation and comments
 </info added on 2025-06-02T09:06:32.032Z>
 
+## 14. Unit Tests for CRUD Operations and Role Logic [done]
+### Dependencies: None
+### Description: Create comprehensive unit tests for UserRole CRUD operations, role checking utilities, and many-to-many relationship logic.
+### Details:
+Test the fundamental building blocks: CRUDUserRole class methods (assign_roles, unassign_roles, get_user_roles), User.has_role() helper method, User.get_active_roles() method, Role assignment validation, and database constraints.
+
+## 15. Integration Tests for API Endpoints and Authentication [pending]
+### Dependencies: None
+### Description: Test all role-related API endpoints with the new many-to-many system, including authentication, authorization, and role assignment operations.
+### Details:
+Test API endpoints: /api/v1/roles/assign, /api/v1/roles/unassign, /api/v1/users/{id}/roles, authentication with multi-role users, require_role() dependency with various role combinations, and API response serialization.
+
+## 16. Security and Authorization Tests [pending]
+### Dependencies: None
+### Description: Comprehensive security testing for access control, permission escalation prevention, and authorization edge cases.
+### Details:
+Test unauthorized access attempts, role boundary enforcement, privilege escalation prevention, multi-role authorization scenarios, audit logging for security events, and HIPAA compliance for role access patterns.
+
+## 17. Performance Tests and Database Query Optimization [pending]
+### Dependencies: None
+### Description: Test performance impact of many-to-many role checking and optimize database queries for role-related operations.
+### Details:
+Benchmark role checking performance, test N+1 query prevention with eager loading, measure database query times for multi-role scenarios, test role checking with large numbers of users/roles, and validate index usage for performance optimization.
+
+## 18. Error Handling and Edge Case Tests [pending]
+### Dependencies: None
+### Description: Test error scenarios, edge cases, and resilience of the role system under various failure conditions.
+### Details:
+Test duplicate role assignments, role assignment to non-existent users/roles, database constraint violations, transaction rollback scenarios, soft deletion edge cases, and graceful handling of invalid role data.
+
+## 19. Multi-Role Scenarios and Audit Logging Validation [pending]
+### Dependencies: None
+### Description: Test complex multi-role scenarios and validate comprehensive audit logging for HIPAA compliance.
+### Details:
+Test users with multiple active roles, role precedence and hierarchy scenarios, comprehensive audit trail validation, HIPAA-compliant access logging, role change history preservation, and audit log integrity checks.
+

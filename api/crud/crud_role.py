@@ -195,9 +195,10 @@ class CRUDUserRole:
 
             if existing:
                 if not existing.is_active:
-                    # Reactivate existing role
+                    # Reactivate inactive role assignment
                     existing.is_active = True
-                    existing.assigned_at = func.now()
+                    current_time = datetime.now()
+                    existing.assigned_at = current_time
                     existing.assigned_by_id = assigned_by_id
 
                     log_role_event(
@@ -209,12 +210,7 @@ class CRUDUserRole:
                         assigned_by_id=assigned_by_id,
                         request=request,
                         details={
-                            "previous_assigned_at": (
-                                existing.assigned_at.isoformat()
-                                if existing.assigned_at
-                                else None
-                            ),
-                            "reactivated_at": datetime.now().isoformat(),
+                            "reactivated_at": current_time.isoformat(),
                         },
                         db_session=db,
                     )

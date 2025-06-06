@@ -178,15 +178,41 @@ class User(Base):
     audit_logs = relationship("AuditLog", back_populates="user")
 
     # Helper methods for role checking
-    def has_role(self, role_name: str) -> bool:
-        """Check if user has a specific role by name"""
-        return any(role.name == role_name for role in self.roles)
+    def has_role(self, role_name: str, db_session=None) -> bool:
+        """Check if user has a specific active role by name"""
+        if db_session:
+            # Query UserRole directly to check is_active flag
+            from sqlalchemy.orm import sessionmaker
 
-    def get_active_roles(self):
+            user_role = (
+                db_session.query(UserRole)
+                .join(Role)
+                .filter(
+                    UserRole.user_id == self.user_id,
+                    Role.name == role_name,
+                    UserRole.is_active == True,
+                )
+                .first()
+            )
+            return user_role is not None
+        else:
+            # Fallback to simple relationship check (may not respect is_active)
+            return any(role.name == role_name for role in self.roles)
+
+    def get_active_roles(self, db_session=None):
         """Get all active roles for this user"""
-        # Note: This would need to be updated to query user_roles.is_active
-        # For now, returns all roles as we don't have direct access to is_active here
-        return self.roles
+        if db_session:
+            # Query UserRole directly to get only active roles
+            active_roles = (
+                db_session.query(Role)
+                .join(UserRole)
+                .filter(UserRole.user_id == self.user_id, UserRole.is_active == True)
+                .all()
+            )
+            return active_roles
+        else:
+            # Fallback to simple relationship (may include inactive roles)
+            return self.roles
 
 
 class TherapyPlan(Base):
