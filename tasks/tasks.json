@@ -2479,7 +2479,7 @@
           "description": "Systematically search the entire codebase to identify all instances of 'chiropractor' in code, database schemas, API endpoints, variable names, documentation, and comments.",
           "dependencies": [],
           "details": "Use automated search tools and scripts to generate a detailed inventory of all usages, categorizing them by type (e.g., code, schema, documentation).",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Validate completeness by cross-checking search results with manual spot checks and peer review."
         },
         {
