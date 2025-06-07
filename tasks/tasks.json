@@ -2321,7 +2321,7 @@
             5
           ],
           "details": "Implement UI components for selecting and displaying multiple roles, ensuring usability and accessibility.",
-          "status": "deferred",
+          "status": "done",
           "testStrategy": "Perform UI tests to confirm users can assign, update, and view multiple roles per user."
         },
         {
@@ -2366,7 +2366,7 @@
           "description": "Conduct a performance and security review of the updated role system, focusing on query efficiency, data access patterns, and HIPAA compliance.",
           "dependencies": [],
           "details": "Profile database queries, review access control logic, and perform security audits to identify and remediate potential vulnerabilities.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Benchmark key operations and run security scans to confirm compliance and performance targets."
         },
         {
@@ -2395,7 +2395,7 @@
           "title": "Update Role Names and References (chiropractor → care_provider)",
           "description": "As part of the role system transition, update the \"chiropractor\" role to \"care_provider\" throughout the system, including database data, code references, enums, and documentation.",
           "details": "Update the Roles table to change 'chiropractor' to 'care_provider'. Search and replace all hardcoded references to 'chiropractor' in the codebase, including enum values, variable names, comments, and documentation. Ensure the migration script handles this role rename alongside the schema changes. Update any frontend labels and role selection interfaces to reflect the new terminology.\n<info added on 2025-06-01T03:08:14.824Z>\n**REFERENCE REQUIRED**: Review `docs/role-system-audit-report.md` before implementation for complete list of chiropractor references.\n\nKey items from audit requiring updates:\n- RoleType enum (api/core/config.py): CHIROPRACTOR = \"chiropractor\" → CARE_PROVIDER = \"care_provider\"\n- 15+ API router files with RoleType.CHIROPRACTOR usage\n- Variable names like TherapyPlan.chiropractor_id throughout system\n- Hard-coded \"chiropractor\" string checks in business logic\n- Seed scripts updating role names in database\n- All documentation and comments\n\nThe audit report provides exact file locations and line numbers for every reference requiring updates.\n</info added on 2025-06-01T03:08:14.824Z>\n<info added on 2025-06-02T09:06:32.032Z>\n**REFERENCE REQUIRED**: Before implementing, review both:\n1. `docs/role-system-audit-report.md` - for complete list of files containing \"chiropractor\" references\n2. `docs/many-to-many-role-schema-design.md` - for the role migration strategy and timing\n\nThe schema design document specifies that the role name change (chiropractor → care_provider) should happen during Phase 1 of the migration, before data migration begins. The audit report identified 15+ files with RoleType.CHIROPRACTOR references that need updates.\n\nCoordinate this task with the migration script (34.7) to ensure:\n- Role name update happens first (UPDATE Roles SET name = 'care_provider' WHERE name = 'chiropractor')\n- All code references are updated to use RoleType.CARE_PROVIDER\n- Business logic properly recognizes the new role name\n- API endpoints and validation logic use the updated role constant\n\nImplementation sequence:\n1. Update database schema first (coordinate with subtask 34.7)\n2. Update enum definitions and constants\n3. Modify all code references following the audit report\n4. Update frontend components and labels\n5. Update documentation and comments\n</info added on 2025-06-02T09:06:32.032Z>",
-          "status": "pending",
+          "status": "done",
           "dependencies": [
             1,
             2
