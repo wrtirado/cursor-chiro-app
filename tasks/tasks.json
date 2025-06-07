@@ -2443,7 +2443,7 @@
           "title": "Error Handling and Edge Case Tests",
           "description": "Test error scenarios, edge cases, and resilience of the role system under various failure conditions.",
           "details": "Test duplicate role assignments, role assignment to non-existent users/roles, database constraint violations, transaction rollback scenarios, soft deletion edge cases, and graceful handling of invalid role data.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 34
         },
