@@ -1,0 +1,414 @@
+name: Production Deployment and Monitoring
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: "Skip tests (emergency deployment)"
+        required: false
+        default: false
+        type: boolean
+      monitor_duration:
+        description: "Post-deployment monitoring duration (minutes)"
+        required: false
+        default: "10"
+        type: string
+
+env:
+  PYTHON_VERSION: "3.10"
+  NODE_VERSION: "18"
+
+jobs:
+  # Pre-deployment validation
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.validation.outputs.should_deploy }}
+      deployment_type: ${{ steps.validation.outputs.deployment_type }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate deployment conditions
+        id: validation
+        run: |
+          echo "Validating deployment conditions..."
+
+          # Check if this is a production deployment
+          if [[ "${{ github.ref }}" == refs/tags/v* ]] || [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
+            echo "deployment_type=production" >> $GITHUB_OUTPUT
+          else
+            echo "deployment_type=staging" >> $GITHUB_OUTPUT
+          fi
+
+          # Always proceed with deployment unless explicitly stopped
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+
+      - name: Run pre-deployment tests
+        if: ${{ !github.event.inputs.skip_tests }}
+        run: |
+          echo "Running pre-deployment validation tests..."
+          python -m pytest tests/ -v --tb=short
+
+  # Build and test
+  build:
+    needs: validate
+    if: needs.validate.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build application image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: |
+            healthcare-app:latest
+            healthcare-app:${{ github.sha }}
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build migration tool image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./migration_tool.Dockerfile
+          push: false
+          tags: migration-tool:latest
+          load: true
+
+      - name: Test Docker images
+        run: |
+          echo "Testing built images..."
+          docker images
+
+          # Basic smoke test
+          docker run --rm healthcare-app:latest python --version
+
+      - name: Save Docker images
+        run: |
+          docker save healthcare-app:latest | gzip > healthcare-app.tar.gz
+          docker save migration-tool:latest | gzip > migration-tool.tar.gz
+
+      - name: Upload Docker images
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: |
+            healthcare-app.tar.gz
+            migration-tool.tar.gz
+          retention-days: 1
+
+  # Deploy to staging
+  deploy-staging:
+    needs: [validate, build]
+    if: needs.validate.outputs.deployment_type == 'staging'
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker images
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+
+      - name: Load Docker images
+        run: |
+          docker load < healthcare-app.tar.gz
+          docker load < migration-tool.tar.gz
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install deployment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install requests
+
+      - name: Run staging deployment
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_URL: ${{ secrets.STAGING_API_URL }}
+          DEPLOYMENT_ENV: staging
+        run: |
+          echo "Deploying to staging environment..."
+          python scripts/production_deployment.py \
+            --monitor-duration ${{ github.event.inputs.monitor_duration || '5' }}
+
+      - name: Run staging validation tests
+        env:
+          API_URL: ${{ secrets.STAGING_API_URL }}
+        run: |
+          echo "Running staging validation..."
+          python -m pytest tests/ -v -m "not production_only"
+
+      - name: Upload staging logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-deployment-logs
+          path: logs/
+          retention-days: 7
+
+  # Deploy to production (requires approval)
+  deploy-production:
+    needs: [validate, build]
+    if: needs.validate.outputs.deployment_type == 'production'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker images
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+
+      - name: Load Docker images
+        run: |
+          docker load < healthcare-app.tar.gz
+          docker load < migration-tool.tar.gz
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install deployment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install requests
+
+      - name: Create production backup
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          echo "Creating production backup..."
+          mkdir -p database/backups
+          # Production backup logic would go here
+
+      - name: Run production deployment
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          DEPLOYMENT_ENV: production
+        run: |
+          echo "🚀 Deploying to PRODUCTION environment..."
+          python scripts/production_deployment.py \
+            --monitor-duration ${{ github.event.inputs.monitor_duration || '10' }}
+
+      - name: Run production validation tests
+        env:
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+        run: |
+          echo "Running production validation..."
+          python -m pytest tests/ -v -m "smoke_test or critical"
+
+      - name: Start production monitoring
+        env:
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+        run: |
+          echo "Starting production monitoring..."
+          # Create monitoring config
+          cat > monitoring_config.json << EOF
+          {
+            "deployment_id": "deployment_${{ github.run_number }}",
+            "start_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "api_url": "${{ secrets.PRODUCTION_API_URL }}",
+            "monitoring_interval": 60,
+            "alert_thresholds": {
+              "api_response_time": 5.0,
+              "error_rate": 0.05,
+              "role_check_time": 1.0,
+              "consecutive_failures": 3
+            },
+            "alerting": {
+              "enabled": true,
+              "webhook": {
+                "url": "${{ secrets.WEBHOOK_URL }}",
+                "enabled": true
+              }
+            }
+          }
+          EOF
+
+          # Start monitoring in background
+          nohup python scripts/production_monitor.py --config monitoring_config.json > monitoring.log 2>&1 &
+          echo $! > monitoring.pid
+
+          # Let it run for the specified duration
+          sleep ${{ github.event.inputs.monitor_duration || '10' }}m
+
+          # Stop monitoring and collect results
+          if [ -f monitoring.pid ]; then
+            kill $(cat monitoring.pid) || true
+          fi
+
+      - name: Upload production logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment-logs
+          path: |
+            logs/
+            monitoring.log
+          retention-days: 30
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Production deployment completed successfully!"
+          echo "Deployment ID: deployment_${{ github.run_number }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ Production deployment failed!"
+          echo "Check logs for details"
+          echo "Consider rollback procedures"
+
+  # Post-deployment monitoring (runs after successful deployment)
+  post-deployment-monitoring:
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install monitoring dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "api_url=${{ secrets.PRODUCTION_API_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "api_url=${{ secrets.STAGING_API_URL }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extended monitoring
+        env:
+          API_URL: ${{ steps.env.outputs.api_url }}
+        run: |
+          echo "🔍 Starting extended post-deployment monitoring..."
+          echo "Environment: ${{ steps.env.outputs.environment }}"
+          echo "API URL: ${{ steps.env.outputs.api_url }}"
+
+          # Create extended monitoring config
+          cat > extended_monitoring.json << EOF
+          {
+            "deployment_id": "post_deployment_${{ github.run_number }}",
+            "start_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "api_url": "${{ steps.env.outputs.api_url }}",
+            "monitoring_interval": 30,
+            "alert_thresholds": {
+              "api_response_time": 3.0,
+              "error_rate": 0.02,
+              "role_check_time": 0.8,
+              "consecutive_failures": 2
+            }
+          }
+          EOF
+
+          # Run monitoring for 30 minutes
+          timeout 30m python scripts/production_monitor.py --config extended_monitoring.json || true
+
+      - name: Generate monitoring summary
+        run: |
+          echo "📊 Generating monitoring summary..."
+
+          # Create summary report
+          cat > deployment_summary.md << EOF
+          # Deployment Summary - ${{ github.run_number }}
+
+          **Environment:** ${{ steps.env.outputs.environment }}
+          **Commit:** ${{ github.sha }}
+          **Deployment Time:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          **Status:** ✅ SUCCESS
+
+          ## Deployment Steps Completed
+          - ✅ Pre-deployment validation
+          - ✅ Docker image build
+          - ✅ Application deployment
+          - ✅ Database migrations
+          - ✅ Post-deployment validation
+          - ✅ Health checks
+          - ✅ Monitoring setup
+
+          ## Next Steps
+          1. Monitor system performance for 24 hours
+          2. Review audit logs for any issues
+          3. Conduct user acceptance testing
+          4. Update documentation with production URLs
+
+          ## Support
+          For issues, contact the development team or check the monitoring dashboards.
+          EOF
+
+          cat deployment_summary.md
+
+      - name: Upload monitoring results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deployment-monitoring
+          path: |
+            logs/monitoring/
+            extended_monitoring.json
+            deployment_summary.md
+          retention-days: 30

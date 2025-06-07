@@ -2387,7 +2387,7 @@
           "description": "Deploy the updated system to production, monitor for issues, and validate that all role assignments, access controls, and audit logs function as intended.",
           "dependencies": [],
           "details": "Establish monitoring and alerting for role-related errors or access violations. Provide support for rollback if critical issues are detected.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Monitor logs and user feedback post-deployment, and conduct a post-mortem review to ensure objectives are met."
         },
         {

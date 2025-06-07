@@ -1,0 +1,159 @@
+{
+  "environments": {
+    "staging": {
+      "api_url": "https://staging-api.healthcare-app.com",
+      "database_url": "sqlite+libsql://staging-db.healthcare-app.com:8080",
+      "health_check_interval": 30,
+      "health_check_timeout": 10,
+      "max_deployment_time": 1200,
+      "rollback_on_failure": true,
+      "monitoring": {
+        "enable_alerts": true,
+        "alert_thresholds": {
+          "api_response_time": 3.0,
+          "error_rate": 0.03,
+          "role_check_time": 0.8
+        }
+      },
+      "validation": {
+        "required_roles": ["admin", "care_provider", "office_manager", "patient", "billing_admin"],
+        "min_test_users": 5,
+        "max_role_check_time": 1.5
+      },
+      "alerting": {
+        "enabled": false,
+        "email": {
+          "enabled": false,
+          "smtp_server": "smtp.healthcare-app.com",
+          "smtp_port": 587,
+          "sender": "staging-monitor@healthcare-app.com",
+          "recipients": ["dev-team@healthcare-app.com"]
+        },
+        "webhook": {
+          "enabled": false,
+          "url": ""
+        }
+      }
+    },
+    "production": {
+      "api_url": "https://api.healthcare-app.com",
+      "database_url": "sqlite+libsql://prod-db.healthcare-app.com:8080",
+      "health_check_interval": 60,
+      "health_check_timeout": 15,
+      "max_deployment_time": 1800,
+      "rollback_on_failure": true,
+      "monitoring": {
+        "enable_alerts": true,
+        "alert_thresholds": {
+          "api_response_time": 5.0,
+          "error_rate": 0.02,
+          "role_check_time": 1.0
+        }
+      },
+      "validation": {
+        "required_roles": ["admin", "care_provider", "office_manager", "patient", "billing_admin"],
+        "min_test_users": 20,
+        "max_role_check_time": 2.0
+      },
+      "alerting": {
+        "enabled": true,
+        "email": {
+          "enabled": true,
+          "smtp_server": "smtp.healthcare-app.com",
+          "smtp_port": 587,
+          "sender": "production-monitor@healthcare-app.com",
+          "recipients": [
+            "admin@healthcare-app.com",
+            "devops@healthcare-app.com",
+            "on-call@healthcare-app.com"
+          ]
+        },
+        "webhook": {
+          "enabled": true,
+          "url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+        }
+      }
+    }
+  },
+  "deployment_steps": [
+    {
+      "name": "pre_deployment_validation",
+      "required": true,
+      "timeout": 300,
+      "retry_count": 1
+    },
+    {
+      "name": "create_rollback_point",
+      "required": true,
+      "timeout": 600,
+      "retry_count": 0
+    },
+    {
+      "name": "deploy_services",
+      "required": true,
+      "timeout": 900,
+      "retry_count": 2
+    },
+    {
+      "name": "run_migrations",
+      "required": true,
+      "timeout": 1200,
+      "retry_count": 1
+    },
+    {
+      "name": "post_deployment_validation",
+      "required": true,
+      "timeout": 600,
+      "retry_count": 2
+    },
+    {
+      "name": "setup_monitoring",
+      "required": true,
+      "timeout": 300,
+      "retry_count": 3
+    },
+    {
+      "name": "health_checks",
+      "required": false,
+      "timeout": 1800,
+      "retry_count": 0
+    }
+  ],
+  "rollback": {
+    "enabled": true,
+    "automatic_triggers": [
+      "deployment_timeout",
+      "critical_validation_failure",
+      "database_migration_failure"
+    ],
+    "manual_approval_required": false,
+    "preserve_logs": true,
+    "notification_required": true
+  },
+  "compliance": {
+    "hipaa_validation": true,
+    "audit_logging": true,
+    "encryption_check": true,
+    "backup_verification": true,
+    "security_scan": true
+  },
+  "performance_benchmarks": {
+    "api_response_time_percentile_95": 2.0,
+    "database_query_time_average": 0.1,
+    "role_check_time_average": 0.5,
+    "concurrent_users_supported": 100,
+    "requests_per_second": 50
+  },
+  "monitoring_config": {
+    "metrics_retention_days": 90,
+    "log_retention_days": 30,
+    "alert_escalation_minutes": 15,
+    "dashboard_update_interval": 30,
+    "health_check_endpoints": [
+      "/health",
+      "/api/v1/auth/status",
+      "/api/v1/roles",
+      "/api/v1/users/me"
+    ]
+  }
+} 
