@@ -1,0 +1,61 @@
+# Task ID: 35
+# Title: Systematic Refactoring: Replace 'chiropractor' Terminology with 'care_provider' Across Codebase
+# Status: pending
+# Dependencies: 4, 5, 30, 33
+# Priority: medium
+# Description: Update all remaining instances of 'chiropractor' to 'care_provider' throughout the codebase, including database schemas, API endpoints, variable names, documentation, comments, and business logic, using an incremental and well-tested approach.
+# Details:
+Begin by auditing the entire codebase to identify all usages of 'chiropractor' in code, database schemas, API endpoints, variable names, documentation, and comments. Develop a detailed refactoring plan that segments the work into manageable, incremental stages (e.g., start with non-breaking changes in comments and documentation, then progress to variable and schema changes, and finally update API endpoints and business logic). For each stage, use automated search-and-replace tools where feasible, but manually review changes to avoid unintended side effects. Coordinate closely with QA to ensure all changes are understood and tested. Update or create migration scripts for any schema changes, ensuring backward compatibility where possible. Communicate major changes to the team and document all updates. Leverage automated tests and static analysis tools to catch regressions and maintain code quality throughout the process. Each incremental change should be merged only after passing all relevant tests and code reviews, minimizing risk to the production system.
+
+# Test Strategy:
+For each refactoring stage, run the full suite of automated unit, integration, and regression tests to ensure no functionality is broken. Manually verify that all user-facing and API references to 'chiropractor' have been updated to 'care_provider'. For schema changes, apply migrations in a staging environment and validate data integrity and application behavior. Review API documentation and ensure all endpoints and payloads reflect the new terminology. Solicit QA sign-off after each incremental deployment, and monitor production logs for unexpected errors post-release.
+
+# Subtasks:
+## 1. Comprehensive Codebase Audit for 'chiropractor' Terminology [pending]
+### Dependencies: None
+### Description: Systematically search the entire codebase to identify all instances of 'chiropractor' in code, database schemas, API endpoints, variable names, documentation, and comments.
+### Details:
+Use automated search tools and scripts to generate a detailed inventory of all usages, categorizing them by type (e.g., code, schema, documentation).
+
+## 2. Refactor Documentation and Comments [pending]
+### Dependencies: 35.1
+### Description: Replace all instances of 'chiropractor' with 'care_provider' in documentation files and code comments, ensuring clarity and consistency.
+### Details:
+Focus on non-functional text to minimize risk. Use automated search-and-replace tools where possible, followed by manual review.
+
+## 3. Update Variable and Function Names in Code [pending]
+### Dependencies: 35.2
+### Description: Refactor variable names, function names, and class names from 'chiropractor' to 'care_provider' across the codebase, excluding database schemas and API endpoints.
+### Details:
+Apply changes incrementally, using IDE refactoring tools to minimize errors. Update related unit tests accordingly.
+
+## 4. Modify Database Schemas and Migration Scripts [pending]
+### Dependencies: 35.3
+### Description: Update database table names, column names, and related migration scripts to replace 'chiropractor' with 'care_provider', ensuring backward compatibility.
+### Details:
+Develop and test migration scripts in a staging environment. Coordinate with DBAs to plan safe rollouts.
+
+## 5. Refactor API Endpoints and Contracts [pending]
+### Dependencies: 35.4
+### Description: Update all API endpoint paths, request/response payloads, and documentation to use 'care_provider' instead of 'chiropractor'.
+### Details:
+Coordinate with frontend and integration teams to update API consumers. Maintain versioning or backward compatibility as needed.
+
+## 6. Update Business Logic and Domain Models [pending]
+### Dependencies: 35.5
+### Description: Refactor business logic, domain models, and related service layers to use 'care_provider' terminology throughout.
+### Details:
+Ensure all business rules, validations, and workflows are updated. Refactor related test cases.
+
+## 7. Coordinate QA Testing and Regression Validation [pending]
+### Dependencies: None
+### Description: Work closely with QA to execute full regression testing after each major refactoring phase, ensuring all changes are validated and no unintended side effects occur.
+### Details:
+Provide QA with detailed change logs and test plans. Address any issues or regressions identified.
+
+## 8. Communicate Changes and Update Team Documentation [pending]
+### Dependencies: None
+### Description: Document all changes, update internal team documentation, and communicate major updates to all stakeholders.
+### Details:
+Summarize the refactoring process, highlight key changes, and provide migration guides or FAQs as needed.
+
