@@ -20,7 +20,7 @@ class RoleType(str, Enum):
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Tirado Chiro API"
+    PROJECT_NAME: str = "Tirado Care Provider API"
     API_V1_STR: str = "/api/v1"
 
     # Environment mode (e.g., 'development', 'production')

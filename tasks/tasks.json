@@ -2511,8 +2511,8 @@
           "dependencies": [
             3
           ],
-          "details": "Develop and test migration scripts in a staging environment. Coordinate with DBAs to plan safe rollouts.",
-          "status": "pending",
+          "details": "Develop and test migration scripts in a staging environment. Coordinate with DBAs to plan safe rollouts.\n<info added on 2025-06-07T07:21:45.159Z>\nBusiness logic and model updates completed successfully. Key changes include:\n\n1. Updated PROJECT_NAME in api/core/config.py from \"Tirado Chiro API\" to \"Tirado Care Provider API\"\n2. Updated welcome message in api/main.py from \"Tirado Chiropractic API\" to \"Tirado Care Provider API\"\n3. Cleaned up outdated comments in api/schemas/plan.py\n4. Verified all model files (base.py, audit.py, audit_log.py) are free of chiropractor references\n5. Verified all service files (billing_service.py, media_service.py) are free of chiropractor references\n6. Verified all core utility files are clean of inappropriate chiropractor references\n7. Validated RoleType enum is correctly configured with CARE_PROVIDER and no CHIROPRACTOR\n\nCreated comprehensive test script (scripts/test_business_logic_updates.py) that validates all updates. All 7 test categories passed successfully, confirming the business logic layer is now fully updated with care_provider terminology.\n</info added on 2025-06-07T07:21:45.159Z>",
+          "status": "done",
           "testStrategy": "Run schema migration tests, verify data integrity, and ensure application functionality remains intact."
         },
         {

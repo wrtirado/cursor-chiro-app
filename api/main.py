@@ -141,7 +141,7 @@ async def startup_event():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Tirado Chiropractic API"}
+    return {"message": "Welcome to the Tirado Care Provider API"}
 
 
 @app.get("/health")
