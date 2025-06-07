@@ -1,5 +1,5 @@
 """
-Media-related Pydantic schemas for the chiropractic care application.
+Media-related Pydantic schemas for the care provider application.
 """
 
 from typing import Optional, List

@@ -115,11 +115,26 @@ Business logic and model updates completed successfully. Key changes include:
 Created comprehensive test script (scripts/test_business_logic_updates.py) that validates all updates. All 7 test categories passed successfully, confirming the business logic layer is now fully updated with care_provider terminology.
 </info added on 2025-06-07T07:21:45.159Z>
 
-## 5. Refactor API Endpoints and Contracts [pending]
+## 5. Refactor API Endpoints and Contracts [done]
 ### Dependencies: 35.4
 ### Description: Update all API endpoint paths, request/response payloads, and documentation to use 'care_provider' instead of 'chiropractor'.
 ### Details:
 Coordinate with frontend and integration teams to update API consumers. Maintain versioning or backward compatibility as needed.
+<info added on 2025-06-07T07:25:33.814Z>
+API Endpoints and Contracts successfully updated to replace 'chiropractor' terminology with 'care_provider' across all components:
+
+1. Updated schema docstrings in media.py from "chiropractic care application" to "care provider application"
+2. Verified FastAPI app correctly uses updated PROJECT_NAME "Tirado Care Provider API"
+3. Cleaned all 7 schema files (plan, user, media, role, branding, office, company) of chiropractor terminology
+4. Ensured all 9 router files have endpoints free of chiropractor references
+5. Confirmed CRUD operations use appropriate naming (get_plans_by_care_provider, associate_user_with_care_provider)
+6. Updated response models with care_provider_id fields
+7. Removed chiropractor terminology from all API documentation and comments
+8. Configured RoleType.CARE_PROVIDER correctly with no CHIROPRACTOR enum
+9. Verified all router tags are appropriate and terminology-compliant
+
+Created comprehensive test script (scripts/test_api_endpoints_contracts.py) that validates all API components for terminology consistency. All tests passed with 100% success rate, confirming API contracts now consistently use care_provider terminology throughout.
+</info added on 2025-06-07T07:25:33.814Z>
 
 ## 6. Update Business Logic and Domain Models [pending]
 ### Dependencies: 35.5

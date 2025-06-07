@@ -2522,8 +2522,8 @@
           "dependencies": [
             4
           ],
-          "details": "Coordinate with frontend and integration teams to update API consumers. Maintain versioning or backward compatibility as needed.",
-          "status": "pending",
+          "details": "Coordinate with frontend and integration teams to update API consumers. Maintain versioning or backward compatibility as needed.\n<info added on 2025-06-07T07:25:33.814Z>\nAPI Endpoints and Contracts successfully updated to replace 'chiropractor' terminology with 'care_provider' across all components:\n\n1. Updated schema docstrings in media.py from \"chiropractic care application\" to \"care provider application\"\n2. Verified FastAPI app correctly uses updated PROJECT_NAME \"Tirado Care Provider API\"\n3. Cleaned all 7 schema files (plan, user, media, role, branding, office, company) of chiropractor terminology\n4. Ensured all 9 router files have endpoints free of chiropractor references\n5. Confirmed CRUD operations use appropriate naming (get_plans_by_care_provider, associate_user_with_care_provider)\n6. Updated response models with care_provider_id fields\n7. Removed chiropractor terminology from all API documentation and comments\n8. Configured RoleType.CARE_PROVIDER correctly with no CHIROPRACTOR enum\n9. Verified all router tags are appropriate and terminology-compliant\n\nCreated comprehensive test script (scripts/test_api_endpoints_contracts.py) that validates all API components for terminology consistency. All tests passed with 100% success rate, confirming API contracts now consistently use care_provider terminology throughout.\n</info added on 2025-06-07T07:25:33.814Z>",
+          "status": "done",
           "testStrategy": "Execute API contract tests and integration tests to confirm correct behavior and compatibility."
         },
         {
