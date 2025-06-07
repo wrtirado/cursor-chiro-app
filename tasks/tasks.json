@@ -2533,8 +2533,8 @@
           "dependencies": [
             5
           ],
-          "details": "Ensure all business rules, validations, and workflows are updated. Refactor related test cases.",
-          "status": "pending",
+          "details": "Ensure all business rules, validations, and workflows are updated. Refactor related test cases.\n<info added on 2025-06-07T07:29:56.982Z>\nBusiness logic and domain models have been successfully refactored to use care_provider terminology:\n\n- Domain model relationships updated (TherapyPlan now uses care_provider_id)\n- Business logic validation files cleaned (security_validator.py, data_minimization.py, audit_logger.py, middleware.py)\n- Service layer logic files updated (billing_service.py, media_service.py)\n- Role enum configuration modified (CARE_PROVIDER added, CHIROPRACTOR removed)\n- User model helper methods verified to work with new role names\n- CRUD operation names standardized (get_plans_by_care_provider, associate_user_with_care_provider)\n- Test fixture documentation updated in conftest.py from \"chiropractic app\" to \"care provider app\"\n- Database relationship integrity maintained with field renaming\n\nTest coverage achieved 100% success rate across all 8 test categories using the comprehensive test script created at scripts/test_business_logic_domain_models.py.\n</info added on 2025-06-07T07:29:56.982Z>",
+          "status": "done",
           "testStrategy": "Run comprehensive unit and integration tests to validate business logic correctness."
         },
         {

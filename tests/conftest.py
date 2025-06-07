@@ -1,5 +1,5 @@
 """
-Shared pytest fixtures for testing the chiropractic app.
+Shared pytest fixtures for testing the care provider app.
 
 This module provides fixtures for:
 - Database sessions with in-memory SQLite

@@ -136,11 +136,25 @@ API Endpoints and Contracts successfully updated to replace 'chiropractor' termi
 Created comprehensive test script (scripts/test_api_endpoints_contracts.py) that validates all API components for terminology consistency. All tests passed with 100% success rate, confirming API contracts now consistently use care_provider terminology throughout.
 </info added on 2025-06-07T07:25:33.814Z>
 
-## 6. Update Business Logic and Domain Models [pending]
+## 6. Update Business Logic and Domain Models [done]
 ### Dependencies: 35.5
 ### Description: Refactor business logic, domain models, and related service layers to use 'care_provider' terminology throughout.
 ### Details:
 Ensure all business rules, validations, and workflows are updated. Refactor related test cases.
+<info added on 2025-06-07T07:29:56.982Z>
+Business logic and domain models have been successfully refactored to use care_provider terminology:
+
+- Domain model relationships updated (TherapyPlan now uses care_provider_id)
+- Business logic validation files cleaned (security_validator.py, data_minimization.py, audit_logger.py, middleware.py)
+- Service layer logic files updated (billing_service.py, media_service.py)
+- Role enum configuration modified (CARE_PROVIDER added, CHIROPRACTOR removed)
+- User model helper methods verified to work with new role names
+- CRUD operation names standardized (get_plans_by_care_provider, associate_user_with_care_provider)
+- Test fixture documentation updated in conftest.py from "chiropractic app" to "care provider app"
+- Database relationship integrity maintained with field renaming
+
+Test coverage achieved 100% success rate across all 8 test categories using the comprehensive test script created at scripts/test_business_logic_domain_models.py.
+</info added on 2025-06-07T07:29:56.982Z>
 
 ## 7. Coordinate QA Testing and Regression Validation [pending]
 ### Dependencies: None
