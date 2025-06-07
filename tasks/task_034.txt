@@ -471,7 +471,7 @@ Test scenarios including multi-role assignment, access control enforcement, data
 ### Details:
 Profile database queries, review access control logic, and perform security audits to identify and remediate potential vulnerabilities.
 
-## 11. Update System Documentation and Compliance Records [pending]
+## 11. Update System Documentation and Compliance Records [done]
 ### Dependencies: 34.8, 34.10
 ### Description: Revise technical documentation, user guides, and compliance records to reflect the new many-to-many role system and HIPAA considerations.
 ### Details:
