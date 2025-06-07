@@ -17,11 +17,36 @@ For each refactoring stage, run the full suite of automated unit, integration, a
 ### Details:
 Use automated search tools and scripts to generate a detailed inventory of all usages, categorizing them by type (e.g., code, schema, documentation).
 
-## 2. Refactor Documentation and Comments [pending]
+## 2. Refactor Documentation and Comments [done]
 ### Dependencies: 35.1
 ### Description: Replace all instances of 'chiropractor' with 'care_provider' in documentation files and code comments, ensuring clarity and consistency.
 ### Details:
 Focus on non-functional text to minimize risk. Use automated search-and-replace tools where possible, followed by manual review.
+<info added on 2025-06-07T07:07:30.764Z>
+## Database Schema Updates Completed
+
+1. **Database Schema Files**:
+   - `database/init_schema.sql`: Updated chiropractor_id → care_provider_id in TherapyPlans table
+   - Updated role seeding: 'chiropractor' → 'care_provider' 
+   - Updated comments and documentation
+
+2. **Migration Files**:
+   - `migrations/20250522044259_initial_database_setup.sql`: Updated to use care_provider terminology
+   - `migrations/20250605002000_update_chiropractor_to_care_provider.sql`: New migration script for column rename and role update
+   - Existing migration `20250605001542_migrate_existing_role_data.sql` already correctly updates roles
+
+3. **Testing Infrastructure**:
+   - Created `scripts/test_schema_updates.py`: Comprehensive test script to validate all schema changes
+   - Tests table structure, role terminology, foreign key constraints, and SQLAlchemy model consistency
+
+4. **Key Changes**:
+   - TherapyPlans.chiropractor_id → TherapyPlans.care_provider_id
+   - Role 'chiropractor' → 'care_provider' in database
+   - All comments and documentation updated
+   - SQLAlchemy models already aligned (from previous work)
+
+The database schema layer is now fully updated and ready for the API layer updates in Task 35.3.
+</info added on 2025-06-07T07:07:30.764Z>
 
 ## 3. Update Variable and Function Names in Code [pending]
 ### Dependencies: 35.2

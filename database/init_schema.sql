@@ -22,11 +22,11 @@ CREATE TABLE Offices (
 -- Roles Table: User role definitions
 CREATE TABLE Roles (
     role_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL -- e.g., 'patient', 'chiropractor', 'office_manager', 'billing_admin'
+    name VARCHAR(50) UNIQUE NOT NULL -- e.g., 'patient', 'care_provider', 'office_manager', 'billing_admin'
 );
 
 -- Seed default roles
-INSERT INTO Roles (name) VALUES ('patient'), ('chiropractor'), ('office_manager'), ('billing_admin'), ('admin');
+INSERT INTO Roles (name) VALUES ('patient'), ('care_provider'), ('office_manager'), ('billing_admin'), ('admin');
 
 -- Users Table: All system users
 CREATE TABLE Users (
@@ -41,10 +41,10 @@ CREATE TABLE Users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- TherapyPlans Table: Treatment plans created by chiropractors
+-- TherapyPlans Table: Treatment plans created by care providers
 CREATE TABLE TherapyPlans (
     plan_id SERIAL PRIMARY KEY,
-    chiropractor_id INT NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE, -- Assuming chiropractors create plans
+    care_provider_id INT NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE, -- Care providers create plans
     title VARCHAR(255) NOT NULL,
     description TEXT,
     version INT DEFAULT 1,

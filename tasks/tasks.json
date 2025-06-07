@@ -2489,8 +2489,8 @@
           "dependencies": [
             1
           ],
-          "details": "Focus on non-functional text to minimize risk. Use automated search-and-replace tools where possible, followed by manual review.",
-          "status": "pending",
+          "details": "Focus on non-functional text to minimize risk. Use automated search-and-replace tools where possible, followed by manual review.\n<info added on 2025-06-07T07:07:30.764Z>\n## Database Schema Updates Completed\n\n1. **Database Schema Files**:\n   - `database/init_schema.sql`: Updated chiropractor_id → care_provider_id in TherapyPlans table\n   - Updated role seeding: 'chiropractor' → 'care_provider' \n   - Updated comments and documentation\n\n2. **Migration Files**:\n   - `migrations/20250522044259_initial_database_setup.sql`: Updated to use care_provider terminology\n   - `migrations/20250605002000_update_chiropractor_to_care_provider.sql`: New migration script for column rename and role update\n   - Existing migration `20250605001542_migrate_existing_role_data.sql` already correctly updates roles\n\n3. **Testing Infrastructure**:\n   - Created `scripts/test_schema_updates.py`: Comprehensive test script to validate all schema changes\n   - Tests table structure, role terminology, foreign key constraints, and SQLAlchemy model consistency\n\n4. **Key Changes**:\n   - TherapyPlans.chiropractor_id → TherapyPlans.care_provider_id\n   - Role 'chiropractor' → 'care_provider' in database\n   - All comments and documentation updated\n   - SQLAlchemy models already aligned (from previous work)\n\nThe database schema layer is now fully updated and ready for the API layer updates in Task 35.3.\n</info added on 2025-06-07T07:07:30.764Z>",
+          "status": "done",
           "testStrategy": "Review documentation builds and code comment diffs to ensure accuracy and no accidental code changes."
         },
         {
