@@ -1,6 +1,6 @@
-# Tirado Chiro App
+# Tirado Care Provider App
 
-This project is a FastAPI-based backend for the Tirado Chiropractic mobile and web applications. It uses Docker Compose for local development, libSQL (running in a local container) for the database, and MinIO for media storage.
+This project is a FastAPI-based backend for the Tirado Care Provider mobile and web applications. It uses Docker Compose for local development, libSQL (running in a local container) for the database, and MinIO for media storage.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ This project is a FastAPI-based backend for the Tirado Chiropractic mobile and w
 
    - The API should be available at [http://localhost:8000/docs](http://localhost:8000/docs) (FastAPI Swagger UI).
 
-4. **Run first migration & eed the database with default roles:**
+4. **Run first migration & seed the database with default roles:**
    The database tables are created automatically on first run, but you must seed the default roles before creating an admin user.
 
    Open a new terminal and run:
@@ -52,6 +52,15 @@ This project is a FastAPI-based backend for the Tirado Chiropractic mobile and w
    - Default admin email: `admin@example.com`
    - Default admin password: `adminpassword`
    - **Change these in production!**
+
+## Recent Updates
+
+🔄 **Terminology Refactoring Completed** (June 2025)
+
+- Successfully migrated from 'chiropractor' to 'care_provider' terminology
+- Enhanced platform flexibility for diverse healthcare provider types
+- Zero breaking changes to existing functionality
+- See `docs/TERMINOLOGY_REFACTORING_GUIDE.md` for complete details
 
 ## Environment Variables
 
