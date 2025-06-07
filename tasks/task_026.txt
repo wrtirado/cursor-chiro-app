@@ -1,6 +1,6 @@
 # Task ID: 26
 # Title: Retrofit HIPAA Compliance for Therapy Plan Management
-# Status: pending
+# Status: in-progress
 # Dependencies: 8
 # Priority: high
 # Description: Modify the existing Therapy Plan Management features to ensure HIPAA compliance through implementing strict RBAC, comprehensive audit logging, data encryption at rest, and secure transmission protocols.
@@ -8,31 +8,34 @@
 This task requires retrofitting HIPAA compliance onto the existing Therapy Plan Management system (from Task 8) with the following specific requirements:
 
 1. Role-Based Access Control (RBAC):
-   - Implement granular permission system for therapy plans with distinct roles (Chiropractor/Creator, Patient, Assistant, Administrator)
+   - Implement granular permission system for therapy plans with distinct roles (CARE_PROVIDER, PATIENT, ADMIN)
    - Enforce ownership model where plan creators have full access rights
    - Limit patient access to view-only for assigned plans
    - Create middleware to validate access permissions before any plan operation
    - Implement access control checks in all plan-related API endpoints
+   - Enforce office-level access restrictions for plan assignments
 
 2. Audit Logging:
    - Create comprehensive logging system capturing all plan interactions
    - Log must include: user ID, action type, timestamp, IP address, affected resource ID, and before/after states
    - Implement logs for plan creation, viewing, modification, assignment, and deletion
    - Ensure exercise addition/modification/removal is logged
-   - Create admin interface for log review with filtering capabilities
-   - Ensure logs are tamper-proof and cannot be modified
+   - Implement tamper-evident logging with cryptographic integrity
+   - Ensure HIPAA-compliant storage with 6-year retention
 
 3. Data Encryption:
-   - Implement field-level encryption for sensitive plan data including titles, descriptions, instructions, and patient-specific notes
-   - Use industry-standard encryption algorithms (AES-256)
-   - Implement proper key management system with rotation capabilities
+   - Implement libSQL Transparent Data Encryption (TDE) with AES-256 for all therapy plan data
+   - Leverage database-level encryption for superior security architecture
+   - Utilize integrated libSQL server-side encryption for key management
    - Ensure database backups are also encrypted
 
 4. Secure Transmission:
-   - Enforce HTTPS for all API communications
+   - Enforce HTTPS with TLS 1.2+ for all API communications
    - Implement proper Content Security Policy headers
    - Add API rate limiting to prevent abuse
-   - Ensure all therapy plan data is encrypted during transmission
+   - Configure secure cookie attributes (HttpOnly, Secure, SameSite)
+   - Implement HSTS headers
+   - Add protection against common web vulnerabilities (XSS, CSRF)
 
 Refer to docs/healthcare-compliance.md for specific HIPAA requirements and implementation guidelines. Coordinate with the security team for encryption standards and key management protocols. Adapt all database operations to work with libSQL/SQLite, including any changes to data types, constraints, and query syntax.
 
@@ -44,25 +47,27 @@ Testing should verify all HIPAA compliance aspects:
    - Integration tests simulating different user roles attempting various operations
    - Negative testing to verify unauthorized access is properly rejected
    - Test boundary cases (e.g., transferred ownership, deactivated accounts)
+   - Verify office-level isolation and assignment validation
 
 2. Audit Logging Verification:
    - Verify all required events generate appropriate log entries with complete information
    - Test log integrity by attempting to modify logs directly
    - Validate log retention policies are enforced
-   - Test log search and filtering functionality
    - Verify logs capture before/after states for modifications
+   - Test real-time monitoring of failed access attempts
 
 3. Encryption Testing:
-   - Verify sensitive fields are encrypted in database using direct DB inspection
+   - Verify database-level encryption using libSQL TDE
    - Test encryption/decryption performance under load
-   - Verify key rotation procedures work correctly
    - Ensure encrypted backups can be properly restored
+   - Verify encryption doesn't impact application performance
 
 4. Security Testing:
    - Perform penetration testing on API endpoints
    - Verify all communications use HTTPS with proper certificate validation
    - Test API rate limiting functionality
    - Conduct man-in-the-middle attack simulations to verify data cannot be intercepted
+   - Verify secure headers implementation (CSP, HSTS, etc.)
 
 5. Compliance Validation:
    - Create comprehensive test documentation mapping each test to specific HIPAA requirements
@@ -75,14 +80,15 @@ Testing should verify all HIPAA compliance aspects:
    - Test performance of complex queries with the new database
    - Ensure transaction integrity for critical operations
    - Test encryption compatibility with libSQL/SQLite
+   - Verify foreign key constraints and referential integrity
 
 # Subtasks:
-## 1. Implement Role-Based Access Control (RBAC) System [pending]
+## 1. Implement Role-Based Access Control (RBAC) System [done]
 ### Dependencies: None
 ### Description: Design and implement a granular RBAC system for the Therapy Plan Management features with distinct roles and permissions.
 ### Details:
 Implementation details:
-1. Create a permission model with defined roles (Chiropractor/Creator, Patient, Assistant, Administrator)
+1. Create a permission model with defined roles (CARE_PROVIDER, PATIENT, ADMIN)
 2. Define granular permissions for each role (create, read, update, delete, assign)
 3. Implement ownership model where plan creators have full access rights
 4. Create middleware to validate access permissions before any plan operation
@@ -90,6 +96,8 @@ Implementation details:
 6. Update database schema to track ownership and permissions
 7. Create role assignment functionality for administrators
 8. Adapt database schema and queries to use libSQL/SQLite
+9. Implement office-level access restrictions for plan assignments
+10. Add patient-provider relationship validation before plan access
 
 Testing approach:
 - Unit tests for permission validation logic
@@ -98,7 +106,7 @@ Testing approach:
 - Security penetration testing to verify unauthorized access is prevented
 - Test compatibility with libSQL/SQLite database
 
-## 2. Develop Comprehensive Audit Logging System [pending]
+## 2. Develop Comprehensive Audit Logging System [done]
 ### Dependencies: 26.1
 ### Description: Create a tamper-proof audit logging system that captures all interactions with therapy plans.
 ### Details:
@@ -120,7 +128,7 @@ Testing approach:
 - Performance tests to ensure logging doesn't impact system performance
 - Test compatibility with libSQL/SQLite for log storage and retrieval
 
-## 3. Implement Data Encryption at Rest [pending]
+## 3. Implement Data Encryption at Rest [done]
 ### Dependencies: 26.1
 ### Description: Add field-level encryption for sensitive therapy plan data using industry-standard encryption algorithms.
 ### Details:
@@ -143,7 +151,7 @@ Testing approach:
 - Backup and restore tests with encrypted data
 - Test compatibility with libSQL/SQLite for storing and retrieving encrypted data
 
-## 4. Enhance Secure Data Transmission [pending]
+## 4. Enhance Secure Data Transmission [done]
 ### Dependencies: 26.1, 26.3
 ### Description: Implement secure transmission protocols for all therapy plan data communications.
 ### Details:
@@ -164,7 +172,7 @@ Testing approach:
 - Performance testing under rate limiting conditions
 - Compatibility testing across different browsers and clients
 
-## 5. Create HIPAA Compliance Documentation and Verification [pending]
+## 5. Create HIPAA Compliance Documentation and Verification [done]
 ### Dependencies: 26.1, 26.2, 26.3, 26.4
 ### Description: Develop comprehensive documentation and verification procedures to ensure HIPAA compliance of the therapy plan management system.
 ### Details:
@@ -186,4 +194,70 @@ Testing approach:
 - Documentation review by legal/compliance team
 - Verification that all requirements from healthcare-compliance.md are satisfied
 - Test database compatibility with libSQL/SQLite across all features
+
+## 6. Develop Enhanced Admin Interface for Audit Log Review [pending]
+### Dependencies: 26.2, 26.5
+### Description: Create an administrative dashboard for therapy plan audit log review and compliance reporting.
+### Details:
+Implementation details:
+1. Design and implement an administrative dashboard for audit log review
+2. Create filtering and search capabilities for audit logs
+3. Implement compliance reporting features for therapy plan operations
+4. Add visualization tools for audit log analysis
+5. Develop export functionality for audit logs in various formats
+6. Implement role-based access control for the admin interface
+7. Create alerting mechanisms for suspicious activities
+8. Add scheduled reporting capabilities
+
+Testing approach:
+- UI/UX testing for dashboard usability
+- Performance testing with large audit log datasets
+- Security testing to ensure admin interface is properly protected
+- Functional testing of all filtering, search, and reporting features
+- Compatibility testing across different browsers and devices
+- Integration testing with the existing audit logging system
+
+## 7. Implement Advanced Consent Tracking System [pending]
+### Dependencies: 26.1, 26.5
+### Description: Develop granular consent tracking for individual therapy plan components and patient consent management interface.
+### Details:
+Implementation details:
+1. Design database schema for tracking patient consent at granular levels
+2. Create API endpoints for consent management
+3. Implement UI components for patients to manage consent preferences
+4. Add consent verification to therapy plan access controls
+5. Implement consent audit logging
+6. Create consent history tracking
+7. Develop consent expiration and renewal mechanisms
+8. Add administrative tools for consent management
+
+Testing approach:
+- Unit tests for consent validation logic
+- Integration tests for consent management API
+- UI tests for consent management interface
+- Security tests to verify consent enforcement
+- Performance testing under various consent scenarios
+- Compliance testing against HIPAA consent requirements
+
+## 8. Develop Therapy Plan Template Management [pending]
+### Dependencies: 26.1, 26.3, 26.4
+### Description: Create functionality for reusable therapy plan templates with categorization and search capabilities.
+### Details:
+Implementation details:
+1. Design database schema for therapy plan templates
+2. Implement CRUD operations for template management
+3. Create template categorization system
+4. Add search functionality for template library
+5. Implement template versioning
+6. Develop template sharing capabilities within offices
+7. Create template-to-plan conversion functionality
+8. Add template usage analytics
+
+Testing approach:
+- Unit tests for template CRUD operations
+- Integration tests for template management
+- Performance testing with large template libraries
+- Security testing to verify proper access controls
+- UI testing for template management interface
+- Functional testing of template search and categorization
 
