@@ -49,12 +49,12 @@ def create_user(db: Session, user: UserCreate) -> User:
         office_id=user.office_id,
     )
 
-    # Generate join code only for chiropractors initially
+    # Generate join code only for care providers initially
     # We need to fetch the Role object or compare role_id if we know the ID mapping
-    # Assuming role_id 2 corresponds to chiropractor based on our init_schema.sql INSERT order
+    # Assuming role_id 2 corresponds to care_provider based on our init_schema.sql INSERT order
     # A better way would be to query the Role table or use the RoleType enum if role_id is predictable
-    temp_chiro_role_id = 2  # Fragile: Assumes ID from seed
-    if user.role_id == temp_chiro_role_id:
+    temp_care_provider_role_id = 2  # Fragile: Assumes ID from seed
+    if user.role_id == temp_care_provider_role_id:
         while True:
             join_code = generate_random_code()
             existing_user = get_user_by_join_code(db, join_code)
@@ -115,13 +115,15 @@ def delete_user(db: Session, user_id: int) -> Optional[User]:
 
 
 # Function to associate a user (patient) using a join code - Placeholder for logic
-def associate_user_with_chiro(db: Session, patient: User, chiro: User) -> User:
-    # Logic to link patient to chiropractor/office based on chiro's info
+def associate_user_with_care_provider(
+    db: Session, patient: User, care_provider: User
+) -> User:
+    # Logic to link patient to care_provider/office based on care_provider's info
     # This might involve updating patient's office_id or creating a linking record
     # depending on the exact association model.
-    # For now, let's assume we link the patient to the chiro's office
-    if chiro.office_id:
-        patient.office_id = chiro.office_id
+    # For now, let's assume we link the patient to the care_provider's office
+    if care_provider.office_id:
+        patient.office_id = care_provider.office_id
         db.add(patient)
         db.commit()
         db.refresh(patient)

@@ -73,7 +73,7 @@ def create_branding(
     """
     Create custom branding for an office.
 
-    Requires admin or chiropractor role.
+    Requires admin or care provider role.
     """
     # Check office access permission
     check_office_access(current_user, branding_in.office_id)
@@ -126,7 +126,7 @@ def update_branding(
     Update or create branding for an office.
 
     This endpoint uses upsert logic - if branding doesn't exist, it creates it.
-    Requires admin or chiropractor role.
+    Requires admin or care provider role.
     """
     # Check office access permission
     check_office_access(current_user, office_id)
@@ -262,7 +262,7 @@ def delete_branding(
     Delete custom branding for an office.
 
     After deletion, the office will use default branding.
-    Requires admin or chiropractor role.
+    Requires admin or care provider role.
     """
     # Check office access permission
     check_office_access(current_user, office_id)

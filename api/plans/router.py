@@ -32,7 +32,7 @@ def create_new_plan(
     """Create a new therapy plan. Requires CARE_PROVIDER role."""
     # care_provider_id is taken from the logged-in user
     return crud_plan.create_plan(
-        db=db, plan=plan_in, chiropractor_id=current_user.user_id
+        db=db, plan=plan_in, care_provider_id=current_user.user_id
     )
 
 
@@ -52,8 +52,8 @@ def read_plans(
     - Other roles (Admin, Manager, Billing) currently see nothing (can be adjusted).
     """
     if current_user.has_role("care_provider"):
-        return crud_plan.get_plans_by_chiropractor(
-            db, chiropractor_id=current_user.user_id, skip=skip, limit=limit
+        return crud_plan.get_plans_by_care_provider(
+            db, care_provider_id=current_user.user_id, skip=skip, limit=limit
         )
     elif current_user.has_role("patient"):
         # This gets the plans associated with the patient through assignments
@@ -81,7 +81,7 @@ def read_single_plan(
     # Authorization check:
     is_creator = (
         current_user.has_role("care_provider")
-        and db_plan.chiropractor_id == current_user.user_id
+        and db_plan.care_provider_id == current_user.user_id
     )
     # Check if patient is assigned (requires querying assignments)
     is_assigned_patient = False
@@ -117,7 +117,7 @@ def update_existing_plan(
     db_plan = crud_plan.get_plan(db, plan_id=plan_id)
     if db_plan is None:
         raise HTTPException(status_code=404, detail="Plan not found")
-    if db_plan.chiropractor_id != current_user.user_id:
+    if db_plan.care_provider_id != current_user.user_id:
         raise HTTPException(
             status_code=403, detail="Not authorized to update this plan"
         )
@@ -142,11 +142,11 @@ def delete_single_plan(
     if deleted_plan is None:
         raise HTTPException(status_code=404, detail="Plan not found")
     # Re-check ownership if delete_plan doesn't guarantee it
-    if deleted_plan.chiropractor_id != current_user.user_id:
+    if deleted_plan.care_provider_id != current_user.user_id:
         # This case shouldn't happen if DB constraints work, but as a safeguard
         # We might have deleted someone else's plan if delete_plan didn't check owner.
         # For now, assume delete_plan works on any plan ID found.
-        # Better: Modify delete_plan to accept chiropractor_id for check.
+        # Better: Modify delete_plan to accept care_provider_id for check.
         raise HTTPException(
             status_code=403, detail="Unauthorized delete attempt detected"
         )
@@ -170,7 +170,7 @@ def assign_plan(
     if db_plan is None:
         raise HTTPException(status_code=404, detail="Plan not found")
     # Optional: Check if the care provider assigning owns the plan
-    if db_plan.chiropractor_id != current_user.user_id:
+    if db_plan.care_provider_id != current_user.user_id:
         raise HTTPException(
             status_code=403, detail="Care providers can only assign their own plans"
         )

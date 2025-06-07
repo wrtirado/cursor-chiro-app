@@ -101,8 +101,8 @@ def associate_patient_with_care_provider(
         )
 
     # Associate the current patient user with the care provider's office
-    crud_user.associate_user_with_chiro(
-        db, patient=current_user, chiro=care_provider_user
+    crud_user.associate_user_with_care_provider(
+        db, patient=current_user, care_provider=care_provider_user
     )
 
     return {

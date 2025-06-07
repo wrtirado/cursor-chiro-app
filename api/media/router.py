@@ -3,17 +3,20 @@ import io
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.orm import Session
+from typing import List
 
 from api.database.session import get_db
 from api.core import s3_client
 from api.auth.dependencies import require_role, get_current_active_user
-from api.core.config import RoleType
+from api.core.config import RoleType, settings
+from api.schemas.media import MediaMetadata, MediaUploadResponse
 from api.models.base import User
+from api.services.media_service import upload_media, get_media_metadata
 
 router = APIRouter()
 
-# Define allowed roles (e.g., Chiropractors can upload media for plans)
-UPLOAD_ROLES = [RoleType.CARE_PROVIDER]
+# Define allowed roles (e.g., Care Providers can upload media for plans)
+CARE_PROVIDER_ROLE = [RoleType.CARE_PROVIDER]
 
 # Define allowed content types
 ALLOWED_CONTENT_TYPES = {
@@ -26,61 +29,45 @@ ALLOWED_CONTENT_TYPES = {
 }
 
 
-@router.post("/upload", status_code=status.HTTP_201_CREATED)
-async def upload_media(
+@router.post(
+    "/upload", response_model=MediaUploadResponse, status_code=status.HTTP_201_CREATED
+)
+def upload_plan_media(
     file: UploadFile = File(...),
+    plan_id: int = None,  # Optional plan association
+    exercise_id: int = None,  # Optional exercise association
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role(UPLOAD_ROLES)),
+    current_user: User = Depends(require_role(CARE_PROVIDER_ROLE)),
 ):
     """
-    Uploads an image or video file to S3/MinIO storage.
-    Requires CHIROPRACTOR role.
-    Returns the object name (path) of the uploaded file in the bucket.
+    Upload media (image/video) for therapy plans or exercises.
+    Requires CARE_PROVIDER role.
     """
-    if not file:
-        raise HTTPException(status_code=400, detail="No file provided")
+    # Implementation here would use the media service
+    # This is a placeholder for the media upload logic
 
-    # Validate content type
-    if file.content_type not in ALLOWED_CONTENT_TYPES:
+    # Validate file type and size
+    allowed_types = ["image/jpeg", "image/png", "video/mp4", "video/avi"]
+    if file.content_type not in allowed_types:
         raise HTTPException(
-            status_code=400,
-            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_CONTENT_TYPES.keys())}",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type {file.content_type} not allowed. Allowed types: {allowed_types}",
         )
 
-    # Generate a unique object name (e.g., using UUID)
-    file_extension = ALLOWED_CONTENT_TYPES[file.content_type]
-    object_name = f"exercises/{uuid.uuid4()}{file_extension}"
-
+    # Upload using media service
     try:
-        # Read file content into a BytesIO stream
-        file_content = await file.read()
-        file_stream = io.BytesIO(file_content)
-
-        # Upload using the s3_client utility
-        uploaded_object_name = s3_client.upload_file_to_s3(
-            file_stream=file_stream,
-            object_name=object_name,
-            content_type=file.content_type,
+        media_url = upload_media(file, plan_id, exercise_id, current_user.user_id)
+        return MediaUploadResponse(
+            url=media_url,
+            plan_id=plan_id,
+            exercise_id=exercise_id,
+            uploaded_by=current_user.user_id,
         )
-
-        if not uploaded_object_name:
-            raise HTTPException(
-                status_code=500, detail="Failed to upload file to storage."
-            )
-
-        # Return the object name (path) - the client can construct the full URL or request presigned URLs
-        # Or potentially return a presigned URL directly?
-        # Let's return the object name for now, as URLs might be stored in DB
-        return {"object_name": uploaded_object_name}
-
     except Exception as e:
-        # Log the exception details
-        print(f"Error during file upload: {e}")  # Replace with proper logging
         raise HTTPException(
-            status_code=500, detail="An error occurred during file upload."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Upload failed: {str(e)}",
         )
-    finally:
-        await file.close()
 
 
 @router.get("/url/{object_name:path}")

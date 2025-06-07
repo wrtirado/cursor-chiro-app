@@ -44,30 +44,29 @@ def update_progress_batch(
         )
 
 
-@router.get("/{patient_id}", response_model=List[Progress])
+@router.get("/patient/{patient_id}", response_model=List[Progress])
 def read_patient_progress(
     patient_id: int,
+    skip: int = 0,
+    limit: int = 100,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role(CARE_PROVIDER_ROLE)),
+    current_user: User = Depends(require_role([RoleType.CARE_PROVIDER])),
 ):
     """
-    Allows a chiropractor to view the progress records for a specific patient.
-    Requires CHIROPRACTOR role.
-    (Further authorization: Check if patient is in chiro's office?)
+    Allows a care provider to view the progress records for a specific patient.
+    Requires CARE_PROVIDER role.
     """
-    # Optional: Check if the patient exists
-    patient = crud_user.get_user(db, patient_id)
-    if not patient or not patient.role or patient.role.name != RoleType.PATIENT.value:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
-        )
+    # Verify that the care provider has access to this patient
+    # (e.g., both are associated with the same office)
+    patient = crud_user.get_user(db, user_id=patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
 
-    # Optional: Authorization check - Does this chiro have access to this patient?
-    # e.g., check if patient.office_id == current_user.office_id
-    if patient.office_id != current_user.office_id:
+    # Check if both the care provider and patient belong to the same office
+    if current_user.office_id != patient.office_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Chiropractor does not have access to this patient's progress (different office).",
+            status_code=403,
+            detail="Care provider does not have access to this patient's progress (different office).",
         )
 
     progress_records = crud_progress.get_progress_for_patient(db, patient_id=patient_id)
