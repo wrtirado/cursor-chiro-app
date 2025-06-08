@@ -1551,7 +1551,7 @@
           "description": "Update password storage, validation, and reset workflows to meet HIPAA security requirements.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Review and update password hashing algorithm to use bcrypt or Argon2 with appropriate work factors\n2. Implement password complexity requirements (minimum length, character types, etc.)\n3. Create a migration plan for existing password hashes\n4. Add brute force protection with account lockout after multiple failed attempts\n5. Update password reset workflow with secure token generation and expiration\n6. Ensure all credential handling code prevents plaintext storage or logging\n7. Implement secure password change functionality with current password verification\n8. Adapt credential storage to work with libSQL/SQLite data types and constraints\n\nTesting approach:\n- Unit test password hashing and validation logic\n- Test password complexity validation rules\n- Create integration tests for the password reset workflow\n- Verify account lockout functionality works correctly\n- Test migration of existing password hashes\n- Test compatibility with libSQL/SQLite for credential storage and retrieval",
-          "status": "in-progress",
+          "status": "done",
           "parentTaskId": 23
         },
         {

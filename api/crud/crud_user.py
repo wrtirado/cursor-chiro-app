@@ -1,14 +1,24 @@
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from fastapi import HTTPException, status
-from datetime import datetime
+from datetime import datetime, timedelta
+import json
 
 from api.models.base import User
 from api.schemas.user import UserCreate, UserUpdate, UserBillingStatusUpdate
-from api.core.security import get_password_hash, verify_password
+from api.core.security import (
+    get_password_hash,
+    verify_password,
+    validate_password_complexity,
+    check_password_history,
+    hash_password_for_history,
+    is_account_locked,
+    get_lockout_remaining_time,
+    PASSWORD_HISTORY_COUNT,
+)
 from api.core.utils import generate_random_code
 from api.core.config import RoleType
-from api.core.audit_logger import log_billing_event
+from api.core.audit_logger import log_billing_event, log_audit_event
 
 # Import billing service for automatic billing integration
 try:
@@ -39,14 +49,113 @@ def get_user_by_join_code(db: Session, join_code: str) -> Optional[User]:
     return db.query(User).filter(User.join_code == join_code).first()
 
 
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+    """
+    Authenticate user with enhanced security including account lockout.
+    Returns User if authentication successful, None if failed.
+    """
+    user = get_user_by_email(db, email)
+    if not user:
+        return None
+
+    # Check if account is currently locked
+    if is_account_locked(user.failed_login_attempts, user.last_failed_login):
+        # Update account_locked_until for consistency
+        if not user.account_locked_until:
+            lockout_time = datetime.utcnow() + timedelta(minutes=30)  # Import timedelta
+            user.account_locked_until = lockout_time
+            db.add(user)
+            db.commit()
+
+        # Log failed attempt due to lockout
+        log_audit_event(
+            event_type="AUTHENTICATION_FAILED_LOCKED",
+            outcome="FAILURE",
+            details={
+                "user_id": user.user_id,
+                "email": email,
+                "reason": "account_locked",
+                "failed_attempts": user.failed_login_attempts,
+                "lockout_remaining": get_lockout_remaining_time(user.last_failed_login),
+            },
+        )
+        return None
+
+    # Verify password
+    if not verify_password(password, user.password_hash):
+        # Increment failed login attempts
+        user.failed_login_attempts += 1
+        user.last_failed_login = datetime.utcnow()
+
+        # Set lockout timestamp if threshold reached
+        if user.failed_login_attempts >= 5:  # MAX_LOGIN_ATTEMPTS
+            user.account_locked_until = datetime.utcnow() + timedelta(minutes=30)
+
+        db.add(user)
+        db.commit()
+
+        # Log failed authentication
+        log_audit_event(
+            event_type="AUTHENTICATION_FAILED",
+            outcome="FAILURE",
+            details={
+                "user_id": user.user_id,
+                "email": email,
+                "failed_attempts": user.failed_login_attempts,
+                "reason": "invalid_password",
+            },
+        )
+        return None
+
+    # Successful authentication - reset failed attempts
+    user.failed_login_attempts = 0
+    user.last_failed_login = None
+    user.account_locked_until = None
+    user.last_successful_login = datetime.utcnow()
+
+    db.add(user)
+    db.commit()
+
+    # Log successful authentication
+    log_audit_event(
+        event_type="AUTHENTICATION_SUCCESS",
+        outcome="SUCCESS",
+        details={
+            "user_id": user.user_id,
+            "email": email,
+            "login_time": user.last_successful_login.isoformat(),
+        },
+    )
+
+    return user
+
+
 def create_user(db: Session, user: UserCreate) -> User:
+    # Validate password complexity
+    validation_result = validate_password_complexity(user.password)
+    if not validation_result.is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "Password does not meet security requirements",
+                "errors": validation_result.errors,
+            },
+        )
+
     hashed_password = get_password_hash(user.password)
+
+    # Initialize password history with first password
+    password_history = [hash_password_for_history(user.password)]
+
     db_user = User(
         email=user.email,
         name=user.name,
         password_hash=hashed_password,
         role_id=user.role_id,
         office_id=user.office_id,
+        password_history=json.dumps(password_history),
+        password_changed_at=datetime.utcnow(),
+        failed_login_attempts=0,
     )
 
     # Generate join code only for care providers initially
@@ -71,7 +180,7 @@ def create_user(db: Session, user: UserCreate) -> User:
 def update_user(db: Session, db_user: User, user_in: UserUpdate) -> User:
     user_data = user_in.dict(exclude_unset=True)
 
-    # Handle password update with current password validation
+    # Handle password update with enhanced security
     if "password" in user_data and user_data["password"]:
         if "current_password" not in user_data or not user_data["current_password"]:
             raise HTTPException(
@@ -81,13 +190,55 @@ def update_user(db: Session, db_user: User, user_in: UserUpdate) -> User:
 
         if not verify_password(user_data["current_password"], db_user.password_hash):
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,  # Or 400? Let's use 401 for incorrect credentials
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect current password.",
             )
 
-        # If current password is correct, hash the new password
+        # Validate new password complexity
+        validation_result = validate_password_complexity(user_data["password"])
+        if not validation_result.is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "New password does not meet security requirements",
+                    "errors": validation_result.errors,
+                },
+            )
+
+        # Check password history
+        password_history = []
+        if db_user.password_history:
+            try:
+                password_history = json.loads(db_user.password_history)
+            except (json.JSONDecodeError, TypeError):
+                password_history = []
+
+        if check_password_history(user_data["password"], password_history):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Password was recently used. Please choose a different password. Last {PASSWORD_HISTORY_COUNT} passwords cannot be reused.",
+            )
+
+        # Hash new password and update history
         hashed_password = get_password_hash(user_data["password"])
         db_user.password_hash = hashed_password
+        db_user.password_changed_at = datetime.utcnow()
+
+        # Update password history (keep last PASSWORD_HISTORY_COUNT passwords)
+        new_password_hash = hash_password_for_history(user_data["password"])
+        password_history.insert(0, new_password_hash)
+        password_history = password_history[:PASSWORD_HISTORY_COUNT]
+        db_user.password_history = json.dumps(password_history)
+
+        # Log password change
+        log_audit_event(
+            event_type="PASSWORD_CHANGED",
+            outcome="SUCCESS",
+            details={
+                "user_id": db_user.user_id,
+                "changed_at": db_user.password_changed_at.isoformat(),
+            },
+        )
 
         # Remove password fields from user_data dictionary so they aren't processed below
         del user_data["password"]

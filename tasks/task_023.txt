@@ -133,7 +133,7 @@ Testing approach:
 - Verify log storage and rotation works correctly
 - Test compatibility with libSQL/SQLite for log storage and retrieval
 
-## 3. Enhance Secure Credential Handling [in-progress]
+## 3. Enhance Secure Credential Handling [done]
 ### Dependencies: None
 ### Description: Update password storage, validation, and reset workflows to meet HIPAA security requirements.
 ### Details:

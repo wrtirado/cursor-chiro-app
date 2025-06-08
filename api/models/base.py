@@ -128,6 +128,39 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
+    # HIPAA-compliant password security fields
+    password_history = Column(
+        JSON,
+        nullable=True,
+        doc="JSON array of previous password hashes for history checking (last 12)",
+    )
+    password_changed_at = Column(
+        DateTime,
+        nullable=True,
+        doc="Timestamp of last password change for policy enforcement",
+    )
+    failed_login_attempts = Column(
+        Integer,
+        nullable=False,
+        default=0,
+        doc="Number of consecutive failed login attempts",
+    )
+    last_failed_login = Column(
+        DateTime,
+        nullable=True,
+        doc="Timestamp of last failed login attempt for lockout calculation",
+    )
+    account_locked_until = Column(
+        DateTime,
+        nullable=True,
+        doc="Timestamp until which account is locked (if applicable)",
+    )
+    last_successful_login = Column(
+        DateTime,
+        nullable=True,
+        doc="Timestamp of last successful login for audit trail",
+    )
+
     # Billing status fields for patient activation billing
     is_active_for_billing = Column(
         Boolean,

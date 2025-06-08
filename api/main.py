@@ -17,6 +17,7 @@ from api.users.router import router as users_router
 from api.branding.router import router as branding_router
 from api.roles.router import router as roles_router  # Import roles router
 from api.routers.consent import router as consent_router  # Import consent router
+from api.routers import security
 
 from api.core.middleware import SecureHeadersMiddleware  # Import the new middleware
 from api.core.security_validator import (
@@ -109,6 +110,9 @@ app.include_router(
 app.include_router(roles_router, prefix=settings.API_V1_STR + "/roles", tags=["roles"])
 app.include_router(
     consent_router, prefix=settings.API_V1_STR + "/consent", tags=["consent"]
+)
+app.include_router(
+    security.router, prefix=settings.API_V1_STR + "/security", tags=["security"]
 )
 
 

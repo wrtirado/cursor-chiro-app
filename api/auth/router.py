@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from datetime import timedelta
 
 from api.database.session import get_db
 from api.schemas.token import Token, AssociateRequest
@@ -9,38 +10,69 @@ from api.crud import crud_user
 from api.core import security
 from api.auth.dependencies import get_current_active_user, require_role
 from api.core.audit_logger import log_audit_event, AuditEvent
+from api.core.security import is_account_locked, get_lockout_remaining_time
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-def login_for_access_token(
-    request: Request,
-    db: Session = Depends(get_db),
-    form_data: OAuth2PasswordRequestForm = Depends(),
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    user = crud_user.get_user_by_email(db, email=form_data.username)
-    if not user or not security.verify_password(form_data.password, user.password_hash):
-        # Log failed login attempt
-        log_audit_event(
-            request=request,
-            event_type=AuditEvent.LOGIN_FAILURE,
-            outcome="FAILURE",
-            details={"attempted_email": form_data.username},
-        )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token = security.create_access_token(data={"sub": user.email})
-    # Log successful login
-    log_audit_event(
-        request=request,
-        user=user,
-        event_type=AuditEvent.LOGIN_SUCCESS,
-        outcome="SUCCESS",
+    """
+    Authenticate user and return access token.
+    Enhanced with HIPAA-compliant security features including account lockout.
+    """
+    # Use enhanced authentication with security features
+    user = crud_user.authenticate_user(db, form_data.username, form_data.password)
+
+    if not user:
+        # Check if user exists to provide specific error message
+        existing_user = crud_user.get_user_by_email(db, form_data.username)
+
+        if existing_user:
+            # Check if account is locked
+            if is_account_locked(
+                existing_user.failed_login_attempts, existing_user.last_failed_login
+            ):
+                remaining_time = get_lockout_remaining_time(
+                    existing_user.last_failed_login
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_423_LOCKED,
+                    detail={
+                        "message": f"Account is temporarily locked due to multiple failed login attempts. Please try again in {remaining_time} minutes.",
+                        "lockout_remaining_minutes": remaining_time,
+                        "type": "account_locked",
+                    },
+                )
+            else:
+                # Account exists but wrong password
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail={
+                        "message": "Incorrect email or password",
+                        "type": "invalid_credentials",
+                    },
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        else:
+            # User doesn't exist
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "message": "Incorrect email or password",
+                    "type": "invalid_credentials",
+                },
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    # Create access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -123,7 +155,7 @@ def update_user_me(
     *,  # Makes db and current_user keyword-only arguments
     db: Session = Depends(get_db),
     user_in: UserUpdate,  # Use the UserUpdate schema
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ) -> User:
     """Update current logged in user details (name, email, password)."""
     # Check if email is being updated and if it's already taken

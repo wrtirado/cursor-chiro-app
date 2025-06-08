@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any, List
 from fastapi import Request
 import json
 from datetime import datetime
+from enum import Enum
 
 # Import the configured logger instance
 from api.core.logging_config import audit_log
@@ -15,22 +16,35 @@ except ImportError:
 
 
 # Define standard audit event types (can be expanded)
-class AuditEvent:
-    LOGIN_SUCCESS = "LOGIN_SUCCESS"
-    LOGIN_FAILURE = "LOGIN_FAILURE"
-    LOGOUT = "LOGOUT"
-    REGISTER_SUCCESS = "REGISTER_SUCCESS"
-    PASSWORD_CHANGE_SUCCESS = "PASSWORD_CHANGE_SUCCESS"
-    PASSWORD_RESET_REQUEST = "PASSWORD_RESET_REQUEST"
-    PASSWORD_RESET_SUCCESS = "PASSWORD_RESET_SUCCESS"
-    USER_CREATE = "USER_CREATE"
-    USER_UPDATE = "USER_UPDATE"
-    USER_DELETE = "USER_DELETE"
-    USER_VIEW = "USER_VIEW"
+class AuditEvent(str, Enum):
+    # User actions
+    USER_CREATED = "user_created"
+    USER_UPDATED = "user_updated"
+    USER_DELETED = "user_deleted"
+    USER_LOGIN = "user_login"
+
+    # Authentication events
+    LOGIN_SUCCESS = "login_success"
+    LOGIN_FAILURE = "login_failure"
+    AUTHENTICATION_SUCCESS = "authentication_success"
+    AUTHENTICATION_FAILED = "authentication_failed"
+    AUTHENTICATION_FAILED_LOCKED = "authentication_failed_locked"
+    LOGOUT = "logout"
+    TOKEN_REFRESH = "token_refresh"
+
+    # Password and security events
+    PASSWORD_CHANGED = "password_changed"
+    PASSWORD_CHANGE_ERROR = "password_change_error"
+    PASSWORD_RESET_ADMIN = "password_reset_admin"
+    ACCOUNT_UNLOCKED = "account_unlocked"
+
+    # Role and permission changes
+    ROLE_ASSIGNED = "role_assigned"
+    ROLE_REMOVED = "role_removed"
+    PERMISSION_GRANTED = "permission_granted"
+    PERMISSION_REVOKED = "permission_revoked"
 
     # NEW: Role-specific audit events for HIPAA compliance
-    ROLE_ASSIGNED = "ROLE_ASSIGNED"
-    ROLE_UNASSIGNED = "ROLE_UNASSIGNED"
     ROLE_DEACTIVATED = "ROLE_DEACTIVATED"
     ROLE_REACTIVATED = "ROLE_REACTIVATED"
     ROLE_ASSIGNMENT_ATTEMPT = "ROLE_ASSIGNMENT_ATTEMPT"
@@ -347,12 +361,12 @@ def log_role_event(
     # Map common role actions to audit event types
     action_event_map = {
         "role_assigned": AuditEvent.ROLE_ASSIGNED,
-        "role_unassigned": AuditEvent.ROLE_UNASSIGNED,
+        "role_unassigned": AuditEvent.ROLE_REMOVED,
         "role_deactivated": AuditEvent.ROLE_DEACTIVATED,
         "role_reactivated": AuditEvent.ROLE_REACTIVATED,
         "role_assignment_attempt": AuditEvent.ROLE_ASSIGNMENT_ATTEMPT,
-        "role_access_granted": AuditEvent.ROLE_ACCESS_GRANTED,
-        "role_access_denied": AuditEvent.ROLE_ACCESS_DENIED,
+        "role_access_granted": AuditEvent.PERMISSION_GRANTED,
+        "role_access_denied": AuditEvent.PERMISSION_REVOKED,
         "role_check_performed": AuditEvent.ROLE_CHECK_PERFORMED,
         "multiple_roles_access": AuditEvent.MULTIPLE_ROLES_ACCESS,
         "role_created": AuditEvent.ROLE_CREATED,
