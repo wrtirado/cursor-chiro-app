@@ -14,6 +14,7 @@ from sqlalchemy.sql import func
 from api.database.session import Base
 from api.models.audit import BillingAuditLog  # noqa
 from api.models.audit_log import AuditLog  # noqa
+from api.models.consent_record import ConsentRecord  # noqa
 
 # Re-defining tables from init_schema.sql using SQLAlchemy ORM
 
@@ -176,6 +177,12 @@ class User(Base):
     )
     # NEW: Audit logs relationship for HIPAA compliance
     audit_logs = relationship("AuditLog", back_populates="user")
+    # NEW: Consent records relationship for HIPAA compliance
+    consent_records = relationship(
+        "ConsentRecord",
+        foreign_keys="[ConsentRecord.patient_id]",
+        back_populates="patient",
+    )
 
     # Helper methods for role checking
     def has_role(self, role_name: str, db_session=None) -> bool:

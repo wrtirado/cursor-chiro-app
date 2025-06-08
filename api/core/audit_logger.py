@@ -85,6 +85,20 @@ class AuditEvent:
     BRANDING_DELETED = "BRANDING_DELETED"
     BRANDING_VIEWED = "BRANDING_VIEWED"
 
+    # Consent tracking events for HIPAA compliance
+    CONSENT_CREATED = "CONSENT_CREATED"
+    CONSENT_GRANTED = "CONSENT_GRANTED"
+    CONSENT_REVOKED = "CONSENT_REVOKED"
+    CONSENT_EXPIRED = "CONSENT_EXPIRED"
+    CONSENT_VIEWED = "CONSENT_VIEWED"
+    CONSENT_UPDATED = "CONSENT_UPDATED"
+    CONSENT_CHECKED = "CONSENT_CHECKED"
+    CONSENT_BULK_CREATED = "CONSENT_BULK_CREATED"
+    CONSENT_SEARCH_PERFORMED = "CONSENT_SEARCH_PERFORMED"
+    CONSENT_OVERVIEW_VIEWED = "CONSENT_OVERVIEW_VIEWED"
+    CONSENT_EXPIRING_CHECKED = "CONSENT_EXPIRING_CHECKED"
+    CONSENT_OLD_EXPIRED = "CONSENT_OLD_EXPIRED"
+
 
 def log_audit_event(
     request: Optional[Request] = None,
@@ -428,55 +442,71 @@ def log_role_access_check(
     db_session: Optional[Any] = None,  # Database session for audit logging
 ):
     """
-    Log role-based access control checks for audit compliance.
+    Log role-based access control checks for HIPAA compliance.
 
-    This function provides detailed logging of every role check, which is
-    critical for HIPAA audit trails showing who accessed what and when.
+    This specialized function logs both successful and failed role checks,
+    providing the detailed audit trail required for HIPAA compliance.
     """
     outcome = "SUCCESS" if granted else "FAILURE"
-    event_type = (
-        AuditEvent.ROLE_ACCESS_GRANTED if granted else AuditEvent.ROLE_ACCESS_DENIED
-    )
+    action = "role_access_granted" if granted else "role_access_denied"
 
-    props: Dict[str, Any] = {
-        "event_type": event_type,
-        "outcome": outcome,
-        "user_id": user_id,
+    details = {
         "required_roles": required_roles,
         "user_roles": user_roles,
         "access_granted": granted,
+        "request_details": {
+            "path": request.url.path if request else None,
+            "method": request.method if request else None,
+        },
     }
 
-    # Add request context
-    if request:
-        props["source_ip"] = request.client.host if request.client else None
-        props["user_agent"] = request.headers.get("user-agent")
-        props["request_path"] = request.url.path
-        props["request_method"] = request.method
-
-    # Add resource context
-    if resource_type:
-        props["resource_type"] = resource_type
-    if resource_id:
-        props["resource_id"] = resource_id
-
-    # Create detailed message
-    action = "granted" if granted else "denied"
-    message = f"Role access {action} for user {user_id}"
-    if resource_type:
-        message += f" accessing {resource_type}"
-        if resource_id:
-            message += f" {resource_id}"
-    message += f" - required: {required_roles}, user has: {user_roles}"
-
-    # Use centralized audit logging for both file and database
     log_audit_event(
         request=request,
-        user=None,  # We only have user_id here
-        event_type=event_type,
-        outcome=outcome,
-        resource_type=resource_type or "endpoint",
+        user_id=user_id,
+        action=action,
+        resource_type=resource_type,
         resource_id=resource_id,
-        details=props,
+        details=details,
+        outcome=outcome,
+        db_session=db_session,
+    )
+
+
+def log_consent_event(
+    action: str,
+    user_id: int,
+    patient_id: Optional[int] = None,
+    consent_id: Optional[int] = None,
+    consent_type: Optional[str] = None,
+    details: Optional[Dict[str, Any]] = None,
+    outcome: str = "SUCCESS",
+    db_session: Optional[Any] = None,
+):
+    """
+    Log consent-related events for HIPAA compliance.
+
+    This specialized function logs consent operations with the appropriate
+    structure for compliance and audit trail requirements.
+    """
+    # Build structured details
+    event_details = {
+        "user_id": user_id,  # Add user_id to details for log_audit_event
+        "patient_id": patient_id,
+        "consent_type": consent_type,
+    }
+
+    if details:
+        event_details.update(details)
+
+    # Determine resource info
+    resource_type = "consent_record"
+    resource_id = str(consent_id) if consent_id else None
+
+    log_audit_event(
+        event_type=action,
+        outcome=outcome,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        details=event_details,
         db_session=db_session,
     )

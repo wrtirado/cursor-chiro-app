@@ -1480,7 +1480,7 @@
           "title": "Implement Consent Tracking System",
           "description": "Create a comprehensive consent tracking system with database models, versioning, and audit integration for HIPAA compliance",
           "details": "Implementation steps:\n1. Create ConsentRecord database model with fields for:\n   - patient_id, consent_type, granted_date, expiry_date, status\n   - consent_version, consent_text, granted_by, revoked_date\n   - purpose, scope, third_party_sharing permissions\n2. Implement consent versioning system for tracking changes over time\n3. Create CRUD operations for consent management in api/crud/\n4. Add consent-specific audit events (CONSENT_GRANTED, CONSENT_REVOKED, etc.)\n5. Create patient-facing consent management endpoints\n6. Integrate consent checks into data access workflows\n7. Add consent validation middleware for data operations\n8. Create admin interface for consent oversight and reporting",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 22
         },
