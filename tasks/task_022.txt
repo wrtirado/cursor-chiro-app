@@ -468,3 +468,85 @@ python scripts/validate_role_migration.py --compliance-check
 This task represents one of the most comprehensive HIPAA compliance implementations with extensive testing, documentation, and validation infrastructure. The system is production-ready with enterprise-grade security and compliance features.
 </info added on 2025-06-07T08:20:23.616Z>
 
+## 6. Implement Consent Tracking System [pending]
+### Dependencies: None
+### Description: Create a comprehensive consent tracking system with database models, versioning, and audit integration for HIPAA compliance
+### Details:
+Implementation steps:
+1. Create ConsentRecord database model with fields for:
+   - patient_id, consent_type, granted_date, expiry_date, status
+   - consent_version, consent_text, granted_by, revoked_date
+   - purpose, scope, third_party_sharing permissions
+2. Implement consent versioning system for tracking changes over time
+3. Create CRUD operations for consent management in api/crud/
+4. Add consent-specific audit events (CONSENT_GRANTED, CONSENT_REVOKED, etc.)
+5. Create patient-facing consent management endpoints
+6. Integrate consent checks into data access workflows
+7. Add consent validation middleware for data operations
+8. Create admin interface for consent oversight and reporting
+
+## 7. Implement Patient Portal for Data Access [pending]
+### Dependencies: None
+### Description: Create patient-facing portal functionality for accessing and requesting their medical records as required by HIPAA Right of Access
+### Details:
+Implementation steps:
+1. Create patient dashboard for viewing available records
+2. Implement patient data access endpoints with proper authorization
+3. Add patient record request workflow with status tracking
+4. Create patient-only authentication and session management
+5. Implement data filtering to show only patient's own records
+6. Add request history and status tracking for patients
+7. Create notification system for record availability
+8. Implement secure patient data viewing with audit logging
+9. Add patient communication preferences management
+10. Ensure all access is logged for HIPAA compliance
+
+## 8. Implement Data Export Functionality [pending]
+### Dependencies: None
+### Description: Create comprehensive data export functionality allowing patients to receive their PHI in commonly used formats as required by HIPAA
+### Details:
+Implementation steps:
+1. Create patient data export service with multiple format support:
+   - JSON format for structured data
+   - PDF format for human-readable reports
+   - CSV format for tabular data (plans, sessions, progress)
+2. Implement secure data aggregation across all patient records:
+   - User profile and demographic information
+   - Therapy plans and exercise assignments
+   - Progress tracking and measurements
+   - Session notes and provider communications
+3. Add export request tracking with audit logging
+4. Implement async export processing for large datasets
+5. Create secure download links with time-limited access
+6. Add export history and re-download capability
+7. Ensure exported data includes all patient-owned PHI
+8. Add export audit events (EXPORT_REQUESTED, EXPORT_COMPLETED, EXPORT_DOWNLOADED)
+9. Implement data sanitization to remove provider-only notes while preserving patient data
+
+## 9. Implement Automated Data Retention Policies [pending]
+### Dependencies: None
+### Description: Create automated data retention policy enforcement system with scheduled cleanup jobs and audit trail preservation
+### Details:
+Implementation steps:
+1. Create data retention policy configuration system:
+   - Define retention periods for different data types (user data, audit logs, media files, etc.)
+   - Configurable retention rules based on data sensitivity and legal requirements
+   - Special handling for audit logs (6+ year retention for HIPAA)
+2. Implement scheduled cleanup jobs:
+   - Daily/weekly/monthly cleanup schedules
+   - Soft-delete implementation with grace periods
+   - Automated archival before deletion
+3. Create data retention audit system:
+   - Log all retention policy actions
+   - Track what data was retained vs. archived vs. deleted
+   - Maintain audit trail even after data deletion
+4. Add retention policy admin interface:
+   - View current retention policies
+   - Monitor retention job status and history
+   - Manual override capabilities for legal holds
+5. Implement automated notification system:
+   - Notify admins of upcoming data retention actions
+   - Alert on retention policy violations or failures
+6. Create retention compliance reporting
+7. Ensure audit logs are preserved according to HIPAA requirements (minimum 6 years)
+
