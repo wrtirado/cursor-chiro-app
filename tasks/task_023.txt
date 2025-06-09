@@ -176,6 +176,45 @@ Testing approach:
 - Verify role-based MFA requirements work correctly
 - Test backward compatibility with existing authentication flows
 - Test compatibility with libSQL/SQLite for MFA configuration storage
+<info added on 2025-06-09T12:14:16.283Z>
+## MFA Implementation Decision
+
+Based on comprehensive research, we will implement TOTP (Time-based One-Time Password) MFA using authenticator apps as our solution. This approach provides the optimal balance of security, usability, and cost-effectiveness for our healthcare environment.
+
+### Selected Solution: TOTP-based Authenticator Apps
+- Compatible with Google Authenticator, Microsoft Authenticator, Authy, and other standard TOTP apps
+- Provides higher security than email/SMS-based alternatives
+- Works offline (critical for clinical environments with potential connectivity issues)
+- No additional per-message costs (unlike SMS)
+- Aligns with healthcare industry standards
+- Future-proof for anticipated HIPAA MFA requirements
+
+### Technical Implementation Details
+1. Database Schema Updates:
+   - Add fields to User model: mfa_enabled (boolean), mfa_secret (encrypted string), backup_codes (encrypted JSON array)
+
+2. New API Endpoints:
+   - POST /auth/mfa/enroll - Generates and returns QR code for app setup
+   - POST /auth/mfa/verify - Validates TOTP code during enrollment
+   - POST /auth/mfa/disable - Disables MFA with confirmation
+   - POST /auth/mfa/backup-codes/regenerate - Creates new backup codes
+
+3. Authentication Flow Changes:
+   - Add MFA verification step after password validation
+   - Implement backup code validation path
+   - Update JWT claims to include MFA verification status
+
+4. Security Measures:
+   - Encrypt TOTP secrets at rest using AES-256
+   - Generate 10 single-use backup codes (128-bit entropy each)
+   - Implement 5-attempt rate limiting on MFA verification
+   - Add comprehensive audit logging for all MFA-related events
+
+5. Role-Based Requirements:
+   - Enforce mandatory MFA for admin and clinical roles
+   - Make MFA optional but encouraged for other roles
+   - Implement grace period for existing users to enroll
+</info added on 2025-06-09T12:14:16.283Z>
 
 ## 5. Integrate and Test Complete HIPAA-Compliant Authentication System [pending]
 ### Dependencies: 23.1, 23.2, 23.3, 23.4
